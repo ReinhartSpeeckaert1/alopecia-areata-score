@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Alopecia Areata Calculator</title>
+<style>
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      padding: 20px;
+      background: linear-gradient(to bottom, #f0f0f0, #dcdcdc);
+      margin: 0;
+    }
+
+    .area-container, .density-container {
+      justify-content: center;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .area-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .area-box {
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border: 2px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-color: white;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .area-box.selected {
+      transform: scale(1.12);
+      box-shadow: 0 0 20px rgba(0, 119, 204, 0.5);
+      background-color: rgba(179, 217, 255, 0.8);
+      border-color: #0077cc;
+    }
+
+    .plus:hover, .minus:hover {
+      transform: scale(2.0);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .plus, .minus {
+      transition: transform 0.2s;
+      border: 1px solid #888;
+      position: absolute;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      text-align: center;
+      line-height: 18px;
+      font-size: 14px;
+    }
+
+    .plus {
+      top: 2px;
+      right: 2px;
+    }
+
+    .minus {
+      top: 2px;
+      left: 2px;
+    }
+
+    .density-container button {
+      padding: 5px 10px;
+      border: 2px solid #ccc;
+      background-color: white;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-width: 40px;
+      min-height: 30px;
+    }
+
+    .density-container button.selected {
+      background-color: rgba(179, 255, 179, 0.8);
+      border-color: #00aa00;
+      box-shadow: 0 0 20px rgba(0, 170, 0, 0.7);
+    }
+
+    #result {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  
+    .tooltip {
+      position: absolute;
+      top: -25px;
+      background-color: transparent;
+      color: black;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 18px;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Custom row heights for different sections */
+    
+    /* Scalp sections */
+    #backside-areas .area-box { height: 306px; width: 90px; }
+    #topside-areas .area-box { height: 340px; width: 100px; }
+    #leftside-areas .area-box { height: 340px; width: 100px; }
+    #rightside-areas .area-box { height: 340px; width: 100px; }
+    
+    /* Eyebrow sections */
+    #right-eyebrow-areas .area-box { height: 48px; width: 160px; }
+    #left-eyebrow-areas .area-box { height: 48px; width: 160px; }
+    
+    /* Eyelash sections */
+    #right-eyelash-areas .area-box { height: 84px; width: 160px; }
+    #left-eyelash-areas .area-box { height: 84px; width: 160px; }
+    
+    /* Beard sections */
+    #right-beard-areas .area-box { height: 138px; width: 120px; }
+    #left-beard-areas .area-box { height: 138px; width: 120px; }
+    #central-beard-areas .area-box { height: 136.8px; width: 120px; }
+    
+    /* Density button customization */
+    #backside-density button { width: 50px; height: 35px; }
+    #topside-density button { width: 50px; height: 35px; }
+    #leftside-density button { width: 50px; height: 35px; }
+    #rightside-density button { width: 50px; height: 35px; }
+    #right-beard-density button { width: 45px; height: 40px; }
+    #left-beard-density button { width: 45px; height: 40px; }
+    #central-beard-density button { width: 45px; height: 40px; }
+
+    /* Individual box identification for background images */
+    
+    /* Backside scalp boxes */
+    #backside-areas .area-box:nth-child(1) { background-image: url('images/backside-0.jpg'); }
+    #backside-areas .area-box:nth-child(2) { background-image: url('images/backside-05.jpg'); }
+    #backside-areas .area-box:nth-child(3) { background-image: url('images/backside-1.jpg'); }
+    #backside-areas .area-box:nth-child(4) { background-image: url('images/backside-4.jpg'); }
+    #backside-areas .area-box:nth-child(5) { background-image: url('images/backside-7.jpg'); }
+    #backside-areas .area-box:nth-child(6) { background-image: url('images/backside-10.jpg'); }
+    #backside-areas .area-box:nth-child(7) { background-image: url('images/backside-13.jpg'); }
+    #backside-areas .area-box:nth-child(8) { background-image: url('images/backside-16.jpg'); }
+    #backside-areas .area-box:nth-child(9) { background-image: url('images/backside-19.jpg'); }
+    #backside-areas .area-box:nth-child(10) { background-image: url('images/backside-22.jpg'); }
+    #backside-areas .area-box:nth-child(11) { background-image: url('images/backside-24.jpg'); }
+    
+    /* Topside scalp boxes */
+    #topside-areas .area-box:nth-child(1) { background-image: url('images/topside-0.jpg'); }
+    #topside-areas .area-box:nth-child(2) { background-image: url('images/topside-05.jpg'); }
+    #topside-areas .area-box:nth-child(3) { background-image: url('images/topside-1.jpg'); }
+    #topside-areas .area-box:nth-child(4) { background-image: url('images/topside-4.jpg'); }
+    #topside-areas .area-box:nth-child(5) { background-image: url('images/topside-7.jpg'); }
+    #topside-areas .area-box:nth-child(6) { background-image: url('images/topside-10.jpg'); }
+    #topside-areas .area-box:nth-child(7) { background-image: url('images/topside-13.jpg'); }
+    #topside-areas .area-box:nth-child(8) { background-image: url('images/topside-16.jpg'); }
+    #topside-areas .area-box:nth-child(9) { background-image: url('images/topside-19.jpg'); }
+    #topside-areas .area-box:nth-child(10) { background-image: url('images/topside-22.jpg'); }
+    #topside-areas .area-box:nth-child(11) { background-image: url('images/topside-25.jpg'); }
+    #topside-areas .area-box:nth-child(12) { background-image: url('images/topside-28.jpg'); }
+    #topside-areas .area-box:nth-child(13) { background-image: url('images/topside-31.jpg'); }
+    #topside-areas .area-box:nth-child(14) { background-image: url('images/topside-34.jpg'); }
+    #topside-areas .area-box:nth-child(15) { background-image: url('images/topside-37.jpg'); }
+    #topside-areas .area-box:nth-child(16) { background-image: url('images/topside-39.jpg'); }
+    
+    /* Leftside scalp boxes */
+    #leftside-areas .area-box:nth-child(1) { background-image: url('images/leftside-0.jpg'); }
+    #leftside-areas .area-box:nth-child(2) { background-image: url('images/leftside-05.jpg'); }
+    #leftside-areas .area-box:nth-child(3) { background-image: url('images/leftside-1.jpg'); }
+    #leftside-areas .area-box:nth-child(4) { background-image: url('images/leftside-2.jpg'); }
+    #leftside-areas .area-box:nth-child(5) { background-image: url('images/leftside-5.jpg'); }
+    #leftside-areas .area-box:nth-child(6) { background-image: url('images/leftside-8.jpg'); }
+    #leftside-areas .area-box:nth-child(7) { background-image: url('images/leftside-11.jpg'); }
+    #leftside-areas .area-box:nth-child(8) { background-image: url('images/leftside-14.jpg'); }
+    #leftside-areas .area-box:nth-child(9) { background-image: url('images/leftside-17.jpg'); }
+    
+    /* Rightside scalp boxes */
+    #rightside-areas .area-box:nth-child(1) { background-image: url('images/rightside-0.jpg'); }
+    #rightside-areas .area-box:nth-child(2) { background-image: url('images/rightside-05.jpg'); }
+    #rightside-areas .area-box:nth-child(3) { background-image: url('images/rightside-1.jpg'); }
+    #rightside-areas .area-box:nth-child(4) { background-image: url('images/rightside-2.jpg'); }
+    #rightside-areas .area-box:nth-child(5) { background-image: url('images/rightside-5.jpg'); }
+    #rightside-areas .area-box:nth-child(6) { background-image: url('images/rightside-8.jpg'); }
+    #rightside-areas .area-box:nth-child(7) { background-image: url('images/rightside-11.jpg'); }
+    #rightside-areas .area-box:nth-child(8) { background-image: url('images/rightside-14.jpg'); }
+    #rightside-areas .area-box:nth-child(9) { background-image: url('images/rightside-17.jpg'); }
+    
+    /* Eyebrow boxes */
+    #right-eyebrow-areas .area-box:nth-child(1) { background-image: url('images/right-eyebrow-0.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(2) { background-image: url('images/right-eyebrow-025.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(3) { background-image: url('images/right-eyebrow-5.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(4) { background-image: url('images/right-eyebrow-15.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(5) { background-image: url('images/right-eyebrow-25.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(6) { background-image: url('images/right-eyebrow-35.jpg'); }
+    #right-eyebrow-areas .area-box:nth-child(7) { background-image: url('images/right-eyebrow-45.jpg'); }
+    
+    #left-eyebrow-areas .area-box:nth-child(1) { background-image: url('images/left-eyebrow-0.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(2) { background-image: url('images/left-eyebrow-025.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(3) { background-image: url('images/left-eyebrow-5.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(4) { background-image: url('images/left-eyebrow-15.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(5) { background-image: url('images/left-eyebrow-25.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(6) { background-image: url('images/left-eyebrow-35.jpg'); }
+    #left-eyebrow-areas .area-box:nth-child(7) { background-image: url('images/left-eyebrow-45.jpg'); }
+    
+    /* Eyelash boxes */
+    #right-eyelash-areas .area-box:nth-child(1) { background-image: url('images/right-eyelash-0.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(2) { background-image: url('images/right-eyelash-025.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(3) { background-image: url('images/right-eyelash-5.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(4) { background-image: url('images/right-eyelash-15.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(5) { background-image: url('images/right-eyelash-25.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(6) { background-image: url('images/right-eyelash-35.jpg'); }
+    #right-eyelash-areas .area-box:nth-child(7) { background-image: url('images/right-eyelash-45.jpg'); }
+    
+    #left-eyelash-areas .area-box:nth-child(1) { background-image: url('images/left-eyelash-0.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(2) { background-image: url('images/left-eyelash-025.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(3) { background-image: url('images/left-eyelash-5.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(4) { background-image: url('images/left-eyelash-15.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(5) { background-image: url('images/left-eyelash-25.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(6) { background-image: url('images/left-eyelash-35.jpg'); }
+    #left-eyelash-areas .area-box:nth-child(7) { background-image: url('images/left-eyelash-45.jpg'); }
+    
+    /* Beard boxes */
+    #right-beard-areas .area-box:nth-child(1) { background-image: url('images/right-beard-0.jpg'); }
+    #right-beard-areas .area-box:nth-child(2) { background-image: url('images/right-beard-1.jpg'); }
+    #right-beard-areas .area-box:nth-child(3) { background-image: url('images/right-beard-4.jpg'); }
+    #right-beard-areas .area-box:nth-child(4) { background-image: url('images/right-beard-10.jpg'); }
+    #right-beard-areas .area-box:nth-child(5) { background-image: url('images/right-beard-16.jpg'); }
+    #right-beard-areas .area-box:nth-child(6) { background-image: url('images/right-beard-224.jpg'); }
+    #right-beard-areas .area-box:nth-child(7) { background-image: url('images/right-beard-28.jpg'); }
+    #right-beard-areas .area-box:nth-child(8) { background-image: url('images/right-beard-344.jpg'); }
+    #right-beard-areas .area-box:nth-child(9) { background-image: url('images/right-beard-40.jpg'); }
+    
+    #left-beard-areas .area-box:nth-child(1) { background-image: url('images/left-beard-0.jpg'); }
+    #left-beard-areas .area-box:nth-child(2) { background-image: url('images/left-beard-1.jpg'); }
+    #left-beard-areas .area-box:nth-child(3) { background-image: url('images/left-beard-4.jpg'); }
+    #left-beard-areas .area-box:nth-child(4) { background-image: url('images/left-beard-10.jpg'); }
+    #left-beard-areas .area-box:nth-child(5) { background-image: url('images/left-beard-16.jpg'); }
+    #left-beard-areas .area-box:nth-child(6) { background-image: url('images/left-beard-224.jpg'); }
+    #left-beard-areas .area-box:nth-child(7) { background-image: url('images/left-beard-28.jpg'); }
+    #left-beard-areas .area-box:nth-child(8) { background-image: url('images/left-beard-344.jpg'); }
+    #left-beard-areas .area-box:nth-child(9) { background-image: url('images/left-beard-40.jpg'); }
+    
+    #central-beard-areas .area-box:nth-child(1) { background-image: url('images/central-beard-0.jpg'); }
+    #central-beard-areas .area-box:nth-child(2) { background-image: url('images/central-beard-05.jpg'); }
+    #central-beard-areas .area-box:nth-child(3) { background-image: url('images/central-beard-2.jpg'); }
+    #central-beard-areas .area-box:nth-child(4) { background-image: url('images/central-beard-5.jpg'); }
+    #central-beard-areas .area-box:nth-child(5) { background-image: url('images/central-beard-8.jpg'); }
+    #central-beard-areas .area-box:nth-child(6) { background-image: url('images/central-beard-112.jpg'); }
+    #central-beard-areas .area-box:nth-child(7) { background-image: url('images/central-beard-14.jpg'); }
+    #central-beard-areas .area-box:nth-child(8) { background-image: url('images/central-beard-172.jpg'); }
+    #central-beard-areas .area-box:nth-child(9) { background-image: url('images/central-beard-20.jpg'); }
+    
+    /* Density button background images */
+    #backside-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #backside-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #backside-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #backside-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #backside-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #backside-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    /* Apply same density images to all sections */
+    #topside-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #topside-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #topside-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #topside-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #topside-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #topside-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    #leftside-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #leftside-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #leftside-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #leftside-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #leftside-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #leftside-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    #rightside-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #rightside-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #rightside-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #rightside-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #rightside-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #rightside-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    #right-beard-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #right-beard-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #right-beard-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #right-beard-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #right-beard-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #right-beard-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    #left-beard-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #left-beard-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #left-beard-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #left-beard-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #left-beard-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #left-beard-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    #central-beard-density button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+    #central-beard-density button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+    #central-beard-density button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+    #central-beard-density button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+    #central-beard-density button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+    #central-beard-density button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+    
+    
+.density-container button:nth-child(2) { background-image: url('images/density-0.jpg'); }
+.density-container button:nth-child(3) { background-image: url('images/density-10.jpg'); }
+.density-container button:nth-child(4) { background-image: url('images/density-25.jpg'); }
+.density-container button:nth-child(5) { background-image: url('images/density-50.jpg'); }
+.density-container button:nth-child(6) { background-image: url('images/density-75.jpg'); }
+.density-container button:nth-child(7) { background-image: url('images/density-90.jpg'); }
+
+.plus.glow {
+  box-shadow: 0 0 6px 3px #00ff00; /* Green glow */
+}
+
+.minus.glow {
+  box-shadow: 0 0 6px 3px #ff0000; /* Red glow */
+}
+
+
+.area-box.selected {
+  z-index: 10;
+}
+
+
+.title-banner {
+  background-color: #0077cc;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.title-banner h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: normal;
+}
+
+
+.help-icon {
+  display: inline-block;
+  background-color: white;
+  color: black;
+  border-radius: 50%;
+  border: 1px solid #999;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 18px;
+  cursor: pointer;
+  position: relative;
+  margin-left: 5px;
+}
+
+.help-tooltip {
+  position: absolute;
+  top: 22px;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 1000;
+}
+
+
+  .help-box {
+    width: 220px;
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #aaa;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    color: #000;
+    position: absolute;
+    top: 22px;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: none;
+  }
+
+
+#results-summary {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0 20px 0;
+}
+
+.result-box {
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    min-width: 100px;
+    text-align: center;
+    color: black;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head>
+<body>
+<div class="title-banner" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;">
+<span class="help-icon" onmouseenter="showTooltip(this, 'Click on the images, + or - to indicate the images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">?</span>
+</div>
+<div style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: white; opacity: 0.8;">
+    © Reinhart Speeckaert, Nanja van Geel
+  </div>
+<h2 id="main-title">
+  Alopecia areata calculator
+   
+</h2>
+</div>
+<div id="pdf-icon-container" style="display: none; text-align: right; margin-bottom: 8px;">
+<button id="generate-pdf" style="color: red; font-weight: bold;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: red;
+    " title="Download PDF">
+        📄 PDF
+    </button>
+</div><div id="selected-preview" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;"></div>
+<div id="results-summary" style="padding: 10px; font-size: 18px; background: #e0f0ff; border-radius: 8px; box-shadow: 0 0 5px #ccc;">
+<!-- Results will be populated here -->
+</div><div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
+<button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+</div>
+<div class="area-container" id="areaContainer"></div>
+<div id="result" style="text-align: center; margin: 10px 0; font-size: 20px; font-weight: bold;">Total Scalp Alopecia Areata: 0%</div>
+<script>
+
+function getColorForPercentage(pct) {
+  pct = Math.min(100, Math.max(0, pct));
+  const r = pct < 50 ? Math.floor(255 * (pct / 50)) : 255;
+  const g = pct < 50 ? 255 : Math.floor(255 * (1 - (pct - 50) / 50));
+  const a = 0.8; // alpha = 100% opacity
+  return `rgba(${r},${g},0,${a})`;
+}
+
+</script>
+<script>
+const topsideTooltips = ["0%", "1.25%", "2.5%", "10%", "17%", "25%", "32.5%", "40%", "47.5%", "55%", "62.5%", "70%", "77.5%", "85%", "92.5%", "97.5%"];
+const topsideMinusTooltips = ["0.5%", "2%", "7.5%", "15%", "22.5%", "30%", "37.5%", "45%", "52.5%", "60%", "67.5%", "75", "82.5%", "90", "96%"];
+const topsidePlusTooltips = ["1.7%", "5%", "12.5%", "20%", "27.5%", "35%", "42.5%", "50%", "57.5%", "65%", "72.5%", "80%", "87.5%","95%", "100%"];
+
+const leftsideTooltips = ["0%", "3%", "5%", "10%", "25%", "45%", "60%", "75%", "95%"];
+const leftsideMinusTooltips = ["1%", "4.5%", "9%", "20%", "40%", "55%", "70%", "90%"];
+const leftsidePlusTooltips = ["4%", "7.5%", "15%", "30%", "50%", "65%", "85%", "100%"];
+
+const rightsideTooltips = [...leftsideTooltips];
+const rightsideMinusTooltips = [...leftsideMinusTooltips];
+const rightsidePlusTooltips = [...leftsidePlusTooltips];
+
+
+const scalpSections = {
+  backside: {
+    id: "backside",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 0.5, minus: 0.25, plus: 0.67 },
+      { label: "", value: 1, minus: 0.83, plus: 2 },
+      { label: "", value: 4, minus: 3, plus: 5 },
+      { label: "", value: 7, minus: 6, plus: 8 },
+      { label: "", value: 10, minus: 9, plus: 11 },
+      { label: "", value: 13, minus: 12, plus: 14 },
+      { label: "", value: 16, minus: 15, plus: 17 },
+      { label: "", value: 19, minus: 18, plus: 20 },
+      { label: "", value: 22, minus: 21, plus: 23 },
+      { label: "", value: 24 }
+    ]
+  },
+  leftside: {
+    id: "leftside",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 0.5, minus: 0.25, plus: 0.67 },
+      { label: "", value: 1, minus: 0.83, plus: 1.33 },
+      { label: "", value: 2, minus: 1.67, plus: 3 },
+      { label: "", value: 5, minus: 4, plus: 6 },
+      { label: "", value: 8, minus: 7, plus: 9 },
+      { label: "", value: 11, minus: 10, plus: 12 },
+      { label: "", value: 14, minus: 13, plus: 15 },
+      { label: "", value: 17, minus: 16, plus: 18 }
+    ]
+  },
+  rightside: {
+    id: "rightside",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 0.5, minus: 0.25, plus: 0.67 },
+      { label: "", value: 1, minus: 0.83, plus: 1.33 },
+      { label: "", value: 2, minus: 1.67, plus: 3 },
+      { label: "", value: 5, minus: 4, plus: 6 },
+      { label: "", value: 8, minus: 7, plus: 9 },
+      { label: "", value: 11, minus: 10, plus: 12 },
+      { label: "", value: 14, minus: 13, plus: 15 },
+      { label: "", value: 17, minus: 16, plus: 18 }
+    ]
+  },
+  topside: {
+    id: "topside",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 0.5, minus: 0.25, plus: 0.7 },
+      { label: "", value: 1, minus: 0.8, plus: 2 },
+      { label: "", value: 4, minus: 3, plus: 5 },
+      { label: "", value: 7, minus: 6, plus: 8 },
+      { label: "", value: 10, minus: 9, plus: 11 },
+      { label: "", value: 13, minus: 12, plus: 14 },
+      { label: "", value: 16, minus: 15, plus: 17 },
+      { label: "", value: 19, minus: 18, plus: 20 },
+      { label: "", value: 22, minus: 21, plus: 23 },
+      { label: "", value: 25, minus: 24, plus: 26 },
+      { label: "", value: 28, minus: 27, plus: 29 },
+      { label: "", value: 31, minus: 30, plus: 32 },
+      { label: "", value: 34, minus: 33, plus: 35 },
+      { label: "", value: 37, minus: 36, plus: 37.3 },
+      { label: "", value: 39, minus: 38.3, plus: 40 }
+    ]
+  }
+};
+
+const totalResultDiv = document.getElementById("result");
+let globalSelections = {};
+
+function renderScalpSection(section) {
+  const container = document.createElement('div');
+  container.innerHTML = `
+    <h3>${
+  section.id === "backside" ? "Back of the scalp" :
+  section.id === "leftside" ? "Left side of the scalp" :
+  section.id === "rightside" ? "Right side of the scalp" :
+  section.id === "topside" ? "Top of the scalp" :
+  section.id
+}</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div></div>
+      <div class="density-container" id="${section.id}-density">
+        <label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the alopecia areata patches')" onmouseleave="hideTooltip(this)">?</span></label>
+        <button data-density="0" class="selected"></button>
+        <button data-density="10"></button>
+        <button data-density="25"></button>
+        <button data-density="50"></button>
+        <button data-density="75"></button>
+        <button data-density="90"></button>
+      </div>
+    </div>
+    <div class="area-container" id="${section.id}-areas"></div>
+  `;
+  
+  if (section.id === "backside") {
+    const previewDiv = document.getElementById("selected-preview");
+    document.body.insertBefore(previewDiv, totalResultDiv);
+  }
+  document.body.insertBefore(container, totalResultDiv);
+
+
+  const areaBox = container.querySelector(`#${section.id}-areas`);
+  globalSelections[section.id] = { selected: new Set(), density: 0 };
+
+  section.areas.forEach(area => {
+    const box = document.createElement("div");
+    box.className = "area-box";
+    box.innerText = area.label;
+    box.dataset.value = area.value;
+
+    if (area.minus !== undefined) {
+      const minus = document.createElement("div");
+      minus.className = "minus";
+      minus.innerText = "−";
+      minus.title = `${area.minus}%`;
+      minus.onclick = (e) => {
+        e.stopPropagation();
+        toggleScalpSelection(section.id, area.minus);
+      };
+      box.appendChild(minus);
+    }
+
+    if (area.plus !== undefined) {
+      const plus = document.createElement("div");
+      plus.className = "plus";
+      plus.innerText = "+";
+      plus.title = `${area.plus}%`;
+      plus.onclick = (e) => {
+        e.stopPropagation();
+        toggleScalpSelection(section.id, area.plus);
+      };
+      box.appendChild(plus);
+    }
+
+    box.onclick = () => {
+      toggleScalpSelection(section.id, area.value);
+    };
+
+    areaBox.appendChild(box);
+  });
+
+  container.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      globalSelections[section.id].density = parseInt(btn.dataset.density);
+      container.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateScalpUI();
+    });
+  });
+}
+
+
+function toggleScalpSelection(sectionId, value) {
+  const selection = globalSelections[sectionId];
+  const valueStr = value.toString();
+  const alreadySelected = Array.from(selection.selected).some(v => v.toString() === valueStr);
+  if (alreadySelected) {
+    selection.selected.forEach(v => {
+      if (v.toString() === valueStr) selection.selected.delete(v);
+    });
+  } else {
+    selection.selected.clear();
+    selection.selected.add(value);
+  }
+  updateScalpUI();
+}
+function updateScalpUI() {
+  setTimeout(updateSelectedPreview, 0);
+  let total = 0;
+  for (const [sectionId, data] of Object.entries(globalSelections)) {
+    const boxEls = document.querySelectorAll(`#${sectionId}-areas .area-box`);
+    boxEls.forEach(box => {
+      const val = parseFloat(box.dataset.value);
+      const isSelected = data.selected.has(val);
+      
+      const plusEl = box.querySelector(".plus");
+      const minusEl = box.querySelector(".minus");
+      const plusVal = plusEl ? parseFloat(plusEl.title) : null;
+      const minusVal = minusEl ? parseFloat(minusEl.title) : null;
+      const isPlusSelected = plusVal !== null && data.selected.has(plusVal);
+      const isMinusSelected = minusVal !== null && data.selected.has(minusVal);
+      box.classList.toggle("selected", isSelected || isPlusSelected || isMinusSelected);
+
+      if (box.querySelector(".plus")) {
+        const plusVal = parseFloat(box.querySelector(".plus").title);
+        const isPlusSelected = data.selected.has(plusVal);
+        box.querySelector(".plus").style.backgroundColor = isPlusSelected ? "#ccffcc" : "white";
+        box.querySelector(".plus").style.transform = isPlusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".plus").classList.toggle("glow", isPlusSelected);
+      }
+      if (box.querySelector(".minus")) {
+        const minusVal = parseFloat(box.querySelector(".minus").title);
+        const isMinusSelected = data.selected.has(minusVal);
+        box.querySelector(".minus").style.backgroundColor = isMinusSelected ? "#ffcccc" : "white";
+        box.querySelector(".minus").style.transform = isMinusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".minus").classList.toggle("glow", isMinusSelected);
+      }
+    });
+    const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
+    total += subtotal * (1 - data.density / 100);
+  }
+  totalResultDiv.innerText = `Total Scalp Alopecia Areata: ${total.toFixed(2)}%`;
+  const titleElement = document.getElementById("main-title");
+  if (titleElement) {
+    titleElement.textContent = `Alopecia areata calculator: Scalp (=${total.toFixed(2)}%)`;
+  }
+}
+
+Object.values(scalpSections).forEach(renderScalpSection);
+
+// Add tooltips to backside section elements
+const backsideValues = [0, 0.5, 1, 4, 7, 10, 13, 16, 19, 22, 24];
+const backsideTooltips = ["0%", "2%", "5%", "15%", "30%", "40%", "55%", "65%", "80%", "90%", "100%"];
+const minusTooltips = ["1%", "3.5%", "12.5%", "25%", "37.5%", "50%", "62.5%", "75%", "87.5%"];
+const plusTooltips = ["2.5%", "10%", "20%", "35%", "45%", "60%", "70%", "85%", "95%"];
+
+
+function createTooltip(text) {
+  const tip = document.createElement("div");
+  tip.className = "tooltip";
+  tip.innerText = text;
+  const match = text.match(/(\d+(\.\d+)?)/);
+  if (match) {
+    const value = parseFloat(match[1]);
+    tip.style.backgroundColor = getColorForPercentage(value);
+  }
+  return tip;
+}
+
+function applyTooltips() {
+  const boxes = document.querySelectorAll("#backside-areas .area-box");
+  boxes.forEach((box, i) => {
+    const percent = backsideTooltips[i];
+    const tip = createTooltip(percent);
+    box.appendChild(tip);
+    tip.style.display = "none";
+
+    function showTip() {
+      tip.style.display = "block";
+    }
+
+    function hideTip() {
+      if (!box.classList.contains("selected")) {
+        tip.style.display = "none";
+      }
+    }
+
+    box.addEventListener("mouseenter", showTip);
+    box.addEventListener("mouseleave", hideTip);
+    box.addEventListener("click", () => {
+      document.querySelectorAll("#backside-areas .tooltip").forEach(t => t.style.display = "none");
+      tip.style.display = "block";
+    });
+
+    const minus = box.querySelector(".minus");
+    if (minus && minusTooltips[i - 1]) {
+      const minusTip = createTooltip(minusTooltips[i - 1]);
+      box.appendChild(minusTip);
+      minusTip.style.display = "none";
+
+      minus.addEventListener("mouseenter", () => {
+        if (!globalSelections['backside'].selected.has(parseFloat(minus.title))) {
+          minusTip.style.display = "block";
+        }
+      });
+      minus.addEventListener("mouseleave", () => {
+        if (!globalSelections['backside'].selected.has(parseFloat(minus.title))) {
+          minusTip.style.display = "none";
+        }
+      });
+      minus.addEventListener("click", () => {
+        document.querySelectorAll("#backside-areas .tooltip").forEach(t => t.style.display = "none");
+        minusTip.style.display = "block";
+      });
+    }
+
+    const plus = box.querySelector(".plus");
+    if (plus && plusTooltips[i - 1]) {
+      const plusTip = createTooltip(plusTooltips[i - 1]);
+      box.appendChild(plusTip);
+      plusTip.style.display = "none";
+
+      plus.addEventListener("mouseenter", () => {
+        if (!globalSelections['backside'].selected.has(parseFloat(plus.title))) {
+          plusTip.style.display = "block";
+        }
+      });
+      plus.addEventListener("mouseleave", () => {
+        if (!globalSelections['backside'].selected.has(parseFloat(plus.title))) {
+          plusTip.style.display = "none";
+        }
+      });
+      plus.addEventListener("click", () => {
+        document.querySelectorAll("#backside-areas .tooltip").forEach(t => t.style.display = "none");
+        plusTip.style.display = "block";
+      });
+    }
+  });
+}
+
+
+function applyTooltipsToSection(sectionId, areaTooltips, minusTooltips, plusTooltips) {
+  const boxes = document.querySelectorAll(`#${sectionId}-areas .area-box`);
+  boxes.forEach((box, i) => {
+    const percent = areaTooltips[i];
+    const tip = createTooltip(percent);
+    box.appendChild(tip);
+    tip.style.display = "none";
+
+    function showTip() {
+      tip.style.display = "block";
+    }
+
+    function hideTip() {
+      if (!box.classList.contains("selected")) {
+        tip.style.display = "none";
+      }
+    }
+
+    box.addEventListener("mouseenter", showTip);
+    box.addEventListener("mouseleave", hideTip);
+    box.addEventListener("click", () => {
+      document.querySelectorAll(`#${sectionId}-areas .tooltip`).forEach(t => t.style.display = "none");
+      tip.style.display = "block";
+    });
+
+    const minus = box.querySelector(".minus");
+    if (minus && minusTooltips[i - 1]) {
+      const minusTip = createTooltip(minusTooltips[i - 1]);
+      box.appendChild(minusTip);
+      minusTip.style.display = "none";
+
+      minus.addEventListener("mouseenter", () => {
+        if (!globalSelections[sectionId].selected.has(parseFloat(minus.title))) {
+          minusTip.style.display = "block";
+        }
+      });
+      minus.addEventListener("mouseleave", () => {
+        if (!globalSelections[sectionId].selected.has(parseFloat(minus.title))) {
+          minusTip.style.display = "none";
+        }
+      });
+      minus.addEventListener("click", () => {
+        document.querySelectorAll(`#${sectionId}-areas .tooltip`).forEach(t => t.style.display = "none");
+        minusTip.style.display = "block";
+      });
+    }
+
+    const plus = box.querySelector(".plus");
+    if (plus && plusTooltips[i - 1]) {
+      const plusTip = createTooltip(plusTooltips[i - 1]);
+      box.appendChild(plusTip);
+      plusTip.style.display = "none";
+
+      plus.addEventListener("mouseenter", () => {
+        if (!globalSelections[sectionId].selected.has(parseFloat(plus.title))) {
+          plusTip.style.display = "block";
+        }
+      });
+      plus.addEventListener("mouseleave", () => {
+        if (!globalSelections[sectionId].selected.has(parseFloat(plus.title))) {
+          plusTip.style.display = "none";
+        }
+      });
+      plus.addEventListener("click", () => {
+        document.querySelectorAll(`#${sectionId}-areas .tooltip`).forEach(t => t.style.display = "none");
+        plusTip.style.display = "block";
+      });
+    }
+  });
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  applyTooltips();
+  applyTooltipsToSection("topside", topsideTooltips, topsideMinusTooltips, topsidePlusTooltips);
+  applyTooltipsToSection("leftside", leftsideTooltips, leftsideMinusTooltips, leftsidePlusTooltips);
+  applyTooltipsToSection("rightside", rightsideTooltips, rightsideMinusTooltips, rightsidePlusTooltips);
+});
+</script>
+<!-- Eyebrow Section -->
+<h3 id="eyebrow-title" style="margin-bottom: 5px;">Eyebrows (0.00%)</h3>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 0px;">
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Right Eyebrow</h4>
+<div class="area-container" id="right-eyebrow-areas"></div>
+</div>
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Left Eyebrow</h4>
+<div class="area-container" id="left-eyebrow-areas"></div>
+</div>
+</div>
+<script>
+const eyebrowAreas = [
+  { label: "", value: 0 },
+  { label: "", value: 2.5, minus: 1.25, plus: 3.8 },
+  { label: "", value: 5, plus: 10 },
+  { label: "", value: 15, plus: 20 },
+  { label: "", value: 25, plus: 30 },
+  { label: "", value: 35, plus: 40 },
+  { label: "", value: 45, plus: 50 }
+];
+
+let eyebrowSelections = {
+  left: new Set(),
+  right: new Set()
+};
+
+function renderEyebrow(side) {
+  const container = document.getElementById(`${side}-eyebrow-areas`);
+  eyebrowAreas.forEach(area => {
+    const box = document.createElement("div");
+    box.className = "area-box";
+    box.innerText = area.label;
+    box.dataset.value = area.value;
+
+    if (area.minus !== undefined) {
+      const minus = document.createElement("div");
+      minus.className = "minus";
+      minus.innerText = "−";
+      minus.title = `${area.minus}%`;
+      minus.onclick = (e) => {
+        e.stopPropagation();
+        toggleEyebrowSelection(side, area.minus);
+      };
+      box.appendChild(minus);
+    }
+
+    if (area.plus !== undefined) {
+      const plus = document.createElement("div");
+      plus.className = "plus";
+      plus.innerText = "+";
+      plus.title = `${area.plus}%`;
+      plus.onclick = (e) => {
+        e.stopPropagation();
+        toggleEyebrowSelection(side, area.plus);
+      };
+      box.appendChild(plus);
+    }
+
+    box.onclick = () => {
+      toggleEyebrowSelection(side, area.value);
+    };
+
+    container.appendChild(box);
+  });
+}
+
+function toggleEyebrowSelection(side, value) {
+  const val = parseFloat(value);
+  const alreadySelected = Array.from(eyebrowSelections[side]).some(v => v === val);
+  if (alreadySelected) {
+    eyebrowSelections[side].delete(val);
+  } else {
+    eyebrowSelections[side].clear();
+    eyebrowSelections[side].add(val);
+  }
+  updateEyebrowUI();
+}
+
+function updateEyebrowUI() {
+  setTimeout(updateSelectedPreview, 0);
+  ["left", "right"].forEach(side => {
+    const boxEls = document.querySelectorAll(`#${side}-eyebrow-areas .area-box`);
+    boxEls.forEach(box => {
+      const val = parseFloat(box.dataset.value);
+      const isSelected = eyebrowSelections[side].has(val);
+      
+      const plusEl = box.querySelector(".plus");
+      const minusEl = box.querySelector(".minus");
+      const plusVal = plusEl ? parseFloat(plusEl.title) : null;
+      const minusVal = minusEl ? parseFloat(minusEl.title) : null;
+      const isPlusSelected = plusVal !== null && eyebrowSelections[side].has(plusVal);
+      const isMinusSelected = minusVal !== null && eyebrowSelections[side].has(minusVal);
+      box.classList.toggle("selected", isSelected || isPlusSelected || isMinusSelected);
+
+      if (box.querySelector(".plus")) {
+        const plusVal = parseFloat(box.querySelector(".plus").title);
+        const isPlusSelected = eyebrowSelections[side].has(plusVal);
+        box.querySelector(".plus").style.backgroundColor = isPlusSelected ? "#ccffcc" : "white";
+        box.querySelector(".plus").style.transform = isPlusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".plus").classList.toggle("glow", isPlusSelected);
+      }
+      if (box.querySelector(".minus")) {
+        const minusVal = parseFloat(box.querySelector(".minus").title);
+        const isMinusSelected = eyebrowSelections[side].has(minusVal);
+        box.querySelector(".minus").style.backgroundColor = isMinusSelected ? "#ffcccc" : "white";
+        box.querySelector(".minus").style.transform = isMinusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".minus").classList.toggle("glow", isMinusSelected);
+      }
+    });
+  });
+
+  const total = [...eyebrowSelections.left, ...eyebrowSelections.right].reduce((sum, val) => sum + val, 0);
+  document.getElementById("eyebrow-title").innerText = `Eyebrows (${total.toFixed(2)}%)`;
+}
+
+
+
+function updateSelectedPreview() {
+  const container = document.getElementById("selected-preview");
+  if (!container) return;
+  container.innerHTML = "";
+
+  // Loop through all area-boxes that are selected
+  document.querySelectorAll(".area-box").forEach(box => {
+    const value = parseFloat(box.dataset.value);
+    const style = window.getComputedStyle(box);
+    const bgImage = style.backgroundImage;
+    const match = bgImage.match(/url\(["']?(.*?)["']?\)/);
+    if (!match) return;
+
+    const section = box.closest(".area-container");
+    if (!section) return;
+
+    const width = box.offsetWidth;
+    const height = box.offsetHeight;
+
+    let isMain = box.classList.contains("selected");
+    let isPlus = false;
+    let isMinus = false;
+
+    const plus = box.querySelector(".plus");
+    const minus = box.querySelector(".minus");
+
+    if (plus) {
+      const plusVal = parseFloat(plus.title);
+      if (!isMain && plus.classList.contains("glow")) {
+        isPlus = true;
+      }
+    }
+
+    if (minus) {
+      const minusVal = parseFloat(minus.title);
+      if (!isMain && minus.classList.contains("glow")) {
+        isMinus = true;
+      }
+    }
+
+    if (!(isMain || isPlus || isMinus)) return;
+
+    const previewBox = document.createElement("div");
+    previewBox.style.width = width + "px";
+    previewBox.style.height = height + "px";
+    previewBox.style.backgroundImage = `url('${match[1]}')`;
+    previewBox.style.backgroundSize = "cover";
+    previewBox.style.backgroundPosition = "center";
+    previewBox.style.border = "2px solid #0077cc";
+    previewBox.style.borderRadius = "6px";
+    previewBox.style.position = "relative";
+    previewBox.style.transform = "scale(1)";
+    previewBox.style.transformOrigin = "top left";
+    previewBox.style.flex = "0 0 auto";
+
+    if (plus && plus.classList.contains("glow")) {
+      const plusEl = document.createElement("div");
+      plusEl.className = "plus glow";
+      plusEl.innerText = "+";
+      plusEl.style.position = "absolute";
+      plusEl.style.top = "-10px";
+      plusEl.style.right = "5px";
+      previewBox.appendChild(plusEl);
+    }
+
+    if (minus && minus.classList.contains("glow")) {
+      const minusEl = document.createElement("div");
+      minusEl.className = "minus glow";
+      minusEl.innerText = "−";
+      minusEl.style.position = "absolute";
+      minusEl.style.top = "-10px";
+      minusEl.style.left = "5px";
+      previewBox.appendChild(minusEl);
+    }
+
+    // Determine if plus or minus is selected
+    let rawValue = parseFloat(box.dataset.value);
+    let selectedValue = null;
+
+    const plusBtn = box.querySelector(".plus");
+    const minusBtn = box.querySelector(".minus");
+
+    if (plusBtn && plusBtn.classList.contains("glow")) {
+        selectedValue = parseFloat(plusBtn.title);
+    } else if (minusBtn && minusBtn.classList.contains("glow")) {
+        selectedValue = parseFloat(minusBtn.title);
+    } else if (box.classList.contains("selected")) {
+        selectedValue = rawValue;
+    }
+
+    if (selectedValue !== null) {
+        let density = 0;
+        const sectionDiv = box.closest("[id$='-areas']");
+        if (sectionDiv && sectionDiv.id) {
+            const sectionId = sectionDiv.id.replace("-areas", "");
+
+            if (globalSelections[sectionId]) {
+                density = globalSelections[sectionId].density;
+            } else if (beardSelections[sectionId]) {
+                density = beardSelections[sectionId].density;
+            }
+
+            const adjusted = Math.round(selectedValue * (1 - density / 100));
+
+            const infoLabel = document.createElement("div");
+            infoLabel.style.position = "absolute";
+            infoLabel.style.bottom = "2px";
+            infoLabel.style.right = "4px";
+            infoLabel.style.fontSize = "13px";
+            infoLabel.style.background = "rgba(255,255,255,0.8)";
+            infoLabel.style.padding = "2px 4px";
+            infoLabel.style.borderRadius = "4px";
+            infoLabel.style.boxShadow = "0 0 2px rgba(0,0,0,0.2)";
+            infoLabel.innerText = `${adjusted}%; (Dens:${density}%)`;
+            previewBox.appendChild(infoLabel);
+        }
+    }
+
+    container.appendChild(previewBox);
+  });
+}
+
+
+
+function updateAllPreviews() {
+  setTimeout(updateSelectedPreview, 0);
+}
+
+// Initialize eyebrow UI after DOM loads
+window.addEventListener("DOMContentLoaded", function() {
+  renderEyebrow("left");
+  renderEyebrow("right");
+  updateEyebrowUI();
+});
+</script>
+<!-- Eyelash Section -->
+<h3 id="eyelash-title" style="margin-bottom: 5px;">Eyelashes (0.00%)</h3>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 0px;">
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Right Eyelash</h4>
+<div class="area-container" id="right-eyelash-areas"></div>
+</div>
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Left Eyelash</h4>
+<div class="area-container" id="left-eyelash-areas"></div>
+</div>
+</div>
+<script>
+let eyelashSelections = {
+  left: new Set(),
+  right: new Set()
+};
+
+function renderEyelash(side) {
+  const container = document.getElementById(`${side}-eyelash-areas`);
+  eyebrowAreas.forEach(area => {
+    const box = document.createElement("div");
+    box.className = "area-box";
+    box.innerText = area.label;
+    box.dataset.value = area.value;
+
+    if (area.minus !== undefined) {
+      const minus = document.createElement("div");
+      minus.className = "minus";
+      minus.innerText = "−";
+      minus.title = `${area.minus}%`;
+      minus.onclick = (e) => {
+        e.stopPropagation();
+        toggleEyelashSelection(side, area.minus);
+      };
+      box.appendChild(minus);
+    }
+
+    if (area.plus !== undefined) {
+      const plus = document.createElement("div");
+      plus.className = "plus";
+      plus.innerText = "+";
+      plus.title = `${area.plus}%`;
+      plus.onclick = (e) => {
+        e.stopPropagation();
+        toggleEyelashSelection(side, area.plus);
+      };
+      box.appendChild(plus);
+    }
+
+    box.onclick = () => {
+      toggleEyelashSelection(side, area.value);
+    };
+
+    container.appendChild(box);
+  });
+}
+
+function toggleEyelashSelection(side, value) {
+  const val = parseFloat(value);
+  const alreadySelected = Array.from(eyelashSelections[side]).some(v => v === val);
+  if (alreadySelected) {
+    eyelashSelections[side].delete(val);
+  } else {
+    eyelashSelections[side].clear();
+    eyelashSelections[side].add(val);
+  }
+  updateEyelashUI();
+}
+
+function updateEyelashUI() {
+  setTimeout(updateSelectedPreview, 0);
+  ["left", "right"].forEach(side => {
+    const boxEls = document.querySelectorAll(`#${side}-eyelash-areas .area-box`);
+    boxEls.forEach(box => {
+      const val = parseFloat(box.dataset.value);
+      const isSelected = eyelashSelections[side].has(val);
+      
+      const plusEl = box.querySelector(".plus");
+      const minusEl = box.querySelector(".minus");
+      const plusVal = plusEl ? parseFloat(plusEl.title) : null;
+      const minusVal = minusEl ? parseFloat(minusEl.title) : null;
+      const isPlusSelected = plusVal !== null && eyelashSelections[side].has(plusVal);
+      const isMinusSelected = minusVal !== null && eyelashSelections[side].has(minusVal);
+      box.classList.toggle("selected", isSelected || isPlusSelected || isMinusSelected);
+
+      if (box.querySelector(".plus")) {
+        const plusVal = parseFloat(box.querySelector(".plus").title);
+        const isPlusSelected = eyelashSelections[side].has(plusVal);
+        box.querySelector(".plus").style.backgroundColor = isPlusSelected ? "#ccffcc" : "white";
+        box.querySelector(".plus").style.transform = isPlusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".plus").classList.toggle("glow", isPlusSelected);
+      }
+      if (box.querySelector(".minus")) {
+        const minusVal = parseFloat(box.querySelector(".minus").title);
+        const isMinusSelected = eyelashSelections[side].has(minusVal);
+        box.querySelector(".minus").style.backgroundColor = isMinusSelected ? "#ffcccc" : "white";
+        box.querySelector(".minus").style.transform = isMinusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".minus").classList.toggle("glow", isMinusSelected);
+      }
+    });
+  });
+
+  const total = [...eyelashSelections.left, ...eyelashSelections.right].reduce((sum, val) => sum + val, 0);
+  document.getElementById("eyelash-title").innerText = `Eyelashes (${total.toFixed(2)}%)`;
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  renderEyelash("left");
+  renderEyelash("right");
+  updateEyelashUI();
+});
+</script>
+<!-- Beard Area Section -->
+<h3 id="beard-title" style="margin-bottom: 0px;">Beard Area (0.00%)</h3>
+<div style="display: flex; flex-direction: column; gap: 0px;">
+<!-- Right Beard -->
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Right Beard Area</h4>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div></div>
+<div class="density-container" id="right-beard-density">
+<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 22')" onmouseleave="hideTooltip(this)">?</span></label>
+<button class="selected" data-density="0"></button>
+<button data-density="10"></button>
+<button data-density="25"></button>
+<button data-density="50"></button>
+<button data-density="75"></button>
+<button data-density="90"></button>
+</div>
+</div>
+<div class="area-container" id="right-beard-areas"></div>
+</div>
+<!-- Left Beard -->
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Left Beard Area</h4>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div></div>
+<div class="density-container" id="left-beard-density">
+<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span></label>
+<button class="selected" data-density="0"></button>
+<button data-density="10"></button>
+<button data-density="25"></button>
+<button data-density="50"></button>
+<button data-density="75"></button>
+<button data-density="90"></button>
+</div>
+</div>
+<div class="area-container" id="left-beard-areas"></div>
+</div>
+<!-- Central Beard -->
+<div>
+<h4 style="text-align: center; margin-bottom: 0px;">Central Beard Area</h4>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div></div>
+<div class="density-container" id="central-beard-density">
+<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span></label>
+<button class="selected" data-density="0"></button>
+<button data-density="10"></button>
+<button data-density="25"></button>
+<button data-density="50"></button>
+<button data-density="75"></button>
+<button data-density="90"></button>
+</div>
+</div>
+<div class="area-container" id="central-beard-areas"></div>
+</div>
+</div>
+<script>
+const beardSections = {
+  "right-beard": {
+    id: "right-beard",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 1, minus: 0.5, plus: 2 },
+      { label: "", value: 4, minus: 3, plus: 6 },
+      { label: "", value: 10, minus: 8, plus: 12 },
+      { label: "", value: 16, minus: 14.4, plus: 18 },
+      { label: "", value: 22.4, minus: 20, plus: 24 },
+      { label: "", value: 28, minus: 26.4, plus: 30.4 },
+      { label: "", value: 34.4, minus: 32, plus: 37 },
+      { label: "", value: 40 }
+    ]
+  },
+  "left-beard": {
+    id: "left-beard",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 1, minus: 0.5, plus: 2 },
+      { label: "", value: 4, minus: 3, plus: 6 },
+      { label: "", value: 10, minus: 8, plus: 12 },
+      { label: "", value: 16, minus: 14.4, plus: 18 },
+      { label: "", value: 22.4, minus: 20, plus: 24 },
+      { label: "", value: 28, minus: 26.4, plus: 30.4 },
+      { label: "", value: 34.4, minus: 32, plus: 37 },
+      { label: "", value: 40 }
+    ]
+  },
+  "central-beard": {
+    id: "central-beard",
+    areas: [
+      { label: "", value: 0 },
+      { label: "", value: 0.5, minus: 0.25, plus: 1 },
+      { label: "", value: 2, minus: 1.5, plus: 3 },
+      { label: "", value: 5, minus: 4, plus: 6 },
+      { label: "", value: 8, minus: 7.3, plus: 9 },
+      { label: "", value: 11.2, minus: 10, plus: 12 },
+      { label: "", value: 14, minus: 13.2, plus: 15.2 },
+      { label: "", value: 17.2, minus: 16, plus: 18.5 },
+      { label: "", value: 20 }
+    ]
+  }
+};
+
+let beardSelections = {};
+
+function renderBeardSection(section) {
+  const container = document.getElementById(`${section.id}-areas`);
+  beardSelections[section.id] = { selected: new Set(), density: 0 };
+
+  section.areas.forEach(area => {
+    const box = document.createElement("div");
+    box.className = "area-box";
+    box.innerText = area.label;
+    box.dataset.value = area.value;
+
+    if (area.minus !== undefined) {
+      const minus = document.createElement("div");
+      minus.className = "minus";
+      minus.innerText = "−";
+      minus.title = `${area.minus}%`;
+      minus.onclick = (e) => {
+        e.stopPropagation();
+        toggleBeardSelection(section.id, area.minus);
+      };
+      box.appendChild(minus);
+    }
+
+    if (area.plus !== undefined) {
+      const plus = document.createElement("div");
+      plus.className = "plus";
+      plus.innerText = "+";
+      plus.title = `${area.plus}%`;
+      plus.onclick = (e) => {
+        e.stopPropagation();
+        toggleBeardSelection(section.id, area.plus);
+      };
+      box.appendChild(plus);
+    }
+
+    box.onclick = () => {
+      toggleBeardSelection(section.id, area.value);
+    };
+
+    container.appendChild(box);
+  });
+
+  document.querySelectorAll(`#${section.id}-density button`).forEach(btn => {
+    btn.addEventListener("click", () => {
+      beardSelections[section.id].density = parseInt(btn.dataset.density);
+      document.querySelectorAll(`#${section.id}-density button`).forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateBeardUI();
+    });
+  });
+}
+
+function toggleBeardSelection(sectionId, value) {
+  const selection = beardSelections[sectionId];
+  const val = parseFloat(value);
+  const alreadySelected = Array.from(selection.selected).some(v => v === val);
+  if (alreadySelected) {
+    selection.selected.delete(val);
+  } else {
+    selection.selected.clear();
+    selection.selected.add(val);
+  }
+  updateBeardUI();
+}
+
+function updateBeardUI() {
+  setTimeout(updateSelectedPreview, 0);
+  let total = 0;
+  for (const [sectionId, data] of Object.entries(beardSelections)) {
+    const boxEls = document.querySelectorAll(`#${sectionId}-areas .area-box`);
+    boxEls.forEach(box => {
+      const val = parseFloat(box.dataset.value);
+      const isSelected = data.selected.has(val);
+      
+      const plusEl = box.querySelector(".plus");
+      const minusEl = box.querySelector(".minus");
+      const plusVal = plusEl ? parseFloat(plusEl.title) : null;
+      const minusVal = minusEl ? parseFloat(minusEl.title) : null;
+      const isPlusSelected = plusVal !== null && data.selected.has(plusVal);
+      const isMinusSelected = minusVal !== null && data.selected.has(minusVal);
+      box.classList.toggle("selected", isSelected || isPlusSelected || isMinusSelected);
+
+      if (box.querySelector(".plus")) {
+        const plusVal = parseFloat(box.querySelector(".plus").title);
+        const isPlusSelected = data.selected.has(plusVal);
+        box.querySelector(".plus").style.backgroundColor = isPlusSelected ? "#ccffcc" : "white";
+        box.querySelector(".plus").style.transform = isPlusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".plus").classList.toggle("glow", isPlusSelected);
+      }
+      if (box.querySelector(".minus")) {
+        const minusVal = parseFloat(box.querySelector(".minus").title);
+        const isMinusSelected = data.selected.has(minusVal);
+        box.querySelector(".minus").style.backgroundColor = isMinusSelected ? "#ffcccc" : "white";
+        box.querySelector(".minus").style.transform = isMinusSelected ? "scale(1.3)" : "scale(1)";
+        box.querySelector(".minus").classList.toggle("glow", isMinusSelected);
+      }
+    });
+
+    const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
+    total += subtotal * (1 - data.density / 100);
+  }
+
+  document.getElementById("beard-title").innerText = `Beard Area (${total.toFixed(2)}%)`;
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  Object.values(beardSections).forEach(renderBeardSection);
+});
+</script>
+<script>
+// Utility to create a tooltip
+function createTooltip(text) {
+  const tip = document.createElement("div");
+  tip.className = "tooltip";
+  tip.innerText = text;
+  const match = text.match(/(\d+(\.\d+)?)/);
+  if (match) {
+    const value = parseFloat(match[1]);
+    tip.style.backgroundColor = getColorForPercentage(value);
+  }
+  return tip;
+}
+
+// Apply tooltips to a custom section
+function applyTooltipToBoxes(sectionPrefix, tooltips, minusTooltips = [], plusTooltips = [], selections) {
+  const boxes = document.querySelectorAll(`#${sectionPrefix}-areas .area-box`);
+  boxes.forEach((box, i) => {
+    const tip = createTooltip(tooltips[i]);
+    box.appendChild(tip);
+    tip.style.display = "none";
+
+    function showTip() { tip.style.display = "block"; }
+    function hideTip() {
+      if (!box.classList.contains("selected")) tip.style.display = "none";
+    }
+
+    box.addEventListener("mouseenter", showTip);
+    box.addEventListener("mouseleave", hideTip);
+    box.addEventListener("click", () => {
+      document.querySelectorAll(`#${sectionPrefix}-areas .tooltip`).forEach(t => t.style.display = "none");
+      tip.style.display = "block";
+    });
+
+    const minus = box.querySelector(".minus");
+    if (minus && minusTooltips[i - 1]) {
+      const minusTip = createTooltip(minusTooltips[i - 1]);
+      box.appendChild(minusTip);
+      minusTip.style.display = "none";
+
+      minus.addEventListener("mouseenter", () => {
+        if (!selections.has(parseFloat(minus.title))) minusTip.style.display = "block";
+      });
+      minus.addEventListener("mouseleave", () => {
+        if (!selections.has(parseFloat(minus.title))) minusTip.style.display = "none";
+      });
+      minus.addEventListener("click", () => {
+        document.querySelectorAll(`#${sectionPrefix}-areas .tooltip`).forEach(t => t.style.display = "none");
+        minusTip.style.display = "block";
+      });
+    }
+
+    const plus = box.querySelector(".plus");
+    if (plus && plusTooltips[i - 1]) {
+      const plusTip = createTooltip(plusTooltips[i - 1]);
+      box.appendChild(plusTip);
+      plusTip.style.display = "none";
+
+      plus.addEventListener("mouseenter", () => {
+        if (!selections.has(parseFloat(plus.title))) plusTip.style.display = "block";
+      });
+      plus.addEventListener("mouseleave", () => {
+        if (!selections.has(parseFloat(plus.title))) plusTip.style.display = "none";
+      });
+      plus.addEventListener("click", () => {
+        document.querySelectorAll(`#${sectionPrefix}-areas .tooltip`).forEach(t => t.style.display = "none");
+        plusTip.style.display = "block";
+      });
+    }
+  });
+}
+
+window.addEventListener("DOMContentLoaded", function () {
+  const eyebrowTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
+  const eyebrowPlus = ["7.5%", "20%", "40%", "60%", "80%", "100%"];
+  const eyebrowMinus = ["2.5%"];
+  applyTooltipToBoxes("left-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.left);
+  applyTooltipToBoxes("right-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.right);
+
+  const eyelashTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
+  applyTooltipToBoxes("left-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.left);
+  applyTooltipToBoxes("right-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.right);
+
+  const beardTooltips = ["0%", "2.5%", "10%", "25%", "40%", "56%", "70%", "86%", "100%"];
+  const beardMinus = ["1.25%", "7.5%", "20%", "36%", "50%", "66%", "80%"];
+  const beardPlus = ["5%", "15%", "30%", "45%", "60%", "75%", "92.5%"];
+  
+  const rightBeardTooltips = ["0%", "2.5%", "10%", "25%", "40%", "56%", "70%", "86%", "100%"];
+  const rightBeardMinus = ["1.25%", "7.5%", "20%", "36%", "50%", "66%", "80%"];
+  const rightBeardPlus = ["5%", "15%", "30%", "45%", "60%", "75%", "92.5%"];
+
+  const leftBeardTooltips = ["0%", "2.5%", "10%", "25%", "40%", "56%", "70%", "86%", "100%"];
+  const leftBeardMinus = ["1.25%", "7.5%", "20%", "36%", "50%", "66%", "80%"];
+  const leftBeardPlus = ["5%", "15%", "30%", "45%", "60%", "75%", "92.5%"];
+
+  const centralBeardTooltips = ["0%", "2.5%", "10%", "25%", "40%", "55%", "70%", "85", "100%"];
+  const centralBeardMinus = ["1.25%", "7.5%", "20%", "35%", "50%", "65%", "80"];
+  const centralBeardPlus = ["5%", "15%", "30%", "45%", "60%", "75%", "92.5"];
+
+  applyTooltipToBoxes("right-beard", rightBeardTooltips, rightBeardMinus, rightBeardPlus, beardSelections["right-beard"].selected);
+  applyTooltipToBoxes("left-beard", leftBeardTooltips, leftBeardMinus, leftBeardPlus, beardSelections["left-beard"].selected);
+  applyTooltipToBoxes("central-beard", centralBeardTooltips, centralBeardMinus, centralBeardPlus, beardSelections["central-beard"].selected);
+
+});
+</script>
+<script>
+function showTooltip(el, text) {
+  let tip = document.createElement('div');
+  tip.className = 'help-box';
+  tip.innerText = text;
+
+  if (text.includes("window 1")) {
+    tip.style.backgroundImage = "url('images/help1.jpg')";
+  } else if (text.includes("window 2")) {
+    tip.style.backgroundImage = "url('images/help2.jpg')";
+  } else {
+    tip.style.background = "#fff";
+  }
+
+  el.appendChild(tip);
+  tip.style.display = 'block';
+}
+
+function hideTooltip(el) {
+  const tip = el.querySelector('.help-box');
+  if (tip) tip.remove();
+}
+</script>
+<script>document.getElementById("reset-button").onclick = () => location.reload();</script>
+<script>
+function calculateSectionTotals() {
+    const sectionData = {
+        Scalp: 0,
+        Eyebrows: 0,
+        Eyelashes: 0,
+        Beard: 0
+    };
+
+    for (const [id, data] of Object.entries(globalSelections)) {
+        const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
+        sectionData.Scalp += subtotal * (1 - data.density / 100);
+    }
+
+    sectionData.Eyebrows = [...eyebrowSelections.left, ...eyebrowSelections.right]
+        .reduce((sum, val) => sum + val, 0);
+
+    sectionData.Eyelashes = [...eyelashSelections.left, ...eyelashSelections.right]
+        .reduce((sum, val) => sum + val, 0);
+
+    for (const [id, data] of Object.entries(beardSelections)) {
+        const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
+        sectionData.Beard += subtotal * (1 - data.density / 100);
+    }
+
+    return sectionData;
+}
+
+function getColorForSection(pct, alpha = 0.2) {
+  pct = Math.min(100, Math.max(0, pct));
+
+  let r, g, b;
+
+  if (pct <= 50) {
+    // Grey to Yellow
+    const ratio = pct / 50;
+    r = Math.floor(128 + (255 - 128) * ratio); // 128 → 255
+    g = Math.floor(128 + (255 - 128) * ratio); // 128 → 255
+    b = Math.floor(128 - 128 * ratio);         // 128 → 0
+  } else {
+    // Yellow to Red
+    const ratio = (pct - 50) / 50;
+    r = 255;
+    g = Math.floor(255 * (1 - ratio));         // 255 → 0
+    b = 0;
+  }
+
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function updateResultsSummary() {
+    const totals = calculateSectionTotals();
+    const resultsDiv = document.getElementById("results-summary");
+    resultsDiv.innerHTML = Object.entries(totals).map(([key, val]) => {
+        return `<div class="result-box" style="background-color:${getColorForSection(val)}">
+            ${key}: ${val.toFixed(1)}%
+        </div>`;
+    }).join("");
+}
+
+setInterval(updateResultsSummary, 1000);
+</script>
+<div style="margin-top: 30px; text-align: center;">
+<button onclick="copyCode()" style="margin: 5px;">📋 Copy Score Code</button>
+<input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/>
+<button onclick="loadCode()">📥 Load Score Code</button>
+</div>
+<script>
+function getCurrentState() {
+  const scalp = {};
+  for (const [sectionId, data] of Object.entries(globalSelections)) {
+    scalp[sectionId] = {
+      selected: Array.from(data.selected),
+      density: data.density
+    };
+  }
+
+  const beard = {};
+  for (const [sectionId, data] of Object.entries(beardSelections)) {
+    beard[sectionId] = {
+      selected: Array.from(data.selected),
+      density: data.density
+    };
+  }
+
+  return {
+    scalp,
+    eyebrows: {
+      left: Array.from(eyebrowSelections.left),
+      right: Array.from(eyebrowSelections.right)
+    },
+    eyelashes: {
+      left: Array.from(eyelashSelections.left),
+      right: Array.from(eyelashSelections.right)
+    },
+    beard
+  };
+}
+
+function applyState(state) {
+  if (state.scalp) {
+    for (const [sectionId, data] of Object.entries(state.scalp)) {
+      globalSelections[sectionId].selected = new Set(data.selected);
+      globalSelections[sectionId].density = data.density;
+    }
+    updateScalpUI();
+  }
+
+  if (state.eyebrows) {
+    eyebrowSelections.left = new Set(state.eyebrows.left);
+    eyebrowSelections.right = new Set(state.eyebrows.right);
+    updateEyebrowUI();
+  }
+
+  if (state.eyelashes) {
+    eyelashSelections.left = new Set(state.eyelashes.left);
+    eyelashSelections.right = new Set(state.eyelashes.right);
+    updateEyelashUI();
+  }
+
+  if (state.beard) {
+    for (const [sectionId, data] of Object.entries(state.beard)) {
+      beardSelections[sectionId].selected = new Set(data.selected);
+      beardSelections[sectionId].density = data.density;
+    }
+    updateBeardUI();
+  }
+}
+
+function copyCode() {
+  const state = getCurrentState();
+  const json = JSON.stringify(state);
+  const encoded = btoa(json);
+  navigator.clipboard.writeText(encoded).then(() => {
+    alert("Score code copied to clipboard!");
+  });
+}
+
+function loadCode() {
+  try {
+    const input = document.getElementById("codeInput").value.trim();
+    if (!input) return alert("Please enter a code.");
+    const json = atob(input);
+    const state = JSON.parse(json);
+    applyState(state);
+  } catch (e) {
+    alert("Invalid code.");
+  }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const pdfButton = document.getElementById("generate-pdf");
+    const iconContainer = document.getElementById("pdf-icon-container");
+    const previewArea = document.getElementById("selected-preview");
+
+    function updatePdfIconVisibility() {
+        iconContainer.style.display = previewArea.children.length > 0 ? "block" : "none";
+    }
+
+    const originalUpdateSelectedPreview = updateSelectedPreview;
+    updateSelectedPreview = function() {
+        originalUpdateSelectedPreview();
+        updatePdfIconVisibility();
+    }
+
+    if (pdfButton) {
+        pdfButton.addEventListener("click", () => {
+            const opt = {
+                margin:       0.3,
+                filename:     'alopecia_preview.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(previewArea).save();
+        });
+    }
+
+    updatePdfIconVisibility();
+});
+</script>
+
+<script>
+document.getElementById("generate-pdf").addEventListener("click", function () {
+  const now = new Date();
+  const datetime = now.toLocaleString();
+  const title = "Alopecia Areata Calculator";
+
+  const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
+  const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
+  const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
+  const beard = document.getElementById("beard-title").innerText.match(/\((.*?)\)/)[1];
+
+  const preview = document.getElementById("selected-preview").cloneNode(true);
+  const summarySection = document.createElement("div");
+  summarySection.id = "pdf-summary";
+  summarySection.style.margin = "20px";
+  summarySection.style.fontFamily = "'Segoe UI', sans-serif";
+  summarySection.innerHTML = `
+    <h2 style='text-align:center;'>${title}</h2>
+    <p style='text-align:center;'><em>${datetime}</em></p>
+    <hr/>
+    <h3>Summary of Alopecia Areata Involvement</h3>
+    <ul>
+      <li><strong>Scalp:</strong> ${scalp}</li>
+      <li><strong>Eyebrows:</strong> ${eyebrows}</li>
+      <li><strong>Eyelashes:</strong> ${eyelashes}</li>
+      <li><strong>Beard:</strong> ${beard}</li>
+    </ul>
+    <h3>Selected Areas Preview</h3>
+  `;
+  summarySection.appendChild(preview);
+
+  document.body.appendChild(summarySection);
+
+  html2pdf().set({
+    margin: 10,
+    filename: 'alopecia_areata_summary.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }).from(summarySection).save().then(() => {
+    document.body.removeChild(summarySection);
+  });
+});
+</script>
+
+
+<script>
+document.getElementById("generate-pdf").addEventListener("click", function () {
+  const now = new Date();
+  const datetime = now.toLocaleString();
+  const title = "Alopecia Areata Calculator";
+
+  const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
+  const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
+  const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
+  const beard = document.getElementById("beard-title").innerText.match(/\((.*?)\)/)[1];
+
+  function getSubtotal(selections, density = 0) {
+    let total = 0;
+    for (const val of selections) {
+      total += val * (1 - density / 100);
+    }
+    return total.toFixed(2);
+  }
+
+  // Collect detailed data
+  const leftScalp = getSubtotal(globalSelections["leftside"].selected, globalSelections["leftside"].density);
+  const rightScalp = getSubtotal(globalSelections["rightside"].selected, globalSelections["rightside"].density);
+  const topScalp = getSubtotal(globalSelections["topside"].selected, globalSelections["topside"].density);
+  const backScalp = getSubtotal(globalSelections["backside"].selected, globalSelections["backside"].density);
+
+  const leftEyebrow = getSubtotal(eyebrowSelections.left);
+  const rightEyebrow = getSubtotal(eyebrowSelections.right);
+
+  const leftEyelash = getSubtotal(eyelashSelections.left);
+  const rightEyelash = getSubtotal(eyelashSelections.right);
+
+  const leftBeard = getSubtotal(beardSelections["left-beard"].selected, beardSelections["left-beard"].density);
+  const rightBeard = getSubtotal(beardSelections["right-beard"].selected, beardSelections["right-beard"].density);
+  const centralBeard = getSubtotal(beardSelections["central-beard"].selected, beardSelections["central-beard"].density);
+
+  const summarySection = document.createElement("div");
+  summarySection.id = "pdf-summary";
+  summarySection.style.margin = "20px";
+  summarySection.style.fontFamily = "'Segoe UI', sans-serif";
+  summarySection.innerHTML = `
+    <h2 style='text-align:center;'>${title}</h2>
+    <p style='text-align:center;'><em>${datetime}</em></p>
+    <hr/>
+    <h3>Summary of Alopecia Areata Involvement</h3>
+    <ul>
+      <li><strong>Total Scalp:</strong> ${scalp}</li>
+      <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
+      <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
+      <li><strong>Total Beard:</strong> ${beard}</li>
+    </ul>
+    <h3>Detailed Area Breakdown</h3>
+    <ul>
+      <li><strong>Left Scalp:</strong> ${leftScalp}%</li>
+      <li><strong>Right Scalp:</strong> ${rightScalp}%</li>
+      <li><strong>Top of the Head:</strong> ${topScalp}%</li>
+      <li><strong>Back of the Head:</strong> ${backScalp}%</li>
+      <li><strong>Left Eyebrow:</strong> ${leftEyebrow}%</li>
+      <li><strong>Right Eyebrow:</strong> ${rightEyebrow}%</li>
+      <li><strong>Left Eyelash:</strong> ${leftEyelash}%</li>
+      <li><strong>Right Eyelash:</strong> ${rightEyelash}%</li>
+      <li><strong>Left Beard Area:</strong> ${leftBeard}%</li>
+      <li><strong>Right Beard Area:</strong> ${rightBeard}%</li>
+      <li><strong>Central Beard Area:</strong> ${centralBeard}%</li>
+    </ul>
+  `;
+
+  document.body.appendChild(summarySection);
+
+  html2pdf().set({
+    margin: 10,
+    filename: 'alopecia_areata_detailed_summary.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }).from(summarySection).save().then(() => {
+    document.body.removeChild(summarySection);
+  });
+});
+</script>
+
+</body>
+</html>
