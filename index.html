@@ -1877,5 +1877,33 @@ document.getElementById("generate-pdf").addEventListener("click", function () {
 });
 </script>
 
+
+<!-- PDF Download Button -->
+<div style="text-align: center; margin: 20px;">
+  <button id="download-pdf" style="padding: 10px 20px; font-size: 16px; background-color: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer;">
+    📄 Download PDF
+  </button>
+</div>
+
+<script>
+document.getElementById("download-pdf").addEventListener("click", () => {
+  if (typeof updateAllPreviews === "function") {
+    updateAllPreviews();  // Ensure dynamic content updates
+  }
+
+  setTimeout(() => {
+    const element = document.body;  // Capture the whole page
+    const opt = {
+      margin: 0.5,
+      filename: 'alopecia_report.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }, 300);
+});
+</script>
+
 </body>
 </html>
