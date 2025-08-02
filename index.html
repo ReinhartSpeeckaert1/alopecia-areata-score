@@ -27,6 +27,7 @@
     }
 
     .area-box {
+  will-change: transform, box-shadow;
       transition: transform 0.2s, box-shadow 0.2s;
       position: relative;
       width: 60px;
@@ -118,23 +119,34 @@
     /* Custom row heights for different sections */
     
     /* Scalp sections */
-    #backside-areas .area-box { height: 340px; width: 100px; }
-    #topside-areas .area-box { height: 340px; width: 100px; }
-    #leftside-areas .area-box { height: 340px; width: 100px; }
-    #rightside-areas .area-box { height: 340px; width: 100px; }
+    #backside-areas .area-box {
+  will-change: transform, box-shadow; height: 340px; width: 100px; }
+    #topside-areas .area-box {
+  will-change: transform, box-shadow; height: 340px; width: 100px; }
+    #leftside-areas .area-box {
+  will-change: transform, box-shadow; height: 340px; width: 100px; }
+    #rightside-areas .area-box {
+  will-change: transform, box-shadow; height: 340px; width: 100px; }
     
     /* Eyebrow sections */
-    #right-eyebrow-areas .area-box { height: 48px; width: 160px; }
-    #left-eyebrow-areas .area-box { height: 48px; width: 160px; }
+    #right-eyebrow-areas .area-box {
+  will-change: transform, box-shadow; height: 48px; width: 160px; }
+    #left-eyebrow-areas .area-box {
+  will-change: transform, box-shadow; height: 48px; width: 160px; }
     
     /* Eyelash sections */
-    #right-eyelash-areas .area-box { height: 84px; width: 160px; }
-    #left-eyelash-areas .area-box { height: 84px; width: 160px; }
+    #right-eyelash-areas .area-box {
+  will-change: transform, box-shadow; height: 84px; width: 160px; }
+    #left-eyelash-areas .area-box {
+  will-change: transform, box-shadow; height: 84px; width: 160px; }
     
     /* Beard sections */
-    #right-beard-areas .area-box { height: 138px; width: 120px; }
-    #left-beard-areas .area-box { height: 138px; width: 120px; }
-    #central-beard-areas .area-box { height: 136.8px; width: 120px; }
+    #right-beard-areas .area-box {
+  will-change: transform, box-shadow; height: 138px; width: 120px; }
+    #left-beard-areas .area-box {
+  will-change: transform, box-shadow; height: 138px; width: 120px; }
+    #central-beard-areas .area-box {
+  will-change: transform, box-shadow; height: 136.8px; width: 120px; }
     
     /* Density button customization */
     #backside-density button { width: 50px; height: 35px; }
@@ -423,9 +435,77 @@
     text-align: center;
     color: black;
 }
+
+#floating-preview {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 2px solid #0077cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 8px;
+  display: none;
+  z-index: 9999;
+}
+
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Preload all beard Images -->
+  <link rel="preload" as="image" href="Images/left-beard-0.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-1.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-4.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-10.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-16.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-224.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-28.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-344.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/left-beard-40.jpg" fetchpriority="high">
+
+  <link rel="preload" as="image" href="Images/right-beard-0.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-1.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-4.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-10.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-16.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-224.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-28.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-344.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/right-beard-40.jpg" fetchpriority="high">
+
+  <link rel="preload" as="image" href="Images/central-beard-0.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-05.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-2.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-5.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-8.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-112.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-14.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-172.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="Images/central-beard-20.jpg" fetchpriority="high">
+
+
+  <!-- Preload key eyebrow Images -->
+<link rel="preload" as="image" href="Images/left-eyebrow-0.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="Images/left-eyebrow-15.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="Images/right-eyebrow-0.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="Images/right-eyebrow-15.jpg" fetchpriority="high">
+
+<!-- Preload key eyelash Images -->
+<link rel="preload" as="image" href="Images/left-eyelash-0.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="Images/right-eyelash-0.jpg" fetchpriority="high">
+
+</head>
 <body>
+<style>
+@media (max-width: 600px) {
+  #floating-preview, #floating-close-btn {
+    display: none !important;
+  }
+}
+</style>
 <div class="title-banner" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;">
 <span class="help-icon" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">?</span>
 </div>
@@ -986,7 +1066,8 @@ function updateSelectedPreview() {
   if (!container) return;
   container.innerHTML = "";
 
-  // Loop through all area-boxes that are selected
+  const previews = [];
+
   document.querySelectorAll(".area-box").forEach(box => {
     const value = parseFloat(box.dataset.value);
     const style = window.getComputedStyle(box);
@@ -1008,14 +1089,12 @@ function updateSelectedPreview() {
     const minus = box.querySelector(".minus");
 
     if (plus) {
-      const plusVal = parseFloat(plus.title);
       if (!isMain && plus.classList.contains("glow")) {
         isPlus = true;
       }
     }
 
     if (minus) {
-      const minusVal = parseFloat(minus.title);
       if (!isMain && minus.classList.contains("glow")) {
         isMinus = true;
       }
@@ -1056,26 +1135,21 @@ function updateSelectedPreview() {
       previewBox.appendChild(minusEl);
     }
 
-    // Determine if plus or minus is selected
-    let rawValue = parseFloat(box.dataset.value);
     let selectedValue = null;
-
-    const plusBtn = box.querySelector(".plus");
-    const minusBtn = box.querySelector(".minus");
-
-    if (plusBtn && plusBtn.classList.contains("glow")) {
-        selectedValue = parseFloat(plusBtn.title);
-    } else if (minusBtn && minusBtn.classList.contains("glow")) {
-        selectedValue = parseFloat(minusBtn.title);
+    if (plus && plus.classList.contains("glow")) {
+        selectedValue = parseFloat(plus.title);
+    } else if (minus && minus.classList.contains("glow")) {
+        selectedValue = parseFloat(minus.title);
     } else if (box.classList.contains("selected")) {
-        selectedValue = rawValue;
+        selectedValue = value;
     }
 
     if (selectedValue !== null) {
         let density = 0;
         const sectionDiv = box.closest("[id$='-areas']");
+        let sectionId = "";
         if (sectionDiv && sectionDiv.id) {
-            const sectionId = sectionDiv.id.replace("-areas", "");
+            sectionId = sectionDiv.id.replace("-areas", "");
 
             if (globalSelections[sectionId]) {
                 density = globalSelections[sectionId].density;
@@ -1097,10 +1171,23 @@ function updateSelectedPreview() {
             infoLabel.innerText = `${adjusted}%; (Dens:${density}%)`;
             previewBox.appendChild(infoLabel);
         }
-    }
 
-    container.appendChild(previewBox);
+        previews.push({ sectionId, element: previewBox });
+    }
   });
+
+  const desiredOrder = [
+    "leftside", "backside", "rightside", "topside",
+    "right-eyebrow", "left-eyebrow",
+    "right-eyelash", "left-eyelash",
+    "right-beard", "central-beard", "left-beard"
+  ];
+
+  previews.sort((a, b) => {
+    return desiredOrder.indexOf(a.sectionId) - desiredOrder.indexOf(b.sectionId);
+  });
+
+  previews.forEach(item => container.appendChild(item.element));
 }
 
 
@@ -1719,7 +1806,6 @@ function loadCode() {
   }
 }
 </script>
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const pdfButton = document.getElementById("generate-pdf");
@@ -1752,7 +1838,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePdfIconVisibility();
 });
 </script>
-
 <script>
 document.getElementById("generate-pdf").addEventListener("click", function () {
   const now = new Date();
@@ -1796,8 +1881,6 @@ document.getElementById("generate-pdf").addEventListener("click", function () {
   });
 });
 </script>
-
-
 <script>
 document.getElementById("generate-pdf").addEventListener("click", function () {
   const now = new Date();
@@ -1850,7 +1933,7 @@ document.getElementById("generate-pdf").addEventListener("click", function () {
     </ul>
     <h3>Detailed Area Breakdown</h3>
     <ul>
-      <li><strong>Left Scalp:</strong> ${leftScalp}%</li>
+      <li><strong>Left Scalp:</strong> ${leftScalp}% test </li>
       <li><strong>Right Scalp:</strong> ${rightScalp}%</li>
       <li><strong>Top of the Head:</strong> ${topScalp}%</li>
       <li><strong>Back of the Head:</strong> ${backScalp}%</li>
@@ -1876,33 +1959,219 @@ document.getElementById("generate-pdf").addEventListener("click", function () {
   });
 });
 </script>
-
-
-<!-- PDF Download Button -->
-<div style="text-align: center; margin: 20px;">
-  <button id="download-pdf" style="padding: 10px 20px; font-size: 16px; background-color: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer;">
-    📄 Download PDF
-  </button>
+<div id="floating-preview" style="position: fixed; top: 20px; right: 20px; width: 250px; height: 250px; padding: 0; margin: 0; overflow: hidden; z-index: 9999; display: none; background: none !important; border: none !important; pointer-events: none;">
+<div id="floating-close-btn" style="
+        position: absolute;
+        top: 2px;
+        right: 6px;
+        font-size: 18px;
+        color: #333;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 10000;
+        pointer-events: auto;
+    ">×</div>
 </div>
 
-<script>
-document.getElementById("download-pdf").addEventListener("click", () => {
-  if (typeof updateAllPreviews === "function") {
-    updateAllPreviews();  // Ensure dynamic content updates
-  }
 
-  setTimeout(() => {
-    const element = document.body;  // Capture the whole page
-    const opt = {
-      margin: 0.5,
-      filename: 'alopecia_report.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
-  }, 300);
+<script>
+let previewVisible = true;
+let floatingPreviewTimeout;
+
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.id === "floating-close-btn") {
+    previewVisible = false;
+    document.getElementById("floating-preview").style.display = "none";
+  }
 });
+
+window.addEventListener("scroll", function () {
+  clearTimeout(floatingPreviewTimeout);
+  const floating = document.getElementById("floating-preview");
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+  if (!previewVisible) return;
+
+  if (scrollTop > 150) {
+    floatingPreviewTimeout = setTimeout(updateFloatingPreview, 10);
+    floating.style.display = "block";
+  } else {
+    floating.style.display = "none";
+  }
+});
+
+function updateFloatingPreview() {
+  const floating = document.getElementById("floating-preview");
+  const closeBtn = document.getElementById("floating-close-btn");
+  floating.innerHTML = "";
+  if (closeBtn) floating.appendChild(closeBtn.cloneNode(true));
+
+  const previewInner = document.createElement("div");
+  previewInner.style.display = "flex";
+  previewInner.style.flexDirection = "column";
+  previewInner.style.gap = "4px";
+  previewInner.style.alignItems = "flex-start";
+  previewInner.style.width = "max-content";
+  previewInner.style.pointerEvents = "none";
+
+  const sectionOrder = ["scalp", "eyebrows", "eyelashes", "beard"];
+  const areaOrder = {
+    scalp: ["leftside-areas", "backside-areas", "rightside-areas", "topside-areas"],
+    eyebrows: ["right-eyebrow-areas", "left-eyebrow-areas"],
+    eyelashes: ["right-eyelash-areas", "left-eyelash-areas"],
+    beard: ["right-beard-areas", "central-beard-areas", "left-beard-areas"]
+  };
+
+  const collected = {
+    scalp: {}, eyebrows: {}, eyelashes: {}, beard: {}
+  };
+
+  document.querySelectorAll(".area-box.selected").forEach(box => {
+    const parent = box.closest(".area-container");
+    if (!parent || !parent.id) return;
+
+    const section = Object.keys(areaOrder).find(sec =>
+      areaOrder[sec].includes(parent.id)) || "scalp";
+
+    const rect = box.getBoundingClientRect();
+    const bg = box.style.backgroundImage || getComputedStyle(box).backgroundImage;
+
+    const div = document.createElement("div");
+    div.style.width = rect.width + "px";
+    div.style.height = rect.height + "px";
+    div.style.backgroundImage = bg;
+    div.style.backgroundSize = "cover";
+    div.style.backgroundPosition = "center";
+    div.style.borderRadius = "5px";
+    div.style.flex = "0 0 auto";
+    div.style.position = "relative";
+
+    // Add + or - overlay
+    const mark = document.createElement("div");
+    mark.textContent = box.classList.contains("plus") ? "+" : (box.classList.contains("minus") ? "−" : "");
+    mark.style.position = "absolute";
+    mark.style.top = "0";
+    mark.style.right = "2px";
+    mark.style.fontSize = "16px";
+    mark.style.fontWeight = "bold";
+    mark.style.color = "white";
+    mark.style.textShadow = "0 0 3px black";
+    mark.style.pointerEvents = "none";
+    div.appendChild(mark);
+
+    collected[section][parent.id] = collected[section][parent.id] || [];
+    collected[section][parent.id].push(div);
+  });
+
+  sectionOrder.forEach(sec => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.gap = "3px";
+    row.style.flexWrap = "nowrap";
+
+    areaOrder[sec].forEach(area => {
+      (collected[sec][area] || []).forEach(el => row.appendChild(el));
+    });
+
+    if (row.childElementCount) previewInner.appendChild(row);
+  });
+
+  floating.appendChild(previewInner);
+
+  requestAnimationFrame(() => {
+    const bounds = previewInner.getBoundingClientRect();
+    const scale = Math.min(230 / bounds.width, 230 / bounds.height, 1);
+    previewInner.style.transformOrigin = "top left";
+    previewInner.style.transform = `scale(${scale})`;
+  });
+}
+</script>
+
+<script>
+const allPreviewImages = [
+  // Beard
+  "Images/left-beard-0.jpg", "Images/left-beard-4.jpg", "Images/left-beard-10.jpg", "Images/left-beard-16.jpg",
+  "Images/right-beard-0.jpg", "Images/right-beard-4.jpg", "Images/right-beard-10.jpg", "Images/right-beard-16.jpg",
+  "Images/central-beard-0.jpg", "Images/central-beard-5.jpg", "Images/central-beard-8.jpg",
+
+  // Eyebrow
+  "Images/left-eyebrow-0.jpg", "Images/left-eyebrow-15.jpg", "Images/right-eyebrow-0.jpg", "Images/right-eyebrow-15.jpg",
+
+  // Eyelash
+  "Images/left-eyelash-0.jpg", "Images/right-eyelash-0.jpg"
+];
+allPreviewImages.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+</script>
+
+
+<div id="beard-floating-preview" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 2px solid #0077cc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 8px;
+  display: none;
+  z-index: 9999;
+">
+  <strong>Beard Preview</strong>
+  <div id="beard-preview-content" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+</div>
+
+
+<script>
+function updateBeardPreview() {
+  const container = document.getElementById("beard-preview-content");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const beardSectionsToCheck = ["left-beard", "right-beard", "central-beard"];
+
+  beardSectionsToCheck.forEach(sectionId => {
+    const areaBoxes = document.querySelectorAll(`#${sectionId}-areas .area-box`);
+    areaBoxes.forEach(box => {
+      const value = parseFloat(box.dataset.value);
+      const style = window.getComputedStyle(box);
+      const bgImage = style.backgroundImage;
+      const match = bgImage.match(/url\(["']?(.*?)["']?\)/);
+      if (!match) return;
+
+      const imageUrl = match[1];
+      const isMain = box.classList.contains("selected");
+      const isPlus = box.querySelector(".plus")?.classList.contains("glow") || false;
+      const isMinus = box.querySelector(".minus")?.classList.contains("glow") || false;
+
+      if (!(isMain || isPlus || isMinus)) return;
+
+      const imgEl = document.createElement("img");
+      imgEl.src = imageUrl;
+      imgEl.style.width = box.offsetWidth + "px";
+      imgEl.style.height = box.offsetHeight + "px";
+      imgEl.style.objectFit = "cover";
+      imgEl.style.border = "2px solid #0077cc";
+      imgEl.style.borderRadius = "6px";
+      imgEl.style.flex = "0 0 auto";
+      imgEl.loading = "eager";
+
+      container.appendChild(imgEl);
+    });
+  });
+
+  const previewBox = document.getElementById("beard-floating-preview");
+  if (container.children.length > 0) {
+    previewBox.style.display = "block";
+  } else {
+    previewBox.style.display = "none";
+  }
+}
 </script>
 
 </body>
