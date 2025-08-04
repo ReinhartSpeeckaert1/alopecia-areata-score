@@ -1188,6 +1188,11 @@ function updateSelectedPreview() {
   });
 
   previews.forEach(item => container.appendChild(item.element));
+const scrollX = window.scrollX;
+const scrollY = window.scrollY;
+window.scrollTo(scrollX, scrollY + 1);
+window.scrollTo(scrollX, scrollY - 1);
+window.scrollTo(scrollX, scrollY);
 }
 
 
