@@ -461,7 +461,7 @@
 .title-banner {
   background: linear-gradient(135deg, #0ea5e9, #2563eb);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 .title-banner::after{
   content: "";
@@ -535,6 +535,31 @@
 }
 /* --- End Added CSS --- */
 
+
+/* Scalp progress scale */
+#scalp-scale { width: 280px; max-width: 90vw; margin: 6px auto 0 auto; }
+#scalp-scale .ticks {
+  height: 8px;
+  background:
+    linear-gradient(to right, transparent, transparent),
+    repeating-linear-gradient(
+      to right,
+      #bdbdbd,
+      #bdbdbd 1px,
+      transparent 1px,
+      transparent 10%
+    );
+  border-radius: 3px;
+}
+#scalp-scale .labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #666;
+  margin-top: 2px;
+  line-height: 1;
+}
+#scalp-scale .labels span { white-space: nowrap; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -609,10 +634,107 @@
   }
 </style>
 
+
+<style>
+/* --- Fancy ring animations --- */
+.ring { will-change: background, transform, box-shadow; }
+
+/* Pulse on update */
+@keyframes ring-pop {
+  0%   { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+  50%  { transform: scale(1.04); box-shadow: 0 6px 18px rgba(2,132,199,.20); }
+  100% { transform: scale(1);    box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+}
+.ring.flash { animation: ring-pop 480ms cubic-bezier(.2,.8,.2,1); }
+
+/* Tiny particles that shoot outward from the ring center */
+.ring .particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  opacity: .95;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,.15));
+  animation: particle-shoot var(--time, 420ms) ease-out forwards;
+}
+@keyframes particle-shoot {
+  to {
+    transform: translate(-50%, -50%) rotate(var(--theta, 0deg)) translate(44px);
+    opacity: 0;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ring, .ring.flash, .ring .particle { animation: none !important; transition: none !important; }
+}
+</style>
+
+
+<style>
+/* --- Floating 'peek' for offscreen ring updates --- */
+#ring-peek {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+.peek-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.85);
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgba(0,0,0,.12);
+  transform: translateY(8px);
+  opacity: 0;
+  animation: peek-in 240ms cubic-bezier(.2,.8,.2,1) forwards;
+  pointer-events: auto;
+}
+@keyframes peek-in { to { opacity: 1; transform: translateY(0); } }
+.peek-item.hide { animation: peek-out 240ms ease forwards; }
+@keyframes peek-out { to { opacity: 0; transform: translateY(8px); } }
+.peek-title { font: 600 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #0f172a; }
+.peek-value { font: 600 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #0ea5e9; }
+.peek-ring {
+  position: relative;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: conic-gradient(#e5e7eb 0%, #e5e7eb 100%);
+  flex: none;
+}
+.peek-ring::after {
+  content: "";
+  position: absolute; inset: 6px;
+  border-radius: 50%;
+  background: white;
+}
+/* Dark mode friendly-ish */
+@media (prefers-color-scheme: dark) {
+  .peek-item { background: rgba(15,15,18,0.75); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  .peek-title { color: #e5e7eb; }
+  .peek-ring::after { background: #111827; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ring-peek, .peek-item { animation: none !important; }
+}
+</style>
+
+<style>.title-banner { overflow: visible !important; }</style>
 </head>
 <body>
 <style>
-@media (max-width: 1400px) {
+@media (max-width: 1200px) {
   #floating-preview, #floating-close-btn {
     display: none !important;
   }
@@ -625,7 +747,7 @@
     © Reinhart Speeckaert, Nanja van Geel
   </div>
 <h2 id="main-title">Alopecia areata calculator</h2>
-<div class="title-sub">Select the options that best fit with the extent of alopecia areata </div>
+<div class="title-sub">Select the options that best fit with the extent of alopecia areata</div>
 </div>
 <div id="pdf-icon-container" style="display: none; text-align: right; margin-bottom: 8px;">
 <button id="generate-pdf" style="color: red; font-weight: bold;
@@ -653,6 +775,22 @@
 </div>
 <div class="area-container" id="areaContainer"></div>
 <div id="result" style="text-align: center; margin: 10px 0; font-size: 20px; font-weight: bold;">Total Scalp Alopecia Areata: 0%</div><div id="scalp-progress"><div></div></div>
+<div id="scalp-scale" aria-hidden="true">
+  <div class="ticks"></div>
+  <div class="labels">
+    <span>0%</span>
+    <span>10%</span>
+    <span>20%</span>
+    <span>30%</span>
+    <span>40%</span>
+    <span>50%</span>
+    <span>60%</span>
+    <span>70%</span>
+    <span>80%</span>
+    <span>90%</span>
+    <span>100%</span>
+  </div>
+</div>
 <script>
 
 function getColorForPercentage(pct) {
@@ -669,7 +807,7 @@ const topsideTooltips = ["0%", "1.25%", "2.5%", "10%", "17%", "25%", "32.5%", "4
 const topsideMinusTooltips = ["0.5%", "2%", "7.5%", "15%", "22.5%", "30%", "37.5%", "45%", "52.5%", "60%", "67.5%", "75", "82.5%", "90", "96%"];
 const topsidePlusTooltips = ["1.7%", "5%", "12.5%", "20%", "27.5%", "35%", "42.5%", "50%", "57.5%", "65%", "72.5%", "80%", "87.5%","95%", "100%"];
 
-const leftsideTooltips = ["0%", "3%", "5%", "10%", "25%", "45%", "60%", "75%", "95%"];
+const leftsideTooltips = ["0%", "3%", "5%", "10%", "25%", "45%", "60%", "75%", "100%"];
 const leftsideMinusTooltips = ["1%", "4.5%", "9%", "20%", "40%", "55%", "70%", "90%"];
 const leftsidePlusTooltips = ["4%", "7.5%", "15%", "30%", "50%", "65%", "85%", "100%"];
 
@@ -706,7 +844,7 @@ const scalpSections = {
       { label: "", value: 8, minus: 7, plus: 9 },
       { label: "", value: 11, minus: 10, plus: 12 },
       { label: "", value: 14, minus: 13, plus: 15 },
-      { label: "", value: 17, minus: 16, plus: 18 }
+      { label: "", value: 18, minus: 16, plus: 18 }
     ]
   },
   rightside: {
@@ -720,7 +858,7 @@ const scalpSections = {
       { label: "", value: 8, minus: 7, plus: 9 },
       { label: "", value: 11, minus: 10, plus: 12 },
       { label: "", value: 14, minus: 13, plus: 15 },
-      { label: "", value: 17, minus: 16, plus: 18 }
+      { label: "", value: 18, minus: 16, plus: 18 }
     ]
   },
   topside: {
@@ -741,7 +879,7 @@ const scalpSections = {
       { label: "", value: 31, minus: 30, plus: 32 },
       { label: "", value: 34, minus: 33, plus: 35 },
       { label: "", value: 37, minus: 36, plus: 37.3 },
-      { label: "", value: 39, minus: 38.3, plus: 40 }
+      { label: "", value: 40, minus: 38.3, plus: 40 }
     ]
   }
 };
@@ -1079,7 +1217,7 @@ const eyebrowAreas = [
   { label: "", value: 15, plus: 20 },
   { label: "", value: 25, plus: 30 },
   { label: "", value: 35, plus: 40 },
-  { label: "", value: 45, plus: 50 }
+  { label: "", value: 50, plus: 50 }
 ];
 
 let eyebrowSelections = {
@@ -1728,13 +1866,13 @@ function applyTooltipToBoxes(sectionPrefix, tooltips, minusTooltips = [], plusTo
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-  const eyebrowTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
+  const eyebrowTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "100%"];
   const eyebrowPlus = ["7.5%", "20%", "40%", "60%", "80%", "100%"];
   const eyebrowMinus = ["2.5%"];
   applyTooltipToBoxes("left-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.left);
   applyTooltipToBoxes("right-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.right);
 
-  const eyelashTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
+  const eyelashTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "100%"];
   applyTooltipToBoxes("left-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.left);
   applyTooltipToBoxes("right-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.right);
 
@@ -1807,6 +1945,12 @@ function calculateSectionTotals() {
     for (const [id, data] of Object.entries(beardSelections)) {
         const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
         sectionData.Beard += subtotal * (1 - data.density / 100);
+    }
+
+    
+    // Clamp each section to [0,100]
+    for (const k of Object.keys(sectionData)) {
+        sectionData[k] = Math.max(0, Math.min(100, Number(sectionData[k]) || 0));
     }
 
     return sectionData;
@@ -2128,92 +2272,155 @@ window.addEventListener("scroll", function () {
   }
 });
 
+
+
+
+
+
 function updateFloatingPreview() {
   const floating = document.getElementById("floating-preview");
+  if (!floating) return;
+
+  // Preserve/restore close button
   const closeBtn = document.getElementById("floating-close-btn");
   floating.innerHTML = "";
   if (closeBtn) floating.appendChild(closeBtn.cloneNode(true));
 
+  // Build rows from the authoritative selected-preview tiles
+  const source = document.getElementById("selected-preview");
+  if (!source || source.children.length === 0) return;
+
+  // Buckets based on image URL
+  const buckets = {
+    scalp:   { left: [], back: [], right: [], top: [] },
+    brows:   [],
+    lashes:  [],
+    beardR:  [], beardC: [], beardL: []
+  };
+
+  // Helper to get w/h numbers from a node
+  const getWH = (el) => {
+    const cs = getComputedStyle(el);
+    const w = parseFloat(cs.width)  || parseFloat(el.style.width)  || 60;
+    const h = parseFloat(cs.height) || parseFloat(el.style.height) || 60;
+    return { w, h };
+  };
+
+  Array.from(source.children).forEach(child => {
+    const style = child.style;
+    const bg = style.backgroundImage || getComputedStyle(child).backgroundImage || "";
+    const s  = String(bg).toLowerCase();
+    if (!s || s === "none") return;
+
+    const clone = child.cloneNode(true);
+    clone.style.transform = "none";
+    clone.style.transformOrigin = "top left";
+    clone.style.flex = "0 0 auto";
+    clone.style.borderRadius = "6px";
+
+    if (s.includes("leftside-"))       buckets.scalp.left.push(clone);
+    else if (s.includes("backside-"))  buckets.scalp.back.push(clone);
+    else if (s.includes("rightside-")) buckets.scalp.right.push(clone);
+    else if (s.includes("topside-"))   buckets.scalp.top.push(clone);
+    else if (s.includes("eyebrow"))    buckets.brows.push(clone);
+    else if (s.includes("eyelash"))    buckets.lashes.push(clone);
+    else if (s.includes("right-beard"))   buckets.beardR.push(clone);
+    else if (s.includes("central-beard")) buckets.beardC.push(clone);
+    else if (s.includes("left-beard"))    buckets.beardL.push(clone);
+  });
+
+  // Compose rows in fixed order
+  const rows = [];
+
+  function makeRow(label, tiles) {
+    if (!tiles || tiles.length === 0) return null;
+
+    const lab = document.createElement("div");
+    lab.textContent = label;
+    lab.style.fontSize = "12px";
+    lab.style.fontWeight = "600";
+    lab.style.marginBottom = "2px";
+
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.flexWrap = "nowrap";        // prevent wrapping; we'll scale to fit
+    row.style.gap = "6px";
+    row.style.alignItems = "flex-start";
+
+    tiles.forEach(t => row.appendChild(t));
+
+    const block = document.createElement("div");
+    block.style.display = "flex";
+    block.style.flexDirection = "column";
+    block.style.alignItems = "flex-start";
+    block.appendChild(lab);
+    block.appendChild(row);
+
+    // Precompute width/height for instant scale (avoid late reflow)
+    const GAP = 6;
+    let w = 0, h = 0;
+    tiles.forEach((t, i) => {
+      const { w: tw, h: th } = getWH(t);
+      w += tw + (i > 0 ? GAP : 0);
+      if (th > h) h = th;
+    });
+    block.__w = Math.max(w, lab.offsetWidth || 60);
+    block.__h = h + (parseFloat(getComputedStyle(lab).lineHeight) || 14) + 2;
+
+    return block;
+  }
+
+  // Scalp: Left, Back, Right, Top in one row
+  const scalpTiles = [].concat(buckets.scalp.left, buckets.scalp.back, buckets.scalp.right, buckets.scalp.top);
+  const scalpBlock = makeRow("Scalp", scalpTiles);
+  if (scalpBlock) rows.push(scalpBlock);
+
+  // Eyebrows / Eyelashes
+  const browBlock = makeRow("Eyebrows", buckets.brows);
+  if (browBlock) rows.push(browBlock);
+  const lashBlock = makeRow("Eyelashes", buckets.lashes);
+  if (lashBlock) rows.push(lashBlock);
+
+  // Beard: Right, Central, Left
+  const beardTiles = [].concat(buckets.beardR, buckets.beardC, buckets.beardL);
+  const beardBlock = makeRow("Beard", beardTiles);
+  if (beardBlock) rows.push(beardBlock);
+
+  if (rows.length === 0) return;
+
+  // Build container and compute scale BEFORE showing
   const previewInner = document.createElement("div");
   previewInner.style.display = "flex";
   previewInner.style.flexDirection = "column";
-  previewInner.style.gap = "4px";
+  previewInner.style.gap = "6px";
   previewInner.style.alignItems = "flex-start";
   previewInner.style.width = "max-content";
   previewInner.style.pointerEvents = "none";
+  previewInner.style.visibility = "hidden";  // prevent flash
 
-  const sectionOrder = ["scalp", "eyebrows", "eyelashes", "beard"];
-  const areaOrder = {
-    scalp: ["leftside-areas", "backside-areas", "rightside-areas", "topside-areas"],
-    eyebrows: ["right-eyebrow-areas", "left-eyebrow-areas"],
-    eyelashes: ["right-eyelash-areas", "left-eyelash-areas"],
-    beard: ["right-beard-areas", "central-beard-areas", "left-beard-areas"]
-  };
-
-  const collected = {
-    scalp: {}, eyebrows: {}, eyelashes: {}, beard: {}
-  };
-
-  document.querySelectorAll(".area-box.selected").forEach(box => {
-    const parent = box.closest(".area-container");
-    if (!parent || !parent.id) return;
-
-    const section = Object.keys(areaOrder).find(sec =>
-      areaOrder[sec].includes(parent.id)) || "scalp";
-
-    const rect = box.getBoundingClientRect();
-    const bg = box.style.backgroundImage || getComputedStyle(box).backgroundImage;
-
-    const div = document.createElement("div");
-    div.style.width = rect.width + "px";
-    div.style.height = rect.height + "px";
-    div.style.backgroundImage = bg;
-    div.style.backgroundSize = "cover";
-    div.style.backgroundPosition = "center";
-    div.style.borderRadius = "5px";
-    div.style.flex = "0 0 auto";
-    div.style.position = "relative";
-
-    // Add + or - overlay
-    const mark = document.createElement("div");
-    mark.textContent = box.classList.contains("plus") ? "+" : (box.classList.contains("minus") ? "−" : "");
-    mark.style.position = "absolute";
-    mark.style.top = "0";
-    mark.style.right = "2px";
-    mark.style.fontSize = "16px";
-    mark.style.fontWeight = "bold";
-    mark.style.color = "white";
-    mark.style.textShadow = "0 0 3px black";
-    mark.style.pointerEvents = "none";
-    div.appendChild(mark);
-
-    collected[section][parent.id] = collected[section][parent.id] || [];
-    collected[section][parent.id].push(div);
-  });
-
-  sectionOrder.forEach(sec => {
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.gap = "3px";
-    row.style.flexWrap = "nowrap";
-
-    areaOrder[sec].forEach(area => {
-      (collected[sec][area] || []).forEach(el => row.appendChild(el));
-    });
-
-    if (row.childElementCount) previewInner.appendChild(row);
-  });
+  rows.forEach(r => previewInner.appendChild(r));
 
   floating.appendChild(previewInner);
 
-  requestAnimationFrame(() => {
-    const bounds = previewInner.getBoundingClientRect();
-    const scale = Math.min(230 / bounds.width, 230 / bounds.height, 1);
-    previewInner.style.transformOrigin = "top left";
-    previewInner.style.transform = `scale(${scale})`;
-  });
+  // Compute required dimensions from precomputed numbers
+  let totalH = 0, maxW = 0;
+  rows.forEach(r => { totalH += (r.__h || 0) + 6; maxW = Math.max(maxW, r.__w || 0); });
+  totalH -= 6; // remove last gap
+
+  const pad = 16;
+  const fw = floating.clientWidth || 230;
+  const fh = floating.clientHeight || 300;
+  const scale = Math.min((fw - pad) / maxW, (fh - pad) / totalH, 1);
+
+  previewInner.style.transformOrigin = "top left";
+  previewInner.style.transform = `scale(${scale})`;
+  previewInner.style.visibility = "visible"; // reveal scaled content immediately
 }
 </script>
+
+
+
+
 
 <script>
 const allPreviewImages = [
@@ -2846,5 +3053,312 @@ document.addEventListener("DOMContentLoaded", function(){
   document.addEventListener('DOMContentLoaded', checkFloatingPreviewVisibility);
 })();
 </script>
+
+
+
+
+<script>
+/* Smooth sweep + pulse + particle burst on value change for score rings + pinned peek; improved triggers */
+(function () {
+  // Ensure a peek container exists
+  function ensurePeekRoot() {
+    let root = document.getElementById('ring-peek');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'ring-peek';
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  // Make/update a mini ring item
+  const peekItems = new Map(); // key: ring id -> {el, hideTimer}
+
+  // Map region name to its ring id and track the active region for peeks
+  const REGION_TO_RING = {
+    'Scalp': 'ring-scalp',
+    'Eyebrows': 'ring-eyebrows',
+    'Eyelashes': 'ring-eyelashes',
+    'Beard': 'ring-beard'
+  };
+  let currentPeekRegion = null;
+
+  function clearNonActivePeeks() {
+    const root = ensurePeekRoot();
+    const keepRingId = currentPeekRegion ? REGION_TO_RING[currentPeekRegion] : null;
+    for (const [rid, item] of Array.from(peekItems.entries())) {
+      if (!keepRingId || rid !== keepRingId) {
+        if (item.hideTimer) clearTimeout(item.hideTimer);
+        item.el.remove();
+        peekItems.delete(rid);
+      }
+    }
+  }
+  function setMiniRingPct(el, pct) {
+    const clamped = Math.max(0, Math.min(100, pct || 0));
+    const hue = 120 - (clamped * 1.2);
+    el.style.background = `conic-gradient(hsl(${hue}, 85%, 50%) 0% ${clamped}%, #e5e7eb ${clamped}% 100%)`;
+  }
+  function showPeek(ringId, label, pct) {
+    // Only show peek for the current active region, if set
+    if (currentPeekRegion) {
+      const keepRingId = REGION_TO_RING[currentPeekRegion] || null;
+      if (keepRingId && ringId !== keepRingId) return;
+    }
+    const root = ensurePeekRoot();
+    clearNonActivePeeks();
+    let item = peekItems.get(ringId);
+    if (!item) {
+      const container = document.createElement('div');
+      container.className = 'peek-item';
+      const circle = document.createElement('div');
+      circle.className = 'peek-ring';
+      const textWrap = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'peek-title';
+      title.textContent = label;
+      const value = document.createElement('div');
+      value.className = 'peek-value';
+      value.textContent = (pct ?? 0).toFixed ? (pct).toFixed(1) + '%' : pct + '%';
+      textWrap.appendChild(title);
+      textWrap.appendChild(value);
+      container.appendChild(circle);
+      container.appendChild(textWrap);
+      root.appendChild(container);
+      item = { el: container, circle, title, value, hideTimer: null };
+      peekItems.set(ringId, item);
+      // Click to scroll to the ring or section
+      container.addEventListener('click', () => {
+        let target = document.getElementById(ringId);
+        if (!target) {
+          // try matching section by label
+          const sec = Array.from(document.querySelectorAll('section, .section, .area, fieldset')).find(el =>
+            el.textContent && el.textContent.toLowerCase().includes(label.toLowerCase())
+          );
+          if (sec) target = sec;
+        }
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+    item.title.textContent = label;
+    item.value.textContent = (Number(pct)||0).toFixed(1) + '%';
+    setMiniRingPct(item.circle, pct);
+
+    // reset hide timer (2s)
+    if (item.hideTimer) clearTimeout(item.hideTimer);
+    item.el.classList.remove('hide');
+    item.hideTimer = setTimeout(() => {
+      item.el.classList.add('hide');
+      setTimeout(() => {
+        if (peekItems.get(ringId) === item) {
+          item.el.remove();
+          peekItems.delete(ringId);
+          if (peekItems.size === 0) { currentPeekRegion = null; }
+        }
+      }, 260);
+    }, 2000);
+  }
+
+  const previous = new Map();
+  const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+  function numberTween(from, to, t) { return from + (to - from) * t; }
+  function burst(ringEl, colorHue) {
+    const n = 12;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('span');
+      s.className = 'particle';
+      const theta = (i * (360 / n)) + (Math.random() * 10 - 5);
+      s.style.setProperty('--theta', theta + 'deg');
+      s.style.setProperty('--time', (320 + Math.random() * 240) + 'ms');
+      s.style.background = `hsl(${colorHue}, 85%, 50%)`;
+      ringEl.appendChild(s);
+      setTimeout(() => s.remove(), 700);
+    }
+  }
+  function hueForPct(pct) { return 120 - (pct * 1.2); }
+
+  // Animate a single ring to target percentage; 'label' used for peek
+  function animateRingTo(ringEl, valueEl, targetPct, label) {
+    const to = Math.max(0, Math.min(100, Number(targetPct) || 0));
+    const from = previous.has(ringEl) ? previous.get(ringEl) : 0;
+
+    // If difference is extremely small, still update text & peek so user sees feedback
+    if (Math.abs(to - from) < 0.001) {
+      if (typeof setRingPct === 'function') setRingPct(ringEl, to);
+      if (valueEl) valueEl.textContent = to.toFixed(1) + '%';
+      showPeek(ringEl.id || label, label, to);
+      previous.set(ringEl, to);
+      return;
+    }
+
+    const increasing = to > from;
+    const overshoot = increasing ? Math.min(100, to + Math.min(8, (to - from) * 0.25)) : to;
+
+    ringEl.classList.remove('flash'); void ringEl.offsetWidth; ringEl.classList.add('flash');
+
+    const start = performance.now();
+    const duration = 850;
+
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const k = easeOutCubic(t);
+      const current = numberTween(from, overshoot, k);
+      if (typeof setRingPct === 'function') setRingPct(ringEl, current);
+      const shown = numberTween(from, to, k);
+      if (valueEl) valueEl.textContent = shown.toFixed(1) + '%';
+
+      // Always mirror progress into the peek widget
+      showPeek(ringEl.id || label, label, shown);
+
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        if (typeof setRingPct === 'function') setRingPct(ringEl, to);
+        previous.set(ringEl, to);
+        burst(ringEl, hueForPct(to));
+        showPeek(ringEl.id || label, label, to);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const originalUpdate = window.updateScoreRings;
+  window.updateScoreRings = function () {
+    if (typeof calculateSectionTotals !== 'function') { if (typeof originalUpdate === 'function') try{originalUpdate()}catch{}; return; }
+    const totals = calculateSectionTotals();
+    const entries = [
+      ['Scalp',     'ring-scalp',     'ring-val-scalp'],
+      ['Eyebrows',  'ring-eyebrows',  'ring-val-eyebrows'],
+      ['Eyelashes', 'ring-eyelashes', 'ring-val-eyelashes'],
+      ['Beard',     'ring-beard',     'ring-val-beard'],
+    ];
+    entries.forEach(([key, ringId, valId]) => {
+      const ring = document.getElementById(ringId);
+      const val  = document.getElementById(valId);
+      if (!ring || !val) return;
+      const pct = (totals && totals[key] != null) ? Number(totals[key]) : 0;
+      animateRingTo(ring, val, pct, key);
+    });
+
+    const progressBar = document.querySelector('#scalp-progress > div');
+    if (progressBar) {
+      const scalpPct = (totals && totals['Scalp'] != null) ? Number(totals['Scalp']) : 0;
+      progressBar.style.width = `${Math.max(0, Math.min(100, scalpPct))}%`;
+    }
+
+    if (typeof originalUpdate === 'function') { try { originalUpdate(); } catch {} }
+  };
+
+  // Heuristic: detect which region the user is interacting with from the event target
+  
+  
+function detectRegionFromEventTarget(t) {
+  // Compose a broad string from the element and a nearby container
+  const s = (
+    (t.id||'') + ' ' + (t.name||'') + ' ' + (t.className||'') + ' ' +
+    (t.getAttribute && (t.getAttribute('aria-label')||'')) + ' ' +
+    (t.closest && (t.closest('section, fieldset, .section, .area, .card')?.textContent||''))
+  ).toLowerCase();
+
+  // Quick text checks
+  if (s.includes('eyebrow') || s.includes('brow')) return 'Eyebrows';
+  if (s.includes('eyelash') || s.includes('eyelid')) return 'Eyelashes';
+  if (s.includes('beard')) return 'Beard';
+  if (s.includes('scalp')) return 'Scalp';
+
+  // Ancestor id/class checks
+  if (t.closest('[id*="eyebrow" i], [class*="eyebrow" i], [aria-label*="eyebrow" i]')) return 'Eyebrows';
+  if (t.closest('[id*="eyelash" i], [class*="eyelash" i], [aria-label*="eyelash" i], [id*="eyelid" i], [class*="eyelid" i]')) return 'Eyelashes';
+  if (t.closest('[id*="beard" i], [class*="beard" i], [aria-label*="beard" i]')) return 'Beard';
+
+  // Scalp sections use ids without the word "scalp" (backside/leftside/rightside/topside).
+  // Detect those.
+  if (t.closest('[id*="backside" i], [id*="leftside" i], [id*="rightside" i], [id*="topside" i]')) return 'Scalp';
+  if (t.closest('[id$="-density" i]')) {
+    const id = (t.closest('[id$="-density" i]')?.id||'').toLowerCase();
+    if (/(backside|leftside|rightside|topside)-density/.test(id)) return 'Scalp';
+  }
+
+  return null;
+}
+
+
+
+  
+
+
+
+function showImmediatePeekFor(region) {
+  const map = {
+    'Scalp':     ['ring-scalp',     'ring-val-scalp'],
+    'Eyebrows':  ['ring-eyebrows',  'ring-val-eyebrows'],
+    'Eyelashes': ['ring-eyelashes', 'ring-val-eyelashes'],
+    'Beard':     ['ring-beard',     'ring-val-beard'],
+  };
+  const pair = map[region];
+  if (!pair) return;
+  const [ringId, valId] = pair;
+  const ring = document.getElementById(ringId);
+  const val  = document.getElementById(valId);
+  if (!ring || !val) return;
+
+  // Authoritative target from calculation
+  let target = 0;
+  try {
+    if (typeof calculateSectionTotals === 'function') {
+      const totals = calculateSectionTotals();
+      if (totals && totals[region] != null) target = Number(totals[region]) || 0;
+      else target = 0;
+    } else {
+      target = parseFloat((val.textContent||'0').replace('%','')) || 0;
+    }
+  } catch(_) {
+    target = parseFloat((val.textContent||'0').replace('%','')) || 0;
+  }
+
+  // Show peek immediately and then animate ring/text
+  try { showPeek(ringId, region, target); } catch(_){}
+  if (typeof animateRingTo === 'function') {
+    try { animateRingTo(ring, val, target, region); } catch(_){}
+  }
+}
+
+['input','change','click'].forEach(evt => {
+  document.addEventListener(evt, (e) => {
+    const region = detectRegionFromEventTarget(e.target);
+    if (!region) return;
+    currentPeekRegion = region;
+    clearNonActivePeeks();
+    // Defer until after native handlers (toggle* functions) complete
+    const run = () => {
+      if (typeof window.updateScoreRings === 'function') {
+        try { window.updateScoreRings(); } catch {}
+      }
+      showImmediatePeekFor(region);
+    };
+    if ('requestAnimationFrame' in window) {
+      requestAnimationFrame(() => setTimeout(run, 0));
+    } else {
+      setTimeout(run, 0);
+    }
+  }, false); // listen in bubbling phase
+});
+
+
+  window.addEventListener('DOMContentLoaded', () => {
+    [['ring-scalp','ring-val-scalp','Scalp'],['ring-eyebrows','ring-val-eyebrows','Eyebrows'],
+     ['ring-eyelashes','ring-val-eyelashes','Eyelashes'],['ring-beard','ring-val-beard','Beard']]
+      .forEach(([rid, vid]) => {
+        const r = document.getElementById(rid);
+        const v = document.getElementById(vid);
+        if (r && v) {
+          const n = parseFloat((v.textContent || '0').replace('%','')) || 0;
+          previous.set(r, n);
+        }
+      });
+  });
+})();
+</script>
+
+
 
 </body></html>
