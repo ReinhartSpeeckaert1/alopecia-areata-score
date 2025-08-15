@@ -2501,6 +2501,15 @@ setInterval(updateScoreRings, 700);
       <h2 style='text-align:center;'>${title}</h2>
       <p style='text-align:center;'><em>${datetime}</em></p>
       <hr/>
+
+        <style>
+          #pdf-summary{max-width:190mm;}
+          #pdf-summary table{width:100%;max-width:190mm;border-collapse:collapse;table-layout:fixed;}
+          #pdf-summary td{border:1px solid #ccc;padding:6px;word-wrap:break-word;white-space:normal;}
+          #pdf-summary tr{page-break-inside:avoid;break-inside:avoid;-webkit-region-break-inside:avoid;-webkit-column-break-inside:avoid;}
+          #pdf-summary table, #pdf-summary td{page-break-inside:avoid;break-inside:avoid;}
+        </style>
+
       <h3>Summary of Alopecia Areata Involvement</h3>
       <ul>
         <li><strong>Total Scalp:</strong> ${scalp}</li>
@@ -2534,8 +2543,7 @@ setInterval(updateScoreRings, 700);
       } catch(e) {}
     
 
-    html2pdf().set({
-      margin: 10,
+    html2pdf().set({ margin: 10, pagebreak: { mode: ['css','legacy'], avoid: ['tr','td','.no-split'] },
       filename: 'alopecia_areata_detailed_summary.pdf',
       html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
