@@ -2100,7 +2100,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 margin:       0.3,
                 filename:     'alopecia_preview.pdf',
                 Image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(previewArea).save();
@@ -2111,124 +2111,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script>
-document.getElementById("generate-pdf").addEventListener("click", function () {
-  const now = new Date();
-  const datetime = now.toLocaleString();
-  const title = "Alopecia Areata Calculator";
-
-  const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
-  const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
-  const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
-  const beard = document.getElementById("beard-title").innerText.match(/\((.*?)\)/)[1];
-
-  const preview = document.getElementById("selected-preview").cloneNode(true);
-  const summarySection = document.createElement("div");
-  summarySection.id = "pdf-summary";
-  summarySection.style.margin = "20px";
-  summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-  summarySection.innerHTML = `
-    <h2 style='text-align:center;'>${title}</h2>
-    <p style='text-align:center;'><em>${datetime}</em></p>
-    <hr/>
-    <h3>Summary of Alopecia Areata Involvement</h3>
-    <ul>
-      <li><strong>Scalp:</strong> ${scalp}</li>
-      <li><strong>Eyebrows:</strong> ${eyebrows}</li>
-      <li><strong>Eyelashes:</strong> ${eyelashes}</li>
-      <li><strong>Beard:</strong> ${beard}</li>
-    </ul>
-    <h3>Selected Areas Preview</h3>
-  `;
-  summarySection.appendChild(preview);
-
-  document.body.appendChild(summarySection);
-
-  html2pdf().set({
-    margin: 10,
-    filename: 'alopecia_areata_summary.pdf',
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).from(summarySection).save().then(() => {
-    document.body.removeChild(summarySection);
-  });
+/* removed previous generate-pdf listener */
 });
 </script>
 <script>
-document.getElementById("generate-pdf").addEventListener("click", function () {
-  const now = new Date();
-  const datetime = now.toLocaleString();
-  const title = "Alopecia Areata Calculator";
-
-  const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
-  const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
-  const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
-  const beard = document.getElementById("beard-title").innerText.match(/\((.*?)\)/)[1];
-
-  function getSubtotal(selections, density = 0) {
-    let total = 0;
-    for (const val of selections) {
-      total += val * (1 - density / 100);
-    }
-    return total.toFixed(2);
-  }
-
-  // Collect detailed data
-  const leftScalp = getSubtotal(globalSelections["leftside"].selected, globalSelections["leftside"].density);
-  const rightScalp = getSubtotal(globalSelections["rightside"].selected, globalSelections["rightside"].density);
-  const topScalp = getSubtotal(globalSelections["topside"].selected, globalSelections["topside"].density);
-  const backScalp = getSubtotal(globalSelections["backside"].selected, globalSelections["backside"].density);
-
-  const leftEyebrow = getSubtotal(eyebrowSelections.left);
-  const rightEyebrow = getSubtotal(eyebrowSelections.right);
-
-  const leftEyelash = getSubtotal(eyelashSelections.left);
-  const rightEyelash = getSubtotal(eyelashSelections.right);
-
-  const leftBeard = getSubtotal(beardSelections["left-beard"].selected, beardSelections["left-beard"].density);
-  const rightBeard = getSubtotal(beardSelections["right-beard"].selected, beardSelections["right-beard"].density);
-  const centralBeard = getSubtotal(beardSelections["central-beard"].selected, beardSelections["central-beard"].density);
-
-  const summarySection = document.createElement("div");
-  summarySection.id = "pdf-summary";
-  summarySection.style.margin = "20px";
-  summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-  summarySection.innerHTML = `
-    <h2 style='text-align:center;'>${title}</h2>
-    <p style='text-align:center;'><em>${datetime}</em></p>
-    <hr/>
-    <h3>Summary of Alopecia Areata Involvement</h3>
-    <ul>
-      <li><strong>Total Scalp:</strong> ${scalp}</li>
-      <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
-      <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-      <li><strong>Total Beard:</strong> ${beard}</li>
-    </ul>
-    <h3>Detailed Area Breakdown</h3>
-    <ul>
-      <li><strong>Left Scalp:</strong> ${leftScalp}% test </li>
-      <li><strong>Right Scalp:</strong> ${rightScalp}%</li>
-      <li><strong>Top of the Head:</strong> ${topScalp}%</li>
-      <li><strong>Back of the Head:</strong> ${backScalp}%</li>
-      <li><strong>Left Eyebrow:</strong> ${leftEyebrow}%</li>
-      <li><strong>Right Eyebrow:</strong> ${rightEyebrow}%</li>
-      <li><strong>Left Eyelash:</strong> ${leftEyelash}%</li>
-      <li><strong>Right Eyelash:</strong> ${rightEyelash}%</li>
-      <li><strong>Left Beard Area:</strong> ${leftBeard}%</li>
-      <li><strong>Right Beard Area:</strong> ${rightBeard}%</li>
-      <li><strong>Central Beard Area:</strong> ${centralBeard}%</li>
-    </ul>
-  `;
-
-  document.body.appendChild(summarySection);
-
-  html2pdf().set({
-    margin: 10,
-    filename: 'alopecia_areata_detailed_summary.pdf',
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).from(summarySection).save().then(() => {
-    document.body.removeChild(summarySection);
-  });
+/* removed previous generate-pdf listener */
 });
 </script>
 <div id="floating-preview" style="position: fixed; top: 20px; right: 20px; width: 250px; height: 250px; padding: 0; margin: 0; overflow: hidden; z-index: 9999; display: none; background: none !important; border: none !important; pointer-events: none;">
@@ -2552,7 +2439,7 @@ setInterval(updateScoreRings, 700);
   }
 })();
 
-// --- Replace PDF click handler to include relative percentages ---
+// --- Replace PDF click handler to include Percentage of the areas ---
 (function() {
   const oldBtn = document.getElementById("generate-pdf");
   if (!oldBtn) return;
@@ -2623,26 +2510,34 @@ setInterval(updateScoreRings, 700);
       </ul>
       <h3>Detailed Area Breakdown</h3>
       <ul>
-        <li><strong>Left Scalp:</strong> ${leftScalp}% (=relative percentage=${rel(leftScalp, MAX.leftScalp)}%)</li>
-        <li><strong>Right Scalp:</strong> ${rightScalp}% (=relative percentage=${rel(rightScalp, MAX.rightScalp)}%)</li>
-        <li><strong>Top of the Head:</strong> ${topScalp}% (=relative percentage=${rel(topScalp, MAX.topScalp)}%)</li>
-        <li><strong>Back of the Head:</strong> ${backScalp}% (=relative percentage=${rel(backScalp, MAX.backScalp)}%)</li>
-        <li><strong>Left Eyebrow:</strong> ${leftEyebrow}% (=relative percentage=${rel(leftEyebrow, MAX.leftEyebrow)}%)</li>
-        <li><strong>Right Eyebrow:</strong> ${rightEyebrow}% (=relative percentage=${rel(rightEyebrow, MAX.rightEyebrow)}%)</li>
-        <li><strong>Left Eyelash:</strong> ${leftEyelash}% (=relative percentage=${rel(leftEyelash, MAX.leftEyelash)}%)</li>
-        <li><strong>Right Eyelash:</strong> ${rightEyelash}% (=relative percentage=${rel(rightEyelash, MAX.rightEyelash)}%)</li>
-        <li><strong>Left Beard Area:</strong> ${leftBeard}% (=relative percentage=${rel(leftBeard, MAX.leftBeard)}%)</li>
-        <li><strong>Right Beard Area:</strong> ${rightBeard}% (=relative percentage=${rel(rightBeard, MAX.rightBeard)}%)</li>
-        <li><strong>Central Beard Area:</strong> ${centralBeard}% (=relative percentage=${rel(centralBeard, MAX.centralBeard)}%)</li>
+        <li><strong>Left Scalp:</strong> ${leftScalp}% (=Percentage of the area=${rel(leftScalp, MAX.leftScalp)}%)</li>
+        <li><strong>Right Scalp:</strong> ${rightScalp}% (=Percentage of the area=${rel(rightScalp, MAX.rightScalp)}%)</li>
+        <li><strong>Top of the Head:</strong> ${topScalp}% (=Percentage of the area=${rel(topScalp, MAX.topScalp)}%)</li>
+        <li><strong>Back of the Head:</strong> ${backScalp}% (=Percentage of the area=${rel(backScalp, MAX.backScalp)}%)</li>
+        <li><strong>Left Eyebrow:</strong> ${leftEyebrow}% (=Percentage of the area=${rel(leftEyebrow, MAX.leftEyebrow)}%)</li>
+        <li><strong>Right Eyebrow:</strong> ${rightEyebrow}% (=Percentage of the area=${rel(rightEyebrow, MAX.rightEyebrow)}%)</li>
+        <li><strong>Left Eyelash:</strong> ${leftEyelash}% (=Percentage of the area=${rel(leftEyelash, MAX.leftEyelash)}%)</li>
+        <li><strong>Right Eyelash:</strong> ${rightEyelash}% (=Percentage of the area=${rel(rightEyelash, MAX.rightEyelash)}%)</li>
+        <li><strong>Left Beard Area:</strong> ${leftBeard}% (=Percentage of the area=${rel(leftBeard, MAX.leftBeard)}%)</li>
+        <li><strong>Right Beard Area:</strong> ${rightBeard}% (=Percentage of the area=${rel(rightBeard, MAX.rightBeard)}%)</li>
+        <li><strong>Central Beard Area:</strong> ${centralBeard}% (=Percentage of the area=${rel(centralBeard, MAX.centralBeard)}%)</li>
       </ul>
     `;
 
     document.body.appendChild(summarySection);
+      // Ensure images can be rendered by html2canvas when loaded from another origin
+      try {
+        summarySection.querySelectorAll('img').forEach(img => {
+          if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+          // If images are data: URLs this has no effect, but it is safe.
+        });
+      } catch(e) {}
+    
 
     html2pdf().set({
       margin: 10,
       filename: 'alopecia_areata_detailed_summary.pdf',
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     }).from(summarySection).save().then(() => {
       document.body.removeChild(summarySection);
@@ -2750,17 +2645,17 @@ setInterval(updateScoreRings, 700);
     lines.push(`- Total Beard: ${totals.beard}`);
     lines.push("");
     lines.push("Detailed Area Breakdown");
-    lines.push(`- Left Scalp: ${details.leftScalp}% (=relative percentage=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-    lines.push(`- Right Scalp: ${details.rightScalp}% (=relative percentage=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-    lines.push(`- Top of the Head: ${details.topScalp}% (=relative percentage=${rel(details.topScalp, MAX.topScalp)}%)`);
-    lines.push(`- Back of the Head: ${details.backScalp}% (=relative percentage=${rel(details.backScalp, MAX.backScalp)}%)`);
-    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=relative percentage=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=relative percentage=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=relative percentage=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=relative percentage=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-    lines.push(`- Left Beard Area: ${details.leftBeard}% (=relative percentage=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-    lines.push(`- Right Beard Area: ${details.rightBeard}% (=relative percentage=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-    lines.push(`- Central Beard Area: ${details.centralBeard}% (=relative percentage=${rel(details.centralBeard, MAX.centralBeard)}%)`);
+    lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
+    lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
+    lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
+    lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
+    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
+    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
+    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
+    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
+    lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
+    lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
+    lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
 
     const text = lines.join("
 ");
@@ -2927,17 +2822,17 @@ document.addEventListener("DOMContentLoaded", function(){
       lines.push(`- Total Beard: ${totals.beard}`);
       lines.push("");
       lines.push("Detailed Area Breakdown");
-      lines.push(`- Left Scalp: ${details.leftScalp}% (=relative percentage=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-      lines.push(`- Right Scalp: ${details.rightScalp}% (=relative percentage=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-      lines.push(`- Top of the Head: ${details.topScalp}% (=relative percentage=${rel(details.topScalp, MAX.topScalp)}%)`);
-      lines.push(`- Back of the Head: ${details.backScalp}% (=relative percentage=${rel(details.backScalp, MAX.backScalp)}%)`);
-      lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=relative percentage=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-      lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=relative percentage=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-      lines.push(`- Left Eyelash: ${details.leftEyelash}% (=relative percentage=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-      lines.push(`- Right Eyelash: ${details.rightEyelash}% (=relative percentage=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-      lines.push(`- Left Beard Area: ${details.leftBeard}% (=relative percentage=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-      lines.push(`- Right Beard Area: ${details.rightBeard}% (=relative percentage=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-      lines.push(`- Central Beard Area: ${details.centralBeard}% (=relative percentage=${rel(details.centralBeard, MAX.centralBeard)}%)`);
+      lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
+      lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
+      lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
+      lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
+      lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
+      lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
+      lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
+      lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
+      lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
+      lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
+      lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
 
       const text = lines.join("\n");
 
@@ -3360,5 +3255,139 @@ function showImmediatePeekFor(region) {
 </script>
 
 
+
+
+<script>
+(function(){
+  ));
+    }
+    
+    catch (err) {
+            // Tainted canvas; hide the image to avoid blocking export
+            img.style.display = 'none';
+          }
+        } catch (e) {
+          img.style.display = 'none';
+        }
+      }
+    }
+
+    async function buildAndSavePdf(e){
+    try{
+      if (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+      if (window.__pdfRunning) return;
+      window.__pdfRunning = true;
+
+      const now = new Date();
+      const datetime = now.toLocaleString();
+      const title = "Alopecia Areata Calculator";
+
+      const scalp = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
+      const eyebrows = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+      const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+      const beard = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+
+      function getSubtotal(selections, density){
+        let total = 0;
+        if (selections && typeof selections.forEach === "function") {
+          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
+        } else if (Array.isArray(selections)) {
+          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
+        }
+        return total.toFixed(2);
+      }
+
+      
+      const MAX = {
+        leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
+        leftEyebrow: 50, rightEyebrow: 50,
+        leftEyelash: 50, rightEyelash: 50,
+        leftBeard: 40, rightBeard: 40, centralBeard: 20
+      };
+      function rel(val, max){ try { return ( (Number(val)||0) / (Number(max)||1) * 100 ).toFixed(2); } catch(e){ return "0.00"; } }
+    const leftScalp  = getSubtotal((globalSelections?.leftside||{}).selected,  globalSelections?.leftside?.density);
+      const rightScalp = getSubtotal((globalSelections?.rightside||{}).selected, globalSelections?.rightside?.density);
+      const topScalp   = getSubtotal((globalSelections?.topside||{}).selected,   globalSelections?.topside?.density);
+      const backScalp  = getSubtotal((globalSelections?.backside||{}).selected,  globalSelections?.backside?.density);
+
+      const leftEyebrow  = getSubtotal(eyebrowSelections?.left, 0);
+      const rightEyebrow = getSubtotal(eyebrowSelections?.right, 0);
+
+      const leftEyelash  = getSubtotal(eyelashSelections?.left, 0);
+      const rightEyelash = getSubtotal(eyelashSelections?.right, 0);
+
+      const leftBeard    = getSubtotal(beardSelections?.["left-beard"]?.selected,    beardSelections?.["left-beard"]?.density);
+      const rightBeard   = getSubtotal(beardSelections?.["right-beard"]?.selected,   beardSelections?.["right-beard"]?.density);
+      const centralBeard = getSubtotal(beardSelections?.["central-beard"]?.selected, beardSelections?.["central-beard"]?.density);
+
+      const summarySection = document.createElement("div");
+      summarySection.id = "pdf-summary";
+      summarySection.style.margin = "20px";
+      summarySection.style.fontFamily = "'Segoe UI', sans-serif";
+      summarySection.innerHTML = `
+        <h2 style='text-align:center;'>${title}</h2>
+        <p style='text-align:center;'><em>${datetime}</em></p>
+        <hr/>
+        <h3>Summary of Alopecia Areata Involvement</h3>
+        <ul>
+          <li><strong>Total Scalp:</strong> ${scalp}</li>
+          <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
+          <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
+          <li><strong>Total Beard:</strong> ${beard}</li>
+        </ul>
+        <h3>Detailed Area Breakdown</h3>
+        <table id="detail-table" style="width:100%;border-collapse:collapse;">
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${leftScalp}% (Percentage of the area: ${rel(leftScalp, MAX.leftScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${rightScalp}% (Percentage of the area: ${rel(rightScalp, MAX.rightScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${topScalp}% (Percentage of the area: ${rel(topScalp, MAX.topScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${backScalp}% (Percentage of the area: ${rel(backScalp, MAX.backScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${leftEyebrow}% (Percentage of the area: ${rel(leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${rightEyebrow}% (Percentage of the area: ${rel(rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${leftEyelash}% (Percentage of the area: ${rel(leftEyelash, MAX.leftEyelash)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${rightEyelash}% (Percentage of the area: ${rel(rightEyelash, MAX.rightEyelash)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${leftBeard}% (Percentage of the area: ${rel(leftBeard, MAX.leftBeard)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${rightBeard}% (Percentage of the area: ${rel(rightBeard, MAX.rightBeard)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${centralBeard}% (Percentage of the area: ${rel(centralBeard, MAX.centralBeard)}%)</td></tr>
+        </table>
+        `;
+
+      const preview = document.getElementById("selected-preview")?.cloneNode(true);
+      document.body.appendChild(summarySection);
+      // Ensure images can be rendered by html2canvas when loaded from another origin
+      try {
+        summarySection.querySelectorAll('img').forEach(img => {
+          if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+          // If images are data: URLs this has no effect, but it is safe.
+        });
+      } catch(e) {}
+    
+      html2pdf().set({
+        margin: 10,
+        filename: 'alopecia_areata_summary_with_details.pdf',
+        html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(summarySection).save()
+      .then(() => { /* success */ })
+      .catch((err) => { console && console.warn && console.warn('PDF export failed:', err); })
+      .finally(() => { try { document.body.removeChild(summarySection); } catch(e) {} window.__pdfRunning = false; });
+    }catch(err){ window.__pdfRunning = false; }
+    return false;
+  }
+
+  function install(){
+    const btn = document.getElementById("generate-pdf");
+    if (!btn) return;
+    const clone = btn.cloneNode(true); // strips all listeners
+    btn.parentNode.replaceChild(clone, btn);
+    clone.addEventListener("click", (ev)=>{ buildAndSavePdf(ev); }, true); // capture
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(install, 0);
+  } else {
+    document.addEventListener("DOMContentLoaded", install);
+  }
+})();
+</script>
 
 </body></html>
