@@ -3390,4 +3390,117 @@ function showImmediatePeekFor(region) {
 })();
 </script>
 
+
+<script>
+(function(){
+  function buildAndSavePdf(e){
+    try {
+      if (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+      if (window.__pdfRunning) return false;
+      window.__pdfRunning = true;
+
+      const now = new Date();
+      const datetime = now.toLocaleString();
+      const title = "Alopecia Areata Calculator";
+
+      const scalp = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
+      const eyebrows = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+      const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+      const beard = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+
+      function getSubtotal(selections, density){
+        let total = 0;
+        if (selections && typeof selections.forEach === "function") {
+          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
+        } else if (Array.isArray(selections)) {
+          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
+        }
+        return total.toFixed(2);
+      }
+
+      // Compute detailed values
+      const leftScalp  = getSubtotal((globalSelections?.leftside||{}).selected,  globalSelections?.leftside?.density);
+      const rightScalp = getSubtotal((globalSelections?.rightside||{}).selected, globalSelections?.rightside?.density);
+      const topScalp   = getSubtotal((globalSelections?.topside||{}).selected,   globalSelections?.topside?.density);
+      const backScalp  = getSubtotal((globalSelections?.backside||{}).selected,  globalSelections?.backside?.density);
+
+      const leftEyebrow  = getSubtotal(eyebrowSelections?.left, 0);
+      const rightEyebrow = getSubtotal(eyebrowSelections?.right, 0);
+
+      const leftEyelash  = getSubtotal(eyelashSelections?.left, 0);
+      const rightEyelash = getSubtotal(eyelashSelections?.right, 0);
+
+      const leftBeard    = getSubtotal(beardSelections?.["left-beard"]?.selected,    beardSelections?.["left-beard"]?.density);
+      const rightBeard   = getSubtotal(beardSelections?.["right-beard"]?.selected,   beardSelections?.["right-beard"]?.density);
+      const centralBeard = getSubtotal(beardSelections?.["central-beard"]?.selected, beardSelections?.["central-beard"]?.density);
+
+      const MAX = {
+        leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
+        leftEyebrow: 50, rightEyebrow: 50,
+        leftEyelash: 50, rightEyelash: 50,
+        leftBeard: 40, rightBeard: 40, centralBeard: 20
+      };
+      function pctArea(val, max){ try { return ( (Number(val)||0) / (Number(max)||1) * 100 ).toFixed(2); } catch(e){ return "0.00"; } }
+
+      // Compose export section (no pictures)
+      const section = document.createElement("div");
+      section.id = "pdf-summary";
+      section.style.margin = "20px";
+      section.style.fontFamily = "'Segoe UI', sans-serif";
+      section.innerHTML = `
+        <h2 style='text-align:center;'>${title}</h2>
+        <p style='text-align:center;'><em>${datetime}</em></p>
+        <hr/>
+        <h3>Summary of Alopecia Areata Involvement</h3>
+        <ul>
+          <li><strong>Total Scalp:</strong> ${scalp}</li>
+          <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
+          <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
+          <li><strong>Total Beard:</strong> ${beard}</li>
+        </ul>
+        <h3>Detailed Area Breakdown</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${leftScalp}% (Percentage of the area: ${pctArea(leftScalp, MAX.leftScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${rightScalp}% (Percentage of the area: ${pctArea(rightScalp, MAX.rightScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${topScalp}% (Percentage of the area: ${pctArea(topScalp, MAX.topScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${backScalp}% (Percentage of the area: ${pctArea(backScalp, MAX.backScalp)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${leftEyebrow}% (Percentage of the area: ${pctArea(leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${rightEyebrow}% (Percentage of the area: ${pctArea(rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${leftEyelash}% (Percentage of the area: ${pctArea(leftEyelash, MAX.leftEyelash)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${rightEyelash}% (Percentage of the area: ${pctArea(rightEyelash, MAX.rightEyelash)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${leftBeard}% (Percentage of the area: ${pctArea(leftBeard, MAX.leftBeard)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${rightBeard}% (Percentage of the area: ${pctArea(rightBeard, MAX.rightBeard)}%)</td></tr>
+          <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${centralBeard}% (Percentage of the area: ${pctArea(centralBeard, MAX.centralBeard)}%)</td></tr>
+        </table>
+      `;
+
+      document.body.appendChild(section);
+      html2pdf().set({
+        margin: 10,
+        filename: 'alopecia_areata_summary_without_pictures.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(section).save()
+        .catch((err)=>{ console && console.warn && console.warn('PDF export failed:', err); })
+        .finally(()=>{ try { document.body.removeChild(section); } catch(e) {} window.__pdfRunning = false; });
+    } catch (err) { window.__pdfRunning = false; }
+    return false;
+  }
+
+  function install(){
+    const btn = document.getElementById("generate-pdf");
+    if (!btn) return;
+    const clone = btn.cloneNode(true);   // strips ALL previous listeners
+    btn.parentNode.replaceChild(clone, btn);
+    clone.addEventListener("click", buildAndSavePdf, true); // capture phase
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(install, 0);
+  } else {
+    document.addEventListener("DOMContentLoaded", install);
+  }
+})();
+</script>
+
 </body></html>
