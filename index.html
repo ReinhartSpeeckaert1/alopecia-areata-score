@@ -1423,7 +1423,7 @@ function updateSelectedPreview() {
             infoLabel.style.padding = "2px 4px";
             infoLabel.style.borderRadius = "4px";
             infoLabel.style.boxShadow = "0 0 2px rgba(0,0,0,0.2)";
-            infoLabel.innerText = `${adjusted}%; (Dens:${density}%)`;
+            infoLabel.innerText = density > 0 ? `${adjusted}%; (Dens:${density}%)` : `${adjusted}%`;
             previewBox.appendChild(infoLabel);
         }
 
