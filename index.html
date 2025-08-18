@@ -807,7 +807,7 @@ const topsideTooltips = ["0%", "1.25%", "2.5%", "10%", "17%", "25%", "32.5%", "4
 const topsideMinusTooltips = ["0.5%", "2%", "7.5%", "15%", "22.5%", "30%", "37.5%", "45%", "52.5%", "60%", "67.5%", "75", "82.5%", "90", "96%"];
 const topsidePlusTooltips = ["1.7%", "5%", "12.5%", "20%", "27.5%", "35%", "42.5%", "50%", "57.5%", "65%", "72.5%", "80%", "87.5%","95%", "100%"];
 
-const leftsideTooltips = ["0%", "3%", "5%", "10%", "25%", "45%", "60%", "75%", "100%"];
+const leftsideTooltips = ["0%", "3%", "5%", "10%", "25%", "45%", "60%", "75%", "95%"];
 const leftsideMinusTooltips = ["1%", "4.5%", "9%", "20%", "40%", "55%", "70%", "90%"];
 const leftsidePlusTooltips = ["4%", "7.5%", "15%", "30%", "50%", "65%", "85%", "100%"];
 
@@ -1866,13 +1866,13 @@ function applyTooltipToBoxes(sectionPrefix, tooltips, minusTooltips = [], plusTo
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-  const eyebrowTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "100%"];
+  const eyebrowTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
   const eyebrowPlus = ["7.5%", "20%", "40%", "60%", "80%", "100%"];
   const eyebrowMinus = ["2.5%"];
   applyTooltipToBoxes("left-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.left);
   applyTooltipToBoxes("right-eyebrow", eyebrowTooltips, eyebrowMinus, eyebrowPlus, eyebrowSelections.right);
 
-  const eyelashTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "100%"];
+  const eyelashTooltips = ["0%", "5%", "10%", "30%", "50%", "70%", "90%"];
   applyTooltipToBoxes("left-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.left);
   applyTooltipToBoxes("right-eyelash", eyelashTooltips, eyebrowMinus, eyebrowPlus, eyelashSelections.right);
 
