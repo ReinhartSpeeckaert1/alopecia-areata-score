@@ -2094,67 +2094,71 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePdfIconVisibility();
     }
 
-    if (pdfButton) {
-        pdfButton.addEventListener("click", () => {
-            const opt = {
-                margin:       0.3,
-                filename:     'alopecia_preview.pdf',
-                Image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(previewArea).save();
-        });
-    }
+    
 
-    updatePdfIconVisibility();
-});
-</script>
-<script>
-/* removed previous generate-pdf listener */
-});
-</script>
-<script>
-/* removed previous generate-pdf listener */
-});
-</script>
-<div id="floating-preview" style="position: fixed; top: 20px; right: 20px; width: 250px; height: 250px; padding: 0; margin: 0; overflow: hidden; z-index: 9999; display: none; background: none !important; border: none !important; pointer-events: none;">
-<div id="floating-close-btn" style="
-        position: absolute;
-        top: 2px;
-        right: 6px;
-        font-size: 18px;
-        color: #333;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 10000;
-        pointer-events: auto;
-    ">×</div>
-</div>
+if (pdfButton) {
+  pdfButton.addEventListener("click", () => {
+    const opt = {
+      margin: 0.3,
+      filename: 'alopecia_summary.pdf',
+      Image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
 
+    // Build a dedicated export container using data, not the on-screen preview
+    const { totals, details, MAX, rel } = getTotalsAndDetails();
 
-<script>
-let previewVisible = true;
-let floatingPreviewTimeout;
+    const hasBrows = (eyebrowSelections?.left?.size || 0) + (eyebrowSelections?.right?.size || 0) > 0;
+    const hasLashes = (eyelashSelections?.left?.size || 0) + (eyelashSelections?.right?.size || 0) > 0;
+    let hasBeard = false;
+    if (beardSelections) { for (const k in beardSelections) { if (beardSelections[k]?.selected instanceof Set && beardSelections[k].selected.size) { hasBeard = true; break; } } }
 
-document.addEventListener("click", function (e) {
-  if (e.target && e.target.id === "floating-close-btn") {
-    previewVisible = false;
-    document.getElementById("floating-preview").style.display = "none";
-  }
-});
+    const wrap = document.createElement("div");
+    wrap.style.fontFamily = "Arial, Helvetica, sans-serif";
+    wrap.style.padding = "16px";
+    wrap.style.maxWidth = "700px";
+    wrap.style.lineHeight = "1.4";
 
-window.addEventListener("scroll", function () {
-  clearTimeout(floatingPreviewTimeout);
-  const floating = document.getElementById("floating-preview");
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const h1 = document.createElement("h2");
+    h1.textContent = "Alopecia Areata Calculator";
+    wrap.appendChild(h1);
 
-  if (!previewVisible) return;
+    const pgen = document.createElement("div");
+    pgen.textContent = "Generated on: " + (new Date()).toLocaleString();
+    pgen.style.marginBottom = "10px";
+    wrap.appendChild(pgen);
 
-  if (scrollTop > 150) {
-    floatingPreviewTimeout = setTimeout(updateFloatingPreview, 10);
-    if (floating) { floating.style.display = "block"; floating.style.opacity = "1"; }
-  } else {
+    const h2 = document.createElement("h3");
+    h2.textContent = "Totals";
+    wrap.appendChild(h2);
+
+    const ul = document.createElement("ul");
+    const liScalp = document.createElement("li"); liScalp.textContent = `Total Scalp: ${totals.scalp}`; ul.appendChild(liScalp);
+    if (hasBrows) { const li = document.createElement("li"); li.textContent = `Total Eyebrows: ${totals.eyebrows}`; ul.appendChild(li); }
+    if (hasLashes) { const li = document.createElement("li"); li.textContent = `Total Eyelashes: ${totals.eyelashes}`; ul.appendChild(li); }
+    if (hasBeard) { const li = document.createElement("li"); li.textContent = `Total Beard: ${totals.beard}`; ul.appendChild(li); }
+    wrap.appendChild(ul);
+
+    const h3det = document.createElement("h3");
+    h3det.textContent = "Detailed Area Breakdown";
+    wrap.appendChild(h3det);
+
+    const ul2 = document.createElement("ul");
+    function addLine(label, value, max){ const li = document.createElement("li"); li.textContent = `${label}: ${value}% (=Percentage of the area=${rel(value, max)}%)`; ul2.appendChild(li); }
+    addLine("Left Scalp", details.leftScalp, MAX.leftScalp);
+    addLine("Right Scalp", details.rightScalp, MAX.rightScalp);
+    addLine("Top of the Head", details.topScalp, MAX.topScalp);
+    addLine("Back of the Head", details.backScalp, MAX.backScalp);
+    if (hasBrows) { addLine("Left Eyebrow", details.leftEyebrow, MAX.leftEyebrow); addLine("Right Eyebrow", details.rightEyebrow, MAX.rightEyebrow); }
+    if (hasLashes) { addLine("Left Eyelash", details.leftEyelash, MAX.leftEyelash); addLine("Right Eyelash", details.rightEyelash, MAX.rightEyelash); }
+    if (hasBeard) { addLine("Left Beard Area", details.leftBeard, MAX.leftBeard); addLine("Right Beard Area", details.rightBeard, MAX.rightBeard); addLine("Central Beard Area", details.centralBeard, MAX.centralBeard); }
+    wrap.appendChild(ul2);
+
+    html2pdf().set(opt).from(wrap).save();
+  });
+}
+ else {
     if (floating) { floating.style.opacity = "0"; floating.style.display = "none"; }
   }
 });
@@ -2642,30 +2646,45 @@ setInterval(updateScoreRings, 700);
     const now = new Date();
     const dt = now.toLocaleString();
     const { totals, details, MAX, rel } = getTotalsAndDetails();
-    const lines = [];
-    lines.push("Alopecia Areata Calculator");
-    lines.push(dt);
-    lines.push("");
-    lines.push("Summary of Alopecia Areata Involvement");
-    lines.push(`- Total Scalp: ${totals.scalp}`);
-    lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
-    lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
-    lines.push(`- Total Beard: ${totals.beard}`);
-    lines.push("");
-    lines.push("Detailed Area Breakdown");
-    lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-    lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-    lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
-    lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
-    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-    lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-    lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-    lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
+    
+const lines = [];
+lines.push(`Alopecia Areata Calculator`);
+lines.push(`Generated on: ${datetime}`);
+lines.push("");
+lines.push("Totals");
 
-    const text = lines.join("
+lines.push(`- Total Scalp: ${totals.scalp}`);
+
+const hasBrows = (eyebrowSelections?.left?.size || 0) + (eyebrowSelections?.right?.size || 0) > 0;
+const hasLashes = (eyelashSelections?.left?.size || 0) + (eyelashSelections?.right?.size || 0) > 0;
+let hasBeard = false;
+if (beardSelections) { for (const k in beardSelections) { if (beardSelections[k]?.selected instanceof Set && beardSelections[k].selected.size) { hasBeard = true; break; } } }
+
+if (hasBrows) lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
+if (hasLashes) lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
+if (hasBeard) lines.push(`- Total Beard: ${totals.beard}`);
+
+lines.push("");
+lines.push("Detailed Area Breakdown");
+lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
+lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
+lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
+lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
+
+if (hasBrows) {
+  lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
+  lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
+}
+if (hasLashes) {
+  lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
+  lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
+}
+if (hasBeard) {
+  lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
+  lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
+  lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
+}
+const text = lines.join("
 ");
 
     async function writeClipboard(t){
@@ -3511,4 +3530,300 @@ function showImmediatePeekFor(region) {
 })();
 </script>
 
-</body></html>
+
+
+
+
+<script>
+/* Ultra-compact V3: no key tables, no counts, no header; base64url (no padding).
+   Layout: [scalpBytes (N)] [beardBytes (M)] [browByte] [lashByte]
+   Decoder uses current app's counts: N = number of keys in globalSelections (sorted by key),
+   M = number of keys in beardSelections (sorted by key). This makes tokens ~2–4× shorter than V2.
+*/
+
+const V3_NO_PICK6 = 63;
+const V3_NO_PICK4 = 15;
+
+function v3_sortedKeys(obj){ return Object.keys(obj||{}).sort(); }
+
+function v3_packMap(map){
+  const keys = v3_sortedKeys(map);
+  const bytes = new Uint8Array(keys.length);
+  for (let i=0;i<keys.length;i++){
+    const sec = map[keys[i]] || {};
+    let pick = V3_NO_PICK6;
+    if (sec.selected instanceof Set) { for (const v of sec.selected){ pick = Number(v); break; } }
+    else if (Array.isArray(sec.selected) && sec.selected.length) { pick = Number(sec.selected[0]); }
+    let dens = Number(sec.density ?? 0);
+    if (!(dens >= 0 && dens <= 3)) dens = 0;
+    if (!(pick >= 0 && pick <= 62)) pick = V3_NO_PICK6;
+    bytes[i] = ((dens & 0b11) << 6) | (pick & 0b111111);
+  }
+  return bytes;
+}
+function v3_unpackMap(map, bytes){
+  const keys = v3_sortedKeys(map);
+  for (let i=0;i<keys.length;i++){
+    const b = bytes[i] ?? 0;
+    const dens = (b >> 6) & 0b11;
+    const pick = b & 0b111111;
+    const sec = map[keys[i]];
+    if (!sec) continue;
+    if (!(sec.selected instanceof Set)) sec.selected = new Set();
+    sec.selected.clear();
+    if (pick !== V3_NO_PICK6) sec.selected.add(pick);
+    sec.density = dens;
+  }
+}
+
+function v3_packTwoSidesByte(leftSet, rightSet){
+  const l = (leftSet instanceof Set && leftSet.size) ? Number([...leftSet][0]) : V3_NO_PICK4;
+  const r = (rightSet instanceof Set && rightSet.size) ? Number([...rightSet][0]) : V3_NO_PICK4;
+  const L = (l >= 0 && l <= 14) ? l : V3_NO_PICK4;
+  const R = (r >= 0 && r <= 14) ? r : V3_NO_PICK4;
+  return ((R & 0b1111) << 4) | (L & 0b1111);
+}
+function v3_unpackTwoSidesByte(byte){
+  const L = byte & 0b1111;
+  const R = (byte >> 4) & 0b1111;
+  return {
+    left: new Set(L === V3_NO_PICK4 ? [] : [L]),
+    right: new Set(R === V3_NO_PICK4 ? [] : [R]),
+  };
+}
+
+/* Base64url helpers (no padding) */
+function b64u_encode(u8){
+  let s = ''; for (let i=0;i<u8.length;i++) s += String.fromCharCode(u8[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64u_decode(b64u){
+  const b64 = b64u.replace(/-/g,'+').replace(/_/g,'/');
+  const pad = b64.length % 4 === 2 ? '==' : (b64.length % 4 === 3 ? '=' : '');
+  const s = atob(b64 + pad);
+  const out = new Uint8Array(s.length);
+  for (let i=0;i<s.length;i++) out[i] = s.charCodeAt(i);
+  return out;
+}
+
+/* Public API */
+function exportCompactState(){
+  const scalpBytes = v3_packMap(globalSelections || {});
+  const beardBytes = v3_packMap(beardSelections || {});
+  const brow = v3_packTwoSidesByte(eyebrowSelections?.left, eyebrowSelections?.right);
+  const lash = v3_packTwoSidesByte(eyelashSelections?.left, eyelashSelections?.right);
+
+  const payload = new Uint8Array(scalpBytes.length + beardBytes.length + 2);
+  let o = 0;
+  payload.set(scalpBytes, o); o += scalpBytes.length;
+  payload.set(beardBytes, o); o += beardBytes.length;
+  payload[o++] = brow;
+  payload[o++] = lash;
+
+  return b64u_encode(payload); // shortest token
+}
+
+async function importCompactStateToken_V3(token){
+  const buf = b64u_decode(token);
+  // Split by current counts
+  const nScalp = v3_sortedKeys(globalSelections || {}).length;
+  const nBeard = v3_sortedKeys(beardSelections || {}).length;
+  const expected = nScalp + nBeard + 2;
+  if (buf.length !== expected) throw new Error('Length mismatch');
+  let i = 0;
+  const scalpBytes = buf.slice(i, i + nScalp); i += nScalp;
+  const beardBytes = buf.slice(i, i + nBeard); i += nBeard;
+  const browByte = buf[i++];
+  const lashByte = buf[i++];
+
+  if (globalSelections) { v3_unpackMap(globalSelections, scalpBytes); if (typeof updateScalpUI === 'function') updateScalpUI(); }
+  if (beardSelections)   { v3_unpackMap(beardSelections, beardBytes); if (typeof updateBeardUI === 'function') updateBeardUI(); }
+
+  if (eyebrowSelections) {
+    const {left,right} = v3_unpackTwoSidesByte(browByte);
+    eyebrowSelections.left = left; eyebrowSelections.right = right;
+    if (typeof updateEyebrowUI === 'function') updateEyebrowUI();
+  }
+  if (eyelashSelections) {
+    const {left,right} = v3_unpackTwoSidesByte(lashByte);
+    eyelashSelections.left = left; eyelashSelections.right = right;
+    if (typeof updateEyelashUI === 'function') updateEyelashUI();
+  }
+}
+
+/* Public handlers (prefer V3; fallback to V2 and JSON) */
+function copyCode(){
+  try{
+    const token = exportCompactState();
+    navigator.clipboard.writeText(token).then(()=>alert("Score code copied"),()=>alert("Copy failed"));
+  }catch(e){ alert("Copy failed"); }
+}
+
+function loadCode(){
+  const txt = document.getElementById("codeInput")?.value.trim();
+  if (!txt) return alert("Please enter a code.");
+  // Try V3
+  try { return importCompactStateToken_V3(txt); } catch(e){ /* fall through */ }
+  // Try V2 (previous bit-packed with header/tables)
+  try {
+    return (function importV2(token){
+      function _base64ToBytes(b64){ const s=atob(b64); const u8=new Uint8Array(s.length); for(let i=0;i<s.length;i++) u8[i]=s.charCodeAt(i); return u8; }
+      function _unpackSectionsFromBytes(keys,bytes){ const out={}; for(let i=0;i<keys.length;i++){ const b=bytes[i]??0; const dens=(b>>6)&0b11; const pick=b&0b111111; out[keys[i]]={selected:new Set(pick===63?[]:[pick]), density:dens}; } return out; }
+      function _unpackTwoSidesFromByte(byte){ const L=byte&0b1111; const R=(byte>>4)&0b1111; return { left:new Set(L===15?[]:[L]), right:new Set(R===15?[]:[R]) }; }
+      const buf=_base64ToBytes(token); let i=0;
+      if(buf[i++]!==0x56||buf[i++]!==0x32||buf[i++]!==0x7C) throw new Error("Bad header");
+      const scalpCount=buf[i++]|(buf[i++]<<8); const beardCount=buf[i++]|(buf[i++]<<8);
+      function readKeyTable(n){ const keys=[]; for(let k=0;k<n;k++){ const len=buf[i++]; let s=''; for(let j=0;j<len;j++) s+=String.fromCharCode(buf[i++]); keys.push(s);} return keys; }
+      const scalpKeys=readKeyTable(scalpCount);
+      const scalpBytes=buf.slice(i,i+scalpCount); i+=scalpCount;
+      const beardKeys=readKeyTable(beardCount);
+      const beardBytes=buf.slice(i,i+beardCount); i+=beardCount;
+      const browByte=buf[i++]; const lashByte=buf[i++];
+      if(globalSelections){ const dec=_unpackSectionsFromBytes(scalpKeys,scalpBytes); for(const [k,v] of Object.entries(dec)){ if(!globalSelections[k]) continue; globalSelections[k].selected=v.selected; globalSelections[k].density=v.density; } if(typeof updateScalpUI==='function') updateScalpUI(); }
+      if(eyebrowSelections){ const {left,right}=_unpackTwoSidesFromByte(browByte); eyebrowSelections.left=left; eyebrowSelections.right=right; if(typeof updateEyebrowUI==='function') updateEyebrowUI(); }
+      if(eyelashSelections){ const {left,right}=_unpackTwoSidesFromByte(lashByte); eyelashSelections.left=left; eyelashSelections.right=right; if(typeof updateEyelashUI==='function') updateEyelashUI(); }
+      if(beardSelections){ const dec=_unpackSectionsFromBytes(beardKeys,beardBytes); for(const [k,v] of Object.entries(dec)){ if(!beardSelections[k]) continue; beardSelections[k].selected=v.selected; beardSelections[k].density=v.density; } if(typeof updateBeardUI==='function') updateBeardUI(); }
+    })(txt);
+  } catch(e){ /* fall through */ }
+  // Try legacy JSON base64
+  try {
+    const json = decodeURIComponent(escape(atob(txt)));
+    const obj = JSON.parse(json);
+    if (obj && typeof applyState === 'function') return applyState(obj);
+  } catch(e){}
+  alert("Invalid code.");
+}
+</script>
+
+
+<script>
+// Post-filter preview to hide empty eyebrow/eyelash/beard lines
+(function(){
+  if (typeof updateSelectedPreview !== 'function') return;
+  const __origUpdate = updateSelectedPreview;
+  window.updateSelectedPreview = function(){
+    __origUpdate();
+    try {
+      const root = document.getElementById("selected-preview");
+      if (!root) return;
+
+      const hasBrows = (eyebrowSelections?.left?.size || 0) + (eyebrowSelections?.right?.size || 0) > 0;
+      const hasLashes = (eyelashSelections?.left?.size || 0) + (eyelashSelections?.right?.size || 0) > 0;
+      let hasBeard = false;
+      if (beardSelections) { for (const k in beardSelections) { if (beardSelections[k]?.selected instanceof Set && beardSelections[k].selected.size) { hasBeard = true; break; } } }
+
+      function removeLinesByKeyword(keyword){
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+        const toRemove = [];
+        while (walker.nextNode()) {
+          const el = walker.currentNode;
+          // strict match lines like "- Left Eyebrow:" etc.
+          const t = (el.textContent || "").trim();
+          if (/^[-•]\s*/.test(t) && t.toLowerCase().includes(keyword)) {
+            // remove a reasonably sized ancestor to drop the whole line block
+            let target = el;
+            for (let up = 0; up < 3 && target && target !== root; up++) {
+              if (target.childElementCount <= 4) { /* likely a line container */ }
+              target = target.parentElement || target;
+            }
+            toRemove.push(el);
+          }
+        }
+        toRemove.forEach(n => n.parentElement ? n.parentElement.removeChild(n) : n.remove());
+      }
+
+      if (!hasBrows) {
+        removeLinesByKeyword("eyebrow");
+      }
+      if (!hasLashes) {
+        removeLinesByKeyword("eyelash");
+      }
+      if (!hasBeard) {
+        removeLinesByKeyword("beard");
+      }
+    } catch(_) {}
+  };
+})();
+</script>
+
+<script>
+// Strengthen preview cleanup after updateSelectedPreview
+(function(){
+  if (typeof updateSelectedPreview !== 'function') return;
+  const __orig = updateSelectedPreview;
+  window.updateSelectedPreview = function(){
+    __orig();
+    try{
+      const root = document.getElementById("selected-preview");
+      if (!root) return;
+      const hasBrows = (eyebrowSelections?.left?.size || 0) + (eyebrowSelections?.right?.size || 0) > 0;
+      const hasLashes = (eyelashSelections?.left?.size || 0) + (eyelashSelections?.right?.size || 0) > 0;
+      let hasBeard = false;
+      if (beardSelections) { for (const k in beardSelections) { if (beardSelections[k]?.selected instanceof Set && beardSelections[k].selected.size) { hasBeard = true; break; } } }
+
+      function removeLines(root, patterns){
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+        const toRemove = [];
+        while (walker.nextNode()) {
+          const el = walker.currentNode;
+          const t = (el.textContent || "").trim();
+          for (const rx of patterns) {
+            if (rx.test(t)) { toRemove.push(el); break; }
+          }
+        }
+        toRemove.forEach(n => n.parentElement ? n.parentElement.removeChild(n) : n.remove());
+      }
+      const patternsBrows = [/^[-•]\s*Total\s*Eyebrows:/i,/^[-•]\s*(Left|Right)\s*Eyebrow:/i];
+      const patternsLashes = [/^[-•]\s*Total\s*Eyelashes:/i,/^[-•]\s*(Left|Right)\s*Eyelash:/i];
+      const patternsBeard = [/^[-•]\s*Total\s*Beard:/i,/^[-•]\s*(Left|Right|Central)\s*Beard/i];
+      if (!hasBrows) removeLines(root, patternsBrows);
+      if (!hasLashes) removeLines(root, patternsLashes);
+      if (!hasBeard) removeLines(root, patternsBeard);
+    }catch(_){}
+  };
+})();
+</script>
+<script>
+// Strong filtering: remove totals/detail lines for face areas when empty
+(function strengthenPdfFilter(){
+  if (typeof pdfButton === 'undefined') return;
+  const hasBrows = (eyebrowSelections?.left?.size || 0) + (eyebrowSelections?.right?.size || 0) > 0;
+  const hasLashes = (eyelashSelections?.left?.size || 0) + (eyelashSelections?.right?.size || 0) > 0;
+  let hasBeard = false;
+  if (beardSelections) { for (const k in beardSelections) { if (beardSelections[k]?.selected instanceof Set && beardSelections[k].selected.size) { hasBeard = true; break; } } }
+
+  function removeLines(root, patterns){
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+    const toRemove = [];
+    while (walker.nextNode()) {
+      const el = walker.currentNode;
+      const t = (el.textContent || "").trim();
+      for (const rx of patterns) {
+        if (rx.test(t)) { toRemove.append ? toRemove.append(el) : toRemove.push(el); break; }
+      }
+    }
+    toRemove.forEach(n => n.parentElement ? n.parentElement.removeChild(n) : n.remove());
+  }
+
+  const pdfSource = document.getElementById("selected-preview");
+  if (!pdfSource) return;
+
+  const patternsBrows = [
+    /^[-•]\s*Total\s*Eyebrows:/i,
+    /^[-•]\s*(Left|Right)\s*Eyebrow:/i,
+  ];
+  const patternsLashes = [
+    /^[-•]\s*Total\s*Eyelashes:/i,
+    /^[-•]\s*(Left|Right)\s*Eyelash:/i,
+  ];
+  const patternsBeard = [
+    /^[-•]\s*Total\s*Beard:/i,
+    /^[-•]\s*(Left|Right|Central)\s*Beard/i,
+  ];
+
+  // Mutate live preview too so user sees the same
+  if (!hasBrows) removeLines(pdfSource, patternsBrows);
+  if (!hasLashes) removeLines(pdfSource, patternsLashes);
+  if (!hasBeard) removeLines(pdfSource, patternsBeard);
+})();
+</script></body></html>
