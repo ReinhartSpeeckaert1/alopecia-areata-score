@@ -2540,6 +2540,7 @@ setInterval(updateScoreRings, 700);
         <li><strong>Right Beard Area:</strong> ${rightBeard}% (=Percentage of the area=${rel(rightBeard, MAX.rightBeard)}%)</li>
         <li><strong>Central Beard Area:</strong> ${centralBeard}% (=Percentage of the area=${rel(centralBeard, MAX.centralBeard)}%)</li>
       </ul>
+      <p><strong>Code:</strong> ${ (typeof getAAEncodedCode==='function' ? getAAEncodedCode() : '') }</p>
     `;
 
     document.body.appendChild(summarySection);
@@ -2841,7 +2842,10 @@ document.addEventListener("DOMContentLoaded", function(){
       lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
       lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
 
-      const text = lines.join("\n");
+      const text = lines.join("
+") + "
+
+Code: " + (typeof getAAEncodedCode==='function' ? getAAEncodedCode() : '');
 
       async function writeClipboard(t){
         try {
@@ -3487,7 +3491,7 @@ function showImmediatePeekFor(region) {
   }
 })();
 </script>
-<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue" id="btnCopyCode18">📋 Copy Code</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue" id="btnLoadCode18">📥 Load Code</button></div><script>
+<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue" id="btnCopyCode18">📋 Copy Score</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue" id="btnLoadCode18">📥 Load Score</button></div><script>
 (function(){
   // 52-symbol alphabet: uppercase + lowercase
   const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -3582,7 +3586,7 @@ function showImmediatePeekFor(region) {
       const allowed = scalpAllowed[sectionId] || [0];
       const val = allowed[Math.max(0, Math.min(allowed.length-1, scoreIdx))] || 0;
       globalSelections[sectionId].selected.clear();
-      globalSelections[sectionId].selected.add(val);
+      if (scoreIdx !== 0) { globalSelections[sectionId].selected.add(val); }
     }
     setDensityUI(sectionId, dens);
   }
@@ -3590,14 +3594,14 @@ function showImmediatePeekFor(region) {
     const val = browAllowed[Math.max(0, Math.min(browAllowed.length-1, scoreIdx))] || 0;
     if (eyebrowSelections && eyebrowSelections[side]){
       eyebrowSelections[side].clear();
-      eyebrowSelections[side].add(val);
+      if (scoreIdx !== 0) { eyebrowSelections[side].add(val); }
     }
   }
   function setLash(side, scoreIdx){
     const val = lashAllowed[Math.max(0, Math.min(lashAllowed.length-1, scoreIdx))] || 0;
     if (eyelashSelections && eyelashSelections[side]){
       eyelashSelections[side].clear();
-      eyelashSelections[side].add(val);
+      if (scoreIdx !== 0) { eyelashSelections[side].add(val); }
     }
   }
   function setBeard(sectionId, densityIdx, scoreIdx){
@@ -3607,7 +3611,7 @@ function showImmediatePeekFor(region) {
       const allowed = beardAllowed[sectionId] || [0];
       const val = allowed[Math.max(0, Math.min(allowed.length-1, scoreIdx))] || 0;
       beardSelections[sectionId].selected.clear();
-      beardSelections[sectionId].selected.add(val);
+      if (scoreIdx !== 0) { beardSelections[sectionId].selected.add(val); }
     }
     setDensityUI(sectionId, dens); // if density buttons exist for beard
   }
@@ -3719,4 +3723,215 @@ function showImmediatePeekFor(region) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-</script></body></html>
+</script>
+<script>
+(function(){
+  window.getAAEncodedCode = function(){
+    try{
+      if (typeof window.encodeAA19 === 'function') return window.encodeAA19();
+      if (typeof window.encodeAA18 === 'function') return window.encodeAA18();
+    }catch(e){}
+    return '';
+  };
+})();
+</script>
+
+
+<script>
+(function(){
+  function getAAEncodedCode(){
+    try {
+      if (typeof window.encodeAA19 === 'function') return window.encodeAA19();
+      if (typeof window.encodeAA18 === 'function') return window.encodeAA18();
+    } catch(e){}
+    return '';
+  }
+  function getTotalsAndDetails(){
+    const scalp     = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
+    const eyebrows  = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+    const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+    const beard     = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
+
+    function subtotal(sel, densityPct){
+      let total = 0;
+      if (sel && typeof sel.forEach === "function") sel.forEach(v => total += Number(v)||0);
+      else if (Array.isArray(sel)) sel.forEach(v => total += Number(v)||0);
+      const dens = Number(densityPct)||0;
+      return Number((total * (1 - dens/100)).toFixed(2));
+    }
+
+    const leftScalp   = subtotal(window.globalSelections?.leftside?.selected,   window.globalSelections?.leftside?.density);
+    const rightScalp  = subtotal(window.globalSelections?.rightside?.selected,  window.globalSelections?.rightside?.density);
+    const topScalp    = subtotal(window.globalSelections?.topside?.selected,    window.globalSelections?.topside?.density);
+    const backScalp   = subtotal(window.globalSelections?.backside?.selected,   window.globalSelections?.backside?.density);
+
+    const leftEyebrow  = subtotal(window.eyebrowSelections?.left,  0);
+    const rightEyebrow = subtotal(window.eyebrowSelections?.right, 0);
+
+    const leftEyelash  = subtotal(window.eyelashSelections?.left,  0);
+    const rightEyelash = subtotal(window.eyelashSelections?.right, 0);
+
+    const leftBeard    = subtotal(window.beardSelections?.["left-beard"]?.selected,    window.beardSelections?.["left-beard"]?.density);
+    const rightBeard   = subtotal(window.beardSelections?.["right-beard"]?.selected,   window.beardSelections?.["right-beard"]?.density);
+    const centralBeard = subtotal(window.beardSelections?.["central-beard"]?.selected, window.beardSelections?.["central-beard"]?.density);
+
+    const MAX = {
+      leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
+      leftEyebrow: 50, rightEyebrow: 50,
+      leftEyelash: 50, rightEyelash: 50,
+      leftBeard: 40, rightBeard: 40, centralBeard: 20
+    };
+    const rel = (val, max) => max ? Math.max(0, Math.min(100, (Number(val)||0)/max*100)).toFixed(2) : "0.00";
+
+    return {
+      totals: { scalp, eyebrows, eyelashes, beard },
+      details: { leftScalp, rightScalp, topScalp, backScalp, leftEyebrow, rightEyebrow, leftEyelash, rightEyelash, leftBeard, rightBeard, centralBeard },
+      MAX, rel
+    };
+  }
+
+  function buildSummaryTextWithCode(){
+    const dt = new Date().toLocaleString();
+    const { totals, details, MAX, rel } = getTotalsAndDetails();
+    const lines = [];
+    lines.push("Alopecia Areata Calculator");
+    lines.push(dt);
+    lines.push("");
+    lines.push("Summary of Alopecia Areata Involvement");
+    lines.push(`- Total Scalp: ${totals.scalp}`);
+    lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
+    lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
+    lines.push(`- Total Beard: ${totals.beard}`);
+    lines.push("");
+    lines.push("Detailed Area Breakdown");
+    lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
+    lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
+    lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
+    lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
+    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
+    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
+    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
+    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
+    lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
+    lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
+    lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
+    lines.push("");
+    lines.push(`Code: ${getAAEncodedCode()}`);
+    return lines.join("\n");
+  }
+
+  function buildSummaryHTMLWithCode(){
+    const now = new Date();
+    const datetime = now.toLocaleString();
+    const title = "Alopecia Areata Calculator";
+    const { totals, details, MAX, rel } = getTotalsAndDetails();
+    const code = getAAEncodedCode();
+
+    const el = document.createElement("div");
+    el.id = "pdf-summary";
+    el.style.margin = "20px";
+    el.style.fontFamily = "'Segoe UI', sans-serif";
+    el.innerHTML = `
+      <h2 style="text-align:center;">${title}</h2>
+      <p style="text-align:center;"><em>${datetime}</em></p>
+      <hr/>
+      <h3>Summary of Alopecia Areata Involvement</h3>
+      <ul>
+        <li><strong>Total Scalp:</strong> ${totals.scalp}</li>
+        <li><strong>Total Eyebrows:</strong> ${totals.eyebrows}</li>
+        <li><strong>Total Eyelashes:</strong> ${totals.eyelashes}</li>
+        <li><strong>Total Beard:</strong> ${totals.beard}</li>
+      </ul>
+      <h3>Detailed Area Breakdown</h3>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${details.leftScalp}% (Percentage of the area: ${rel(details.leftScalp, MAX.leftScalp)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${details.rightScalp}% (Percentage of the area: ${rel(details.rightScalp, MAX.rightScalp)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${details.topScalp}% (Percentage of the area: ${rel(details.topScalp, MAX.topScalp)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${details.backScalp}% (Percentage of the area: ${rel(details.backScalp, MAX.backScalp)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${details.leftEyebrow}% (Percentage of the area: ${rel(details.leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${details.rightEyebrow}% (Percentage of the area: ${rel(details.rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${details.leftEyelash}% (Percentage of the area: ${rel(details.leftEyelash, MAX.leftEyelash)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${details.rightEyelash}% (Percentage of the area: ${rel(details.rightEyelash, MAX.rightEyelash)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.leftBeard}% (Percentage of the area: ${rel(details.leftBeard, MAX.leftBeard)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.rightBeard}% (Percentage of the area: ${rel(details.rightBeard, MAX.rightBeard)}%)</td></tr>
+        <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.centralBeard}% (Percentage of the area: ${rel(details.centralBeard, MAX.centralBeard)}%)</td></tr>
+      </table>
+      <p style="margin-top:12px;"><strong>Code:</strong> ${code}</p>
+    `;
+    return el;
+  }
+
+  function ensureCopyButton(){
+    const pdfBtn = document.getElementById("generate-pdf");
+    if (!pdfBtn) return null;
+    let copyBtn = document.getElementById("copy-summary");
+    if (!copyBtn){
+      copyBtn = document.createElement("button");
+      copyBtn.id = "copy-summary";
+      copyBtn.type = "button";
+      copyBtn.textContent = "Copy summary";
+      copyBtn.style.marginLeft = "8px";
+      copyBtn.style.padding = "8px 12px";
+      copyBtn.style.border = "1px solid #cbd5e1";
+      copyBtn.style.borderRadius = "8px";
+      copyBtn.style.cursor = "pointer";
+      copyBtn.style.background = "white";
+      copyBtn.style.boxShadow = "0 1px 2px rgba(0,0,0,.05)";
+      pdfBtn.insertAdjacentElement("afterend", copyBtn);
+    }
+    return copyBtn;
+  }
+
+  function rewirePdfButton(){
+    const btn = document.getElementById("generate-pdf");
+    if (!btn) return;
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+    clone.addEventListener("click", function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      const section = buildSummaryHTMLWithCode();
+      document.body.appendChild(section);
+      try {
+        html2pdf().set({
+          margin: 10,
+          filename: "alopecia_areata_summary.pdf",
+          html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        }).from(section).save().finally(()=>{ try{ document.body.removeChild(section); }catch(e){} });
+      } catch(e) { try{ document.body.removeChild(section); }catch(_){} }
+    }, true);
+  }
+
+  function wireCopy(){
+    const copyBtn = ensureCopyButton();
+    if (!copyBtn) return;
+    copyBtn.onclick = async function(){
+      const text = buildSummaryTextWithCode();
+      async function writeClipboard(t){
+        try { await navigator.clipboard.writeText(t); return true; }
+        catch(e){
+          try{
+            const ta = document.createElement("textarea");
+            ta.value = t; document.body.appendChild(ta); ta.select();
+            document.execCommand("copy"); document.body.removeChild(ta);
+            return true;
+          }catch(_){ return false; }
+        }
+      }
+      const ok = await writeClipboard(text);
+      copyBtn.textContent = ok ? "Copied!" : "Copy failed";
+      setTimeout(()=>copyBtn.textContent = "Copy summary", 1200);
+    };
+  }
+
+  function install(){
+    rewirePdfButton();
+    wireCopy();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install);
+  else install();
+})();
+</script>
+
+</body></html>
