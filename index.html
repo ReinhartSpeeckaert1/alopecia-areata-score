@@ -756,7 +756,52 @@
       background-color: #60a5fa;
       transform: translateY(0);
     }
-    </style></head>
+    </style>
+
+
+
+
+
+
+<style id="aga-selected-style">
+/* Strong visual marker for selected AGA option */
+#androgenetic-areas .area-box.selected {
+  border-color: #0077cc !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 14px rgba(0, 119, 204, 0.6) !important;
+  background-color: rgba(179, 217, 255, 0.85) !important;
+}
+</style>
+
+
+
+<style>
+/* Override size for androgenetic alopecia boxes only */
+#androgenetic-areas .area-box {
+  width: 110px !important;
+  height: 260px !important;
+}
+</style>
+
+<style>
+  .aga-help-wrap:hover #aga-help-float { display: block !important; }
+</style>
+
+
+<style>
+#androgenetic-areas .plus.glow {
+  outline: 3px solid #28a745; /* green */
+  box-shadow: 0 0 0 3px rgba(40,167,69,0.35);
+  border-radius: 6px;
+}
+#androgenetic-areas .minus.glow {
+  outline: 3px solid #dc3545; /* red */
+  box-shadow: 0 0 0 3px rgba(220,53,69,0.35);
+  border-radius: 6px;
+}
+</style>
+
+</head>
 <body>
 <style>
 @media (max-width: 1200px) {
@@ -799,6 +844,36 @@
 <div style="display: flex; justify-content: space-between; align-items: center;">
 </div>
 <div class="area-container" id="areaContainer"></div>
+
+<!-- Androgenetic toggle -->
+<div id="aga-toggle-container" style="display: none;"></div>
+<div id="aga-ui-wrapper" style="display: none; flex-direction: column; gap: 6px;">
+  
+  <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
+    <span>Androgenetic alopecia</span>
+    <span class="aga-help-wrap" style="position: relative; display: inline-block;">
+      <span id="aga-help" 
+            style="cursor: pointer; font-weight: bold; border: 1px solid #ccc; border-radius: 50%; 
+                   width: 18px; height: 18px; display: inline-flex; align-items: center; 
+                   justify-content: center; background-color: white;" 
+            title="Help">?</span>
+      <div id="aga-help-float" 
+           style="display:none; position: absolute; left: 26px; top: 0; 
+                  background: white; border: 1px solid #999; 
+                  box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
+        <img src="Androgenetichelp.jpg" alt="Androgenetic alopecia help" style="max-width: 360px; height: auto;">
+      </div>
+    </span>
+  </h3>
+
+  
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div></div>
+<div class="density-container" id="androgenetic-density"><label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></label><button data-density="0" class="selected"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button></div>
+</div>
+<div class="area-container" id="androgenetic-areas" style="margin-top: 6px;"></div>
+  <div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
+</div>
 <div id="result" style="text-align: center; margin: 10px 0; font-size: 20px; font-weight: bold;">Total Scalp Alopecia Areata: 0%</div><div id="scalp-progress"><div></div></div>
 <div aria-hidden="true" id="scalp-scale">
 <div class="ticks"></div>
@@ -1010,48 +1085,342 @@ function toggleScalpSelection(sectionId, value) {
   updateScalpUI();
 }
 function updateScalpUI() {
+  // Keep preview update as before
   setTimeout(updateSelectedPreview, 0);
-  let total = 0;
-  for (const [sectionId, data] of Object.entries(globalSelections)) {
-    const boxEls = document.querySelectorAll(`#${sectionId}-areas .area-box`);
-    boxEls.forEach(box => {
-      const val = parseFloat(box.dataset.value);
-      const isSelected = data.selected.has(val);
-      
-      const plusEl = box.querySelector(".plus");
-      const minusEl = box.querySelector(".minus");
-      const plusVal = plusEl ? parseFloat(plusEl.title) : null;
-      const minusVal = minusEl ? parseFloat(minusEl.title) : null;
-      const isPlusSelected = plusVal !== null && data.selected.has(plusVal);
-      const isMinusSelected = minusVal !== null && data.selected.has(minusVal);
-      box.classList.toggle("selected", isSelected || isPlusSelected || isMinusSelected);
 
-      if (box.querySelector(".plus")) {
-        const plusVal = parseFloat(box.querySelector(".plus").title);
-        const isPlusSelected = data.selected.has(plusVal);
-        box.querySelector(".plus").style.backgroundColor = isPlusSelected ? "#ccffcc" : "white";
-        box.querySelector(".plus").style.transform = isPlusSelected ? "scale(1.3)" : "scale(1)";
-        box.querySelector(".plus").classList.toggle("glow", isPlusSelected);
-      }
-      if (box.querySelector(".minus")) {
-        const minusVal = parseFloat(box.querySelector(".minus").title);
-        const isMinusSelected = data.selected.has(minusVal);
-        box.querySelector(".minus").style.backgroundColor = isMinusSelected ? "#ffcccc" : "white";
-        box.querySelector(".minus").style.transform = isMinusSelected ? "scale(1.3)" : "scale(1)";
-        box.querySelector(".minus").classList.toggle("glow", isMinusSelected);
-      }
-    });
-    const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
-    total += subtotal * (1 - data.density / 100);
+  // 1) Restore per-section box highlighting and +/- glow (non-AGA sections)
+  if (typeof globalSelections === 'object' && globalSelections) {
+    for (const [sectionId, data] of Object.entries(globalSelections)) {
+      const boxEls = document.querySelectorAll(`#${sectionId}-areas .area-box`);
+      boxEls.forEach(box => {
+        const val = parseFloat(box.dataset.value);
+        const isSelected = data.selected && data.selected.has(val);
+
+        const plusEl = box.querySelector(".plus");
+        const minusEl = box.querySelector(".minus");
+        const plusVal = plusEl ? parseFloat(plusEl.title) : null;
+        const minusVal = minusEl ? parseFloat(minusEl.title) : null;
+        const isPlusSelected = plusVal !== null && data.selected && data.selected.has(plusVal);
+        const isMinusSelected = minusVal !== null && data.selected && data.selected.has(minusVal);
+
+        // Visual state
+        box.classList.toggle("selected", !!(isSelected || isPlusSelected || isMinusSelected));
+
+        if (plusEl) {
+          const on = !!isPlusSelected;
+          plusEl.style.backgroundColor = on ? "#ccffcc" : "white";
+          plusEl.style.transform = on ? "scale(1.3)" : "scale(1)";
+          plusEl.classList.toggle("glow", on);
+        }
+        if (minusEl) {
+          const on = !!isMinusSelected;
+          minusEl.style.backgroundColor = on ? "#ffcccc" : "white";
+          minusEl.style.transform = on ? "scale(1.3)" : "scale(1)";
+          minusEl.classList.toggle("glow", on);
+        }
+      });
+    }
   }
-  totalResultDiv.innerText = `Total Scalp Alopecia Areata: ${total.toFixed(2)}%`;
+
+  // 2) Unified scalp total to match ring, with clamping
+  let scalpPct = 0;
+  try {
+    const totals = (typeof calculateSectionTotals === 'function') ? calculateSectionTotals() : null;
+    scalpPct = totals && totals.Scalp != null ? Number(totals.Scalp) : 0;
+  } catch (e) { scalpPct = 0; }
+  if (!Number.isFinite(scalpPct)) scalpPct = 0;
+  scalpPct = Math.max(0, Math.min(100, scalpPct));
+
   const titleElement = document.getElementById("main-title");
-  if (titleElement) {
-    titleElement.textContent = `Alopecia areata calculator: Scalp (=${total.toFixed(2)}%)`;
-  }
+  const totalResultDiv = document.getElementById("result");
+  if (totalResultDiv) totalResultDiv.innerText = `Total Scalp Alopecia Areata: ${scalpPct.toFixed(1)}%`;
+  if (titleElement) titleElement.textContent = `Alopecia areata calculator: Scalp (=${scalpPct.toFixed(1)}%)`;
+
+  // 3) Maintain AGA tooltip persistence after UI refresh
+  try { if (typeof refreshAgaTooltip === 'function') refreshAgaTooltip(); } catch(e){}
 }
 
 Object.values(scalpSections).forEach(renderScalpSection);
+// Insert co-occuring AGA toggle just under Top of the scalp and above total result
+(function setupAgaToggle(){
+  // Find the Top of the scalp header container
+  const topsideHeader = [...document.querySelectorAll('h3')].find(h => h.textContent.trim().toLowerCase() === 'top of the scalp');
+  const toggle = document.createElement('div');
+  toggle.id = 'aga-toggle';
+  toggle.style = 'display:flex; align-items:center; gap:8px; margin: 6px 0;';
+  toggle.innerHTML = `
+    <label style="display:flex; align-items:center; gap:6px; font-weight:600;">
+      <input type="checkbox" id="aga-checkbox" />
+      <span>Co-occuring androgenetic alopecia?</span>
+    </label>
+  `;
+  const resultEl = document.getElementById('result');
+  if (resultEl) {
+    resultEl.parentNode.insertBefore(toggle, resultEl);
+  }
+  // Wire the floating help
+  const helpBtn = document.getElementById('aga-help');
+  const helpFloat = document.getElementById('aga-help-float');
+  if (helpBtn && helpFloat) {
+    helpBtn.addEventListener('mouseenter', () => helpFloat.style.display = 'block');
+    helpBtn.addEventListener('mouseleave', () => helpFloat.style.display = 'none');
+    helpFloat.addEventListener('mouseenter', () => helpFloat.style.display = 'block');
+    helpFloat.addEventListener('mouseleave', () => helpFloat.style.display = 'none');
+  }
+  const agaUI = document.getElementById('aga-ui-wrapper');
+  toggle.addEventListener('change', (e) => {
+    const checked = document.getElementById('aga-checkbox').checked;
+    agaUI.style.display = checked ? 'flex' : 'none';
+    updateScalpUI();
+  });
+  // Move the ui wrapper to sit just above the result
+  const uiWrapper = document.getElementById('aga-ui-wrapper');
+  if (resultEl && uiWrapper) {
+    resultEl.parentNode.insertBefore(uiWrapper, resultEl);
+  }
+})();
+
+// Define androgenetic section
+const androgeneticSection = {
+  id: 'androgenetic',
+  areas: [
+    { label: '', value: 0 },
+    { label: '', value: 5, minus: 2.5, plus: 6.7 },
+    { label: '', value: 10, minus: 8.3, plus: 15 },
+    { label: '', value: 25, minus: 20, plus: 30 },
+    { label: '', value: 40, minus: 35, plus: 45 },
+    { label: '', value: 55, minus: 50, plus: 60 },
+    { label: '', value: 70, minus: 65, plus: 75 },
+    { label: '', value: 85, minus: 80, plus: 94 },
+    { label: '', value: 100, minus: 97 }
+  ],
+  images: [
+    'Images/Androgenetisch0.jpg',
+    'Images/Androgenetisch5.jpg',
+    'Images/Androgenetisch10.jpg',
+    'Images/Androgenetisch25.jpg',
+    'Images/Androgenetisch40.jpg',
+    'Images/Androgenetisch55.jpg',
+    'Images/Androgenetisch70.jpg',
+    'Images/Androgenetisch85.jpg',
+    'Images/Androgenetisch100.jpg'
+  ],
+  tooltips: ['0%', '5%', '10%', '25%', '40%', '55%', '70%', '85%', '100%'],
+  minusTips: [null, '2.5%', '8.3%', '20%', '35%', '50%', '65%', '80%', '97%'],
+  plusTips:  [null, '6.7%', '15%', '30%', '45%', '60%', '75%', '94%', null]
+};
+
+// Render androgenetic boxes inside dedicated container
+(function renderAndrogenetic(){
+  const container = document.getElementById('androgenetic-areas');
+  if (!container) return;
+  globalSelections['androgenetic'] = { selected: new Set(), density: 0 };
+  androgeneticSection.areas.forEach((area, i) => {
+    const box = document.createElement('div');
+    box.className = 'area-box';
+    box.dataset.value = area.value;
+    box.style.backgroundImage = `url(${androgeneticSection.images[i]})`;
+    // optional plus/minus for middle boxes
+    if (area.plus !== undefined) {
+      const plus = document.createElement('div');
+      plus.className = 'plus';
+      plus.innerText = '+';
+      plus.title = `${area.plus}%`;
+      plus.onclick = (e) => { e.stopPropagation(); setAndrogeneticSelection(i, area.plus); };
+      box.appendChild(plus);
+    }
+    if (area.minus !== undefined) {
+      const minus = document.createElement('div');
+      minus.className = 'minus';
+      minus.innerText = '−';
+      minus.title = `${area.minus}%`;
+      minus.onclick = (e) => { e.stopPropagation(); setAndrogeneticSelection(i, area.minus); };
+      box.appendChild(minus);
+    }
+    // clicking the main box selects its main value
+    box.onclick = () => setAndrogeneticSelection(i, area.value);
+    container.appendChild(box);
+  });
+
+  // Wire density buttons for androgenetic section
+  (function(){
+    const droot = document.getElementById('androgenetic-density');
+    if (droot) {
+      droot.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!globalSelections['androgenetic']) globalSelections['androgenetic'] = { selected: new Set(), density: 0 };
+          globalSelections['androgenetic'].density = parseInt(btn.dataset.density||'0', 10);
+          droot.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          
+          // Also refresh the AGA score text to reflect density immediately
+          try {
+            const scoreEl = document.getElementById('androgenetic-score');
+            const A = typeof window.androgeneticScore === 'number' ? window.androgeneticScore : 0;
+            const densNow = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
+            const AEffNow = Math.max(0, Math.min(100, A * (1 - densNow/100)));
+            if (scoreEl) scoreEl.textContent = `Androgenetic alopecia score: ${AEffNow.toFixed(1)}%`;
+          } catch(e) {}
+    if (typeof updateScalpUI === 'function') updateScalpUI();
+        });
+      });
+    }
+  })();
+
+  // Apply visual tooltips consistent with other sections
+  const tips = androgeneticSection.tooltips;
+  const minusTips = androgeneticSection.minusTips;
+  const plusTips = androgeneticSection.plusTips;
+  const boxes = container.querySelectorAll('.area-box');
+  boxes.forEach((box, i) => {
+    // main tip
+    const tip = createTooltip(tips[i]);
+    box.appendChild(tip);
+    tip.dataset.role = 'main';
+    tip.style.display = 'none';
+    function showTip(){ if (!box.querySelector('.plus.glow') && !box.querySelector('.minus.glow')) tip.style.display='block'; }
+    function hideTip() { if (!box.classList.contains('selected')) tip.style.display = 'none'; }
+    box.addEventListener('mouseenter', showTip);
+    box.addEventListener('mouseleave', hideTip);
+    box.addEventListener('click', () => {
+      container.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+      tip.style.display = 'block';
+    });
+    // minus tip
+    const minus = box.querySelector('.minus');
+    if (minus && minusTips[i]) {
+      const mtip = createTooltip(minusTips[i]);
+      box.appendChild(mtip);
+      mtip.dataset.role = 'minus';
+      mtip.style.display = 'none';
+      minus.addEventListener('mouseenter', () => { mtip.style.display = 'block'; });
+      minus.addEventListener('mouseleave', () => { mtip.style.display = minus.classList.contains('glow') ? 'block' : 'none'; if (window.refreshAgaTooltip) window.refreshAgaTooltip(); });
+      minus.addEventListener('click', () => {
+        container.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+        // highlight minus and the box
+        container.querySelectorAll('.plus, .minus').forEach(el => el.classList.remove('glow'));
+        minus.classList.add('glow');
+        box.classList.add('selected');
+        mtip.style.display = 'block';
+        if (window.refreshAgaTooltip) window.refreshAgaTooltip();
+      });
+    }
+    // plus tip
+    const plus = box.querySelector('.plus');
+    if (plus && plusTips[i]) {
+      const ptip = createTooltip(plusTips[i]);
+      box.appendChild(ptip);
+      ptip.dataset.role = 'plus';
+      ptip.style.display = 'none';
+      plus.addEventListener('mouseenter', () => { ptip.style.display = 'block'; });
+      plus.addEventListener('mouseleave', () => { ptip.style.display = plus.classList.contains('glow') ? 'block' : 'none'; if (window.refreshAgaTooltip) window.refreshAgaTooltip(); });
+      plus.addEventListener('click', () => {
+        container.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+        // highlight plus and the box
+        container.querySelectorAll('.plus, .minus').forEach(el => el.classList.remove('glow'));
+        plus.classList.add('glow');
+        box.classList.add('selected');
+        ptip.style.display = 'block';
+        if (window.refreshAgaTooltip) window.refreshAgaTooltip();
+      });
+    }
+  });
+})();
+
+
+function setAndrogeneticSelection(idx, val) {
+  const container = document.getElementById('androgenetic-areas');
+  if (!container) return;
+  const boxes = container.querySelectorAll('.area-box');
+
+  // clear previous selection visuals
+  boxes.forEach(b => {
+    b.classList.remove('selected');
+    b.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+  });
+
+  // mark the clicked box and add persistent label
+  const target = boxes[idx];
+  if (target) {
+    // remove glow on all +/- in all boxes
+    boxes.forEach(b => { b.querySelectorAll('.plus, .minus').forEach(el => el.classList.remove('glow')); });
+    // decide which role this value represents
+    const v = parseFloat(val);
+    const p = target.querySelector('.plus');
+    const m = target.querySelector('.minus');
+    let role = 'main';
+    if (p && !isNaN(v) && parseFloat(p.title) === v) { role = 'plus'; p.classList.add('glow'); }
+    else if (m && !isNaN(v) && parseFloat(m.title) === v) { role = 'minus'; m.classList.add('glow'); }
+
+    target.classList.add('selected');// reveal that box's main tooltip (first tooltip child, if any)
+    let show = target.querySelector('.tooltip[data-role="'+role+'"]');
+    if (!show) show = target.querySelector('.tooltip');
+    if (show) show.style.display = 'block';
+  }
+
+
+  // sync with globalSelections so updateScalpUI keeps the highlight
+  if (typeof globalSelections !== 'undefined') {
+    if (!globalSelections['androgenetic']) {
+      globalSelections['androgenetic'] = { selected: new Set(), density: 0 };
+    }
+    // best-effort: find the currently targeted box from idx
+    (function(){
+      const container = document.getElementById('androgenetic-areas');
+      if (!container) return;
+      const boxes = container.querySelectorAll('.area-box');
+      const target = boxes[idx];
+      const baseVal = target ? parseFloat(target.dataset.value) : 0;
+      if (parseFloat(val) > 0) {
+        globalSelections['androgenetic'].selected = new Set([baseVal]);
+      } else {
+        globalSelections['androgenetic'].selected = new Set();
+      }
+    })();
+  }
+
+  // store numeric score and reflect in UI
+
+  window.androgeneticScore = parseFloat(val) || 0;
+  const scoreEl = document.getElementById('androgenetic-score');
+  const dens = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
+  const AEffDisp = Math.max(0, Math.min(100, window.androgeneticScore * (1 - dens/100)));
+  if (scoreEl) scoreEl.textContent = `Androgenetic alopecia score: ${AEffDisp.toFixed(1)}%`;
+
+  updateScalpUI();
+}
+
+// Keep old name as wrapper for any existing calls
+function setAndrogeneticScore(val) {
+  // Do not select the 0-picture when A==0 from Load score
+  if (val <= 0) {
+    try {
+      if (!globalSelections['androgenetic']) globalSelections['androgenetic'] = { selected: new Set(), density: 0 };
+      globalSelections['androgenetic'].selected = new Set();
+      window.androgeneticScore = 0;
+      const scoreEl = document.getElementById('androgenetic-score');
+      const dens = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
+      const AEff = Math.max(0, Math.min(100, window.androgeneticScore * (1 - dens/100)));
+      if (scoreEl) scoreEl.textContent = `Androgenetic alopecia score: ${AEff.toFixed(1)}%`;
+      // remove highlight from any previously selected androgenetic box
+      const boxes = document.querySelectorAll('#androgenetic-areas .area-box');
+      boxes.forEach(b => b.classList.remove('selected'));
+      if (typeof updateScalpUI === 'function') updateScalpUI();
+    } catch(e) {}
+    return;
+  }
+
+  const baseValues = [0,5,10,25,40,55,70,85,100];
+  let idx = 0, best = Infinity;
+  baseValues.forEach((v, i) => {
+    const d = Math.abs(v - val);
+    if (d < best) { best = d; idx = i; }
+  });
+  setAndrogeneticSelection(idx, val);
+}
+
+// removed legacy patch
+
 
 // Add tooltips to backside section elements
 const backsideValues = [0, 0.5, 1, 4, 7, 10, 13, 16, 19, 22, 24];
@@ -1956,10 +2325,37 @@ function calculateSectionTotals() {
         Beard: 0
     };
 
-    for (const [id, data] of Object.entries(globalSelections)) {
+    // Compute Scalp with optional AGA adjustment
+    (function(){
+      const per = {};
+      for (const [id, data] of Object.entries(globalSelections)) {
         const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
-        sectionData.Scalp += subtotal * (1 - data.density / 100);
-    }
+        per[id] = { value: subtotal, density: data.density || 0 };
+      }
+      const checked = (document.getElementById('aga-checkbox') && document.getElementById('aga-checkbox').checked);
+      const A = typeof window.androgeneticScore === 'number' ? window.androgeneticScore : 0;
+      const agaDensity = (globalSelections['androgenetic'] ? (globalSelections['androgenetic'].density||0) : 0);
+      const AEff = Math.max(0, Math.min(100, A * (1 - agaDensity/100)));
+      if (checked) {
+        const backside = per['backside'] || {value:0, density:0};
+        const leftside = per['leftside'] || {value:0, density:0};
+        const rightside = per['rightside'] || {value:0, density:0};
+        const topside = per['topside'] || {value:0, density:0};
+        const factor = (1 - ((40 * ((100 - AEff) / 100)) + 60) / 100) + 1;
+        const totalMod =
+          (backside.value * (1 - backside.density / 100)) * factor +
+          (leftside.value * (1 - leftside.density / 100)) * factor +
+          (rightside.value * (1 - rightside.density / 100)) * factor +
+          (topside.value * (1 - topside.density / 100)) / 40 * ((100 - AEff) / 100);
+        sectionData.Scalp = totalMod;
+      } else {
+        let total = 0;
+        ['backside','leftside','rightside','topside'].forEach(k => {
+          if (per[k]) total += per[k].value * (1 - per[k].density/100);
+        });
+        sectionData.Scalp = total;
+      }
+    })();
 
     sectionData.Eyebrows = [...eyebrowSelections.left, ...eyebrowSelections.right]
         .reduce((sum, val) => sum + val, 0);
@@ -2036,7 +2432,8 @@ function getCurrentState() {
   }
 
   return {
-    scalp,
+    agaScore: agaScore,
+scalp,
     eyebrows: {
       left: Array.from(eyebrowSelections.left),
       right: Array.from(eyebrowSelections.right)
@@ -2050,9 +2447,26 @@ function getCurrentState() {
 }
 
 function applyState(state) {
+  // Restore AGA score if present and refresh score display
+  if (typeof state.agaScore === 'number') {
+    window.androgeneticScore = state.agaScore;
+    try {
+      const scoreEl = document.getElementById('androgenetic-score');
+      const dens = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
+      const AEff = Math.max(0, Math.min(100, window.androgeneticScore * (1 - dens/100)));
+      if (scoreEl) scoreEl.textContent = `Androgenetic alopecia score: ${AEff.toFixed(1)}%`;
+    } catch(e){}
+  }
+
   if (state.scalp) {
     for (const [sectionId, data] of Object.entries(state.scalp)) {
-      globalSelections[sectionId].selected = new Set(data.selected);
+      if (sectionId === 'androgenetic') {
+        // Do not auto-select the 0 picture on load
+        const sel = (Array.isArray(data.selected) ? data.selected.filter(v => v > 0) : []);
+        globalSelections[sectionId].selected = new Set(sel);
+      } else {
+        globalSelections[sectionId].selected = new Set(data.selected);
+      }
       globalSelections[sectionId].density = data.density;
     }
     updateScalpUI();
@@ -2422,10 +2836,18 @@ function updateScoreRings() {
     ['Beard','ring-beard','ring-val-beard'],
   ];
   entries.forEach(([key, ringId, valId]) => {
+    const prev = previous.get(ringId);
+    const prev = previous.get(ringId);
     const pct = (totals && totals[key] != null) ? Number(totals[key]) : 0;
     const ring = document.getElementById(ringId);
     const val = document.getElementById(valId);
     if (ring && val) {
+      if (ringId === 'ring-beard') { ring.style.visibility = (pct > 0.0001) ? 'visible' : 'hidden'; }
+      if (prev != null && Math.abs(prev - pct) < 1e-6) return;
+      // Hide beard ring when 0 to avoid flashing on unrelated updates
+      if (ring.id === 'ring-beard') {
+        ring.style.visibility = (pct > 0.0001) ? 'visible' : 'hidden';
+      }
       setRingPct(ring, pct.toFixed(1));
       val.textContent = `${pct.toFixed(1)}%`;
     }
@@ -2540,7 +2962,6 @@ setInterval(updateScoreRings, 700);
         <li><strong>Right Beard Area:</strong> ${rightBeard}% (=Percentage of the area=${rel(rightBeard, MAX.rightBeard)}%)</li>
         <li><strong>Central Beard Area:</strong> ${centralBeard}% (=Percentage of the area=${rel(centralBeard, MAX.centralBeard)}%)</li>
       </ul>
-      <p><strong>Code:</strong> ${ (typeof getAAEncodedCode==='function' ? getAAEncodedCode() : '') }</p>
     `;
 
     document.body.appendChild(summarySection);
@@ -2648,32 +3069,20 @@ setInterval(updateScoreRings, 700);
     const now = new Date();
     const dt = now.toLocaleString();
     const { totals, details, MAX, rel } = getTotalsAndDetails();
-    const lines = [];
+        const lines = [];
     lines.push("Alopecia Areata Calculator");
     lines.push(dt);
     lines.push("");
     lines.push("Summary of Alopecia Areata Involvement");
-    lines.push(`- Total Scalp: ${totals.scalp}`);
-    lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
-    lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
-    lines.push(`- Total Beard: ${totals.beard}`);
+    lines.push(`- Total Scalp: ${Number(totals.scalp).toFixed(0)}%`);
+    lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
+    lines.push(`- Total Eyelashes: ${Number(totals.eyelashes).toFixed(0)}%`);
+    if (Number(totals.beard) > 0) { lines.push(`- Total Beard: ${Number(totals.beard).toFixed(0)}%`); }
+    try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
     lines.push("");
-    lines.push("Detailed Area Breakdown");
-    lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-    lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-    lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
-    lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
-    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-    lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-    lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-    lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
-
+try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
     const text = lines.join("
 ");
-
     async function writeClipboard(t){
       try {
         await navigator.clipboard.writeText(t);
@@ -2693,6 +3102,8 @@ setInterval(updateScoreRings, 700);
         }
       }
     }
+    try { if (typeof encodeAA19==="function" && lines && Array.isArray(lines)) { lines.push(`Code: ${encodeAA19()}`); text = lines.join("
+"); } } catch(e){}
     const ok = await writeClipboard(text);
     if (ok) {
       copyBtn.textContent = "Copied!";
@@ -2820,32 +3231,18 @@ document.addEventListener("DOMContentLoaded", function(){
       const dt = now.toLocaleString();
       const { totals, details, MAX, rel } = getTotalsAndDetails();
       const lines = [];
-      lines.push("Alopecia Areata Calculator");
-      lines.push(dt);
-      lines.push("");
-      lines.push("Summary of Alopecia Areata Involvement");
-      lines.push(`- Total Scalp: ${totals.scalp}`);
-      lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
-      lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
-      lines.push(`- Total Beard: ${totals.beard}`);
-      lines.push("");
-      lines.push("Detailed Area Breakdown");
-      lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-      lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-      lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
-      lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
-      lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-      lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-      lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-      lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-      lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-      lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-      lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
-
-      const text = lines.join("
-") + "
-
-Code: " + (typeof getAAEncodedCode==='function' ? getAAEncodedCode() : '');
+    lines.push("Alopecia Areata Calculator");
+    lines.push(dt);
+    lines.push("");
+    lines.push("Summary of Alopecia Areata Involvement");
+    lines.push(`- Total Scalp: ${Number(totals.scalp).toFixed(0)}%`);
+    lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
+    lines.push(`- Total Eyelashes: ${Number(totals.eyelashes).toFixed(0)}%`);
+    if (Number(totals.beard) > 0) { lines.push(`- Total Beard: ${Number(totals.beard).toFixed(0)}%`); }
+    try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
+    lines.push("");
+const text = lines.join("
+");
 
       async function writeClipboard(t){
         try {
@@ -2865,7 +3262,9 @@ Code: " + (typeof getAAEncodedCode==='function' ? getAAEncodedCode() : '');
           }
         }
       }
-      const ok = await writeClipboard(text);
+      try { if (typeof encodeAA19==="function" && lines && Array.isArray(lines)) { lines.push(`Code: ${encodeAA19()}`); text = lines.join("
+"); } } catch(e){}
+    const ok = await writeClipboard(text);
       if (ok) {
         copyBtn.textContent = "Copied!";
         setTimeout(()=>copyBtn.textContent="Copy summary", 1200);
@@ -3162,7 +3561,7 @@ function detectRegionFromEventTarget(t) {
 
   // Scalp sections use ids without the word "scalp" (backside/leftside/rightside/topside).
   // Detect those.
-  if (t.closest('[id*="backside" i], [id*="leftside" i], [id*="rightside" i], [id*="topside" i]')) return 'Scalp';
+  if (t.closest('[id*="backside" i], [id*="leftside" i], [id*="rightside" i], [id*="topside" i], #androgenetic-areas')) return 'Scalp';
   if (t.closest('[id$="-density" i]')) {
     const id = (t.closest('[id$="-density" i]')?.id||'').toLowerCase();
     if (/(backside|leftside|rightside|topside)-density/.test(id)) return 'Scalp';
@@ -3586,7 +3985,9 @@ function showImmediatePeekFor(region) {
       const allowed = scalpAllowed[sectionId] || [0];
       const val = allowed[Math.max(0, Math.min(allowed.length-1, scoreIdx))] || 0;
       globalSelections[sectionId].selected.clear();
-      if (scoreIdx !== 0) { globalSelections[sectionId].selected.add(val); }
+      if (val > 0) {
+        globalSelections[sectionId].selected.add(val);
+      }
     }
     setDensityUI(sectionId, dens);
   }
@@ -3594,14 +3995,18 @@ function showImmediatePeekFor(region) {
     const val = browAllowed[Math.max(0, Math.min(browAllowed.length-1, scoreIdx))] || 0;
     if (eyebrowSelections && eyebrowSelections[side]){
       eyebrowSelections[side].clear();
-      if (scoreIdx !== 0) { eyebrowSelections[side].add(val); }
+      if (val > 0) {
+        eyebrowSelections[side].add(val);
+      }
     }
   }
   function setLash(side, scoreIdx){
     const val = lashAllowed[Math.max(0, Math.min(lashAllowed.length-1, scoreIdx))] || 0;
     if (eyelashSelections && eyelashSelections[side]){
       eyelashSelections[side].clear();
-      if (scoreIdx !== 0) { eyelashSelections[side].add(val); }
+      if (val > 0) {
+        eyelashSelections[side].add(val);
+      }
     }
   }
   function setBeard(sectionId, densityIdx, scoreIdx){
@@ -3611,7 +4016,9 @@ function showImmediatePeekFor(region) {
       const allowed = beardAllowed[sectionId] || [0];
       const val = allowed[Math.max(0, Math.min(allowed.length-1, scoreIdx))] || 0;
       beardSelections[sectionId].selected.clear();
-      if (scoreIdx !== 0) { beardSelections[sectionId].selected.add(val); }
+      if (val > 0) {
+        beardSelections[sectionId].selected.add(val);
+      }
     }
     setDensityUI(sectionId, dens); // if density buttons exist for beard
   }
@@ -3724,214 +4131,596 @@ function showImmediatePeekFor(region) {
   else init();
 })();
 </script>
+
+
+
 <script>
+/* Robust selection marker for AGA options:
+   - Works for .aga-option, [data-aga-option], [data-value], and .area-box inside #aga-score
+   - Adds .selected to the chosen element
+   - Updates window.androgeneticScore and triggers updateScalpUI */
 (function(){
-  window.getAAEncodedCode = function(){
-    try{
-      if (typeof window.encodeAA19 === 'function') return window.encodeAA19();
-      if (typeof window.encodeAA18 === 'function') return window.encodeAA18();
-    }catch(e){}
-    return '';
-  };
+  function findAGAButtons(){
+    const root = document.getElementById('aga-score') || document;
+    return root.querySelectorAll('#aga-score .aga-option, #aga-score [data-aga-option], #aga-score [data-value], #aga-score .area-box');
+  }
+  function valueOf(el){
+    const v = el.getAttribute('data-value') || el.dataset?.value || el.value;
+    const num = parseFloat(v);
+    return isNaN(num) ? null : num;
+  }
+  function applySelected(value){
+    const btns = findAGAButtons();
+    btns.forEach(b => {
+      const v = valueOf(b);
+      if (v !== null && v === value) b.classList.add('selected'); else b.classList.remove('selected');
+    });
+  }
+  function init(){
+    const btns = findAGAButtons();
+    if (!btns.length) return;
+    btns.forEach(btn => {
+      btn.addEventListener('click', function(){
+        const v = valueOf(this);
+        if (v === null) return;
+        window.androgeneticScore = v;
+        applySelected(v);
+        if (typeof window.updateScalpUI === 'function') { try { window.updateScalpUI(); } catch(e){} }
+      });
+    });
+    // Initialize from any pre-set global
+    const initial = (typeof window.androgeneticScore === 'number') ? window.androgeneticScore : null;
+    if (initial !== null && initial > 0) {
+      applySelected(initial);
+    } else {
+      try {
+        if (!globalSelections['androgenetic']) globalSelections['androgenetic'] = { selected: new Set(), density: 0 };
+        globalSelections['androgenetic'].selected = new Set();
+        const boxes = document.querySelectorAll('#androgenetic-areas .area-box');
+        boxes.forEach(b => b.classList.remove('selected'));
+      } catch(e) {}
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
 
 
+
+
+<script>
+/* Single-source scalp total computation (native units, region caps baked in).
+   - Normal: Total = B + L + R + T
+   - With AGA checked: Total = (B + L + R) / (1 - 0.4*(A/100)) + T*(1 - A/100)
+   This increases the relative weight of non-top regions as A rises, while keeping Top=100%, A=50% case = 20%. */
+(function(){
+  function readDensity(sectionId){
+    const cont = document.getElementById(sectionId + '-density');
+    if (!cont) return 0;
+    const btn = cont.querySelector('button.selected[data-density], [data-density].selected');
+    if (btn) {
+      const v = btn.getAttribute('data-density');
+      return v != null ? +v : 0;
+    }
+    const input = cont.querySelector('input[data-density]:checked');
+    return input ? +input.getAttribute('data-density') : 0;
+  }
+  function chosenBoxValue(box){
+    const plus = box.querySelector('.plus');
+    const minus = box.querySelector('.minus');
+    const plusOn  = plus  && plus.classList.contains('glow');
+    const minusOn = minus && minus.classList.contains('glow');
+    if (plusOn)  return parseFloat(plus.title);
+    if (minusOn) return parseFloat(minus.title);
+    if (box.classList.contains('selected')) return parseFloat(box.dataset.value);
+    const input = box.querySelector('input[type="checkbox"], input[type="radio"]');
+    if (input && input.checked) return parseFloat(box.dataset.value || input.value) || 0;
+    return 0;
+  }
+  function sectionTotal(sectionId){
+    const area = document.getElementById(sectionId + '-areas');
+    if (!area) return 0;
+    let val = 0;
+    area.querySelectorAll('.area-box').forEach(box => { val += chosenBoxValue(box) || 0; });
+    const density = readDensity(sectionId);
+    const total = val * (1 - density/100);
+    return Math.max(0, Math.min(100, total || 0));
+  }
+  function readRegions(){
+    return {
+      B: sectionTotal('backside'),  // ~0..24
+      L: sectionTotal('leftside'),  // ~0..18
+      R: sectionTotal('rightside'), // ~0..18
+      T: sectionTotal('topside')    // ~0..40
+    };
+  }
+  function totalNormal(B,L,R,T){
+    return B + L + R + T;
+  }
+  function totalAGA(B,L,R,T,A){
+    A = Math.max(0, Math.min(100, +A || 0));
+    // Apply androgenetic density scaling
+    try {
+      const dens = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
+      A = Math.max(0, Math.min(100, A * (1 - dens/100)));
+    } catch(e) {}
+    const denom = 1 - 0.4*(A/100);
+    const nonTop = denom > 0 ? (B + L + R) / denom : (B + L + R);
+    return nonTop + T * (1 - A/100);
+  }
+  function readAGA(){
+    let A = (typeof window.androgeneticScore === 'number') ? window.androgeneticScore : null;
+    if (A == null || isNaN(A)) {
+      const cand = document.querySelector('#aga-score [data-value].selected, .aga-option.selected');
+      if (cand) A = parseFloat(cand.getAttribute('data-value'));
+    }
+    if (A == null || isNaN(A)) {
+      const input = document.querySelector('#aga-score input[type="number"], input[name="androgeneticScore"], input#androgeneticScore, input#aga-score, input[name="aga"]');
+      if (input && input.value != null) A = parseFloat(input.value);
+    }
+    if (A == null || isNaN(A)) A = 0;
+    return Math.max(0, Math.min(100, +A));
+  }
+  function computeScalp(){
+    const {B,L,R,T} = readRegions();
+    const checked = document.getElementById('aga-checkbox')?.checked;
+    const A = readAGA();
+    const total = checked ? totalAGA(B,L,R,T,A) : totalNormal(B,L,R,T);
+    return Math.max(0, Math.min(100, total || 0));
+  }
+  // Wrap original UI update so our total is written last
+  
+
+  // Also run once on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ try { placeFloatingLabel(); } catch(e){} });
+  } else {
+    try { placeFloatingLabel(); } catch(e){}
+  }
+  // Keep label on scroll/resize
+  window.addEventListener('scroll', function(){ try { placeFloatingLabel(); } catch(e){} }, {passive:true});
+  window.addEventListener('resize', function(){ try { placeFloatingLabel(); } catch(e){} });
+})();
+</script>
+
+<script>
+/* Keep the androgenetic option's tooltip visible as the label until another option is chosen. */
+(function(){
+  function refreshAgaTooltip(){
+    const root = document.getElementById('androgenetic-areas');
+    if (!root) return;
+    // Hide all AGA tooltips first
+    root.querySelectorAll('.tooltip').forEach(t => { t.style.display = 'none'; });
+    // Find the selected box
+    const sel = root.querySelector('.area-box.selected');
+    if (!sel) return;
+    // If plus/minus is the active choice, prefer its tooltip; else show the main box tooltip
+    let tipToShow = null;
+    if (sel.querySelector('.plus.glow')) {
+      // plus tooltip is usually appended to the same box; choose the last tooltip or one with recognizable content
+      const tips = sel.querySelectorAll('.tooltip');
+      tipToShow = tips[tips.length - 1] || null;
+    } else if (sel.querySelector('.minus.glow')) {
+      const tips = sel.querySelectorAll('.tooltip');
+      tipToShow = tips[tips.length - 1] || null;
+    } else {
+      tipToShow = sel.querySelector('.tooltip');
+    }
+    if (tipToShow) tipToShow.style.display = 'block';
+  }
+
+  // Patch updateScalpUI so our behavior runs after the app updates selection
+  const orig = window.updateScalpUI;
+  window.updateScalpUI = function(){
+    if (typeof orig === 'function') { try { orig(); } catch(e){} }
+    try { refreshAgaTooltip(); } catch(e){}
+  };
+
+  // Also run once on load in case a default selection exists
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ try { refreshAgaTooltip(); } catch(e){} });
+  } else {
+    try { refreshAgaTooltip(); } catch(e){}
+  }
+})();
+</script>
+
+<script>
+/* AGA persistent tooltip click augmentation.
+   - On click inside #androgenetic-areas, mark the clicked box as selected,
+     unselect others, and show its tooltip.
+   - Because hideTip() in your code keeps tooltip visible when .selected is present,
+     the tooltip will persist after mouseleave.
+*/
+(function(){
+  function findBox(el){
+    return el && el.closest ? el.closest('#androgenetic-areas .area-box') : null;
+  }
+  function showOnlyThisBoxTooltip(box){
+    const root = document.getElementById('androgenetic-areas');
+    if (!root || !box) return;
+    // Hide all tooltips in AGA section
+    root.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+    // Prefer tooltip for the hovered/active element if any, otherwise first tooltip in the box
+    // We simply show the first tooltip appended to the box to avoid assumptions.
+    const tip = box.querySelector('.tooltip');
+    if (tip) tip.style.display = 'block';
+  }
+  function onClick(ev){
+    const box = findBox(ev.target);
+    if (!box) return;
+    const root = document.getElementById('androgenetic-areas');
+    if (!root) return;
+    // Unselect others, then select this one
+    root.querySelectorAll('.area-box.selected').forEach(b => b.classList.remove('selected'));
+    box.classList.add('selected');
+    // Show its tooltip and keep it (mouseleave handler won't hide because .selected is present)
+    showOnlyThisBoxTooltip(box);
+  }
+  // Attach after DOM is ready
+  function attach(){
+    const root = document.getElementById('androgenetic-areas');
+    if (!root) return;
+    root.addEventListener('click', onClick, true); // capture to run before any global hides
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+})();
+</script>
+
 <script>
 (function(){
-  function getAAEncodedCode(){
+  function refreshAgaTooltip(){
+    const root = document.getElementById('androgenetic-areas');
+    if (!root) return;
+    // hide all AGA tooltips first
+    root.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
+    const sel = root.querySelector('.area-box.selected');
+    if (!sel) return;
+    let tipToShow = null;
+    if (sel.querySelector('.plus.glow')) {
+      tipToShow = sel.querySelector('.tooltip[data-role="plus"]');
+    } else if (sel.querySelector('.minus.glow')) {
+      tipToShow = sel.querySelector('.tooltip[data-role="minus"]');
+    } else {
+      tipToShow = sel.querySelector('.tooltip[data-role="main"]');
+    }
+    if (tipToShow) tipToShow.style.display = 'block';
+  }
+
+  // Expose for other code paths
+  window.refreshAgaTooltip = refreshAgaTooltip;
+
+  // Hook: after any global UI refresh, also refresh AGA tooltip
+  const prevUpdate = window.updateScalpUI;
+  window.updateScalpUI = function(){
+    if (typeof prevUpdate === 'function') { try { prevUpdate(); } catch(e){} }
+    try { refreshAgaTooltip(); } catch(e){}
+  };
+
+  // Run once on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshAgaTooltip);
+  } else {
+    refreshAgaTooltip();
+  }
+})();
+</script>
+
+
+
+
+
+<script>
+(function(){
+  function ensureCopyButton(){
+    // If already there, nothing to do
+    if (document.getElementById('copy-summary')) return;
+    // Preferred anchor: the PDF button
+    var pdfBtn = document.getElementById('generate-pdf');
+    var btn = document.createElement('button');
+    btn.id = 'copy-summary';
+    btn.type = 'button';
+    btn.textContent = 'Copy summary';
+    btn.style.marginLeft = '8px';
+    btn.style.padding = '8px 12px';
+    btn.style.border = '1px solid #cbd5e1';
+    btn.style.borderRadius = '8px';
+    btn.style.cursor = 'pointer';
+    btn.style.background = 'white';
+    btn.style.boxShadow = '0 1px 2px rgba(0,0,0,.05)';
+    if (pdfBtn && pdfBtn.parentNode) {
+      pdfBtn.parentNode.insertBefore(btn, pdfBtn.nextSibling);
+    } else {
+      // Fallback: place at top of page
+      var host = document.body || document.documentElement;
+      host.insertBefore(btn, host.firstChild);
+    }
+
+    // Click handler - same summary formatting + code
+    btn.addEventListener('click', async function(){
+      function writeClipboard(text){
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+        } else {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            return true;
+          } catch(e){ return false; }
+        }
+      }
+      function getTotals(){
+        try { return calculateSectionTotals && calculateSectionTotals(); } catch(e){}
+        return { Scalp: 0, Eyebrows: 0, Eyelashes: 0, Beard: 0 };
+      }
+      const totals = getTotals();
+      const now = new Date();
+      const dt = now.toLocaleString();
+      const lines = [];
+      lines.push('Alopecia Areata Calculator');
+      lines.push(dt);
+      lines.push('');
+      lines.push('Summary of Alopecia Areata Involvement');
+      lines.push(`- Total Scalp: ${Number(totals.Scalp).toFixed(0)}%`);
+      lines.push(`- Total Eyebrows: ${Number(totals.Eyebrows).toFixed(0)}%`);
+      lines.push(`- Total Eyelashes: ${Number(totals.Eyelashes).toFixed(0)}%`);
+      if (Number(totals.Beard) > 0) lines.push(`- Total Beard: ${Number(totals.Beard).toFixed(0)}%`);
+      try {
+        if (typeof window.encodeAA19 === 'function') {
+          const code = window.encodeAA19();
+          lines.push(`Code: ${code}`);
+        }
+      } catch(e){}
+      lines.push('');
+      const ok = await writeClipboard(lines.join('\
+'));
+      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy summary', 1200); }
+      else { alert('Copy failed'); }
+    });
+  }
+  function boot(){
+    try { ensureCopyButton(); } catch(e){}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+  // Also retry a few times in case the PDF button is injected late
+  let attempts = 0;
+  const iv = setInterval(function(){
+    attempts++;
+    if (document.getElementById('copy-summary')) { clearInterval(iv); return; }
+    try { ensureCopyButton(); } catch(e){}
+    if (attempts > 20) clearInterval(iv);
+  }, 300);
+})();
+</script>
+
+
+
+
+
+<script>
+(function(){
+  function writeClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+    }
     try {
-      if (typeof window.encodeAA19 === 'function') return window.encodeAA19();
-      if (typeof window.encodeAA18 === 'function') return window.encodeAA18();
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    } catch(e){ return false; }
+  }
+
+  function getTotalsSafe(){
+    try {
+      if (typeof calculateSectionTotals === 'function') return calculateSectionTotals();
+    } catch(e){}
+    return { Scalp: 0, Eyebrows: 0, Eyelashes: 0, Beard: 0 };
+  }
+
+  function getCodeSafe(){
+    try {
+      if (typeof window.encodeAA19 === 'function') return String(window.encodeAA19()||'');
+      if (typeof window.encodeAA18 === 'function' && typeof window.dec52==='function' && typeof window.enc52==='function' && typeof window.sumMod52==='function') {
+        const c18 = window.encodeAA18();
+        const idxs = c18.split('').map(window.dec52);
+        const chk = window.sumMod52(idxs);
+        return c18 + window.enc52(chk);
+      }
     } catch(e){}
     return '';
   }
-  function getTotalsAndDetails(){
-    const scalp     = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
-    const eyebrows  = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-    const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-    const beard     = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
 
-    function subtotal(sel, densityPct){
-      let total = 0;
-      if (sel && typeof sel.forEach === "function") sel.forEach(v => total += Number(v)||0);
-      else if (Array.isArray(sel)) sel.forEach(v => total += Number(v)||0);
-      const dens = Number(densityPct)||0;
-      return Number((total * (1 - dens/100)).toFixed(2));
-    }
-
-    const leftScalp   = subtotal(window.globalSelections?.leftside?.selected,   window.globalSelections?.leftside?.density);
-    const rightScalp  = subtotal(window.globalSelections?.rightside?.selected,  window.globalSelections?.rightside?.density);
-    const topScalp    = subtotal(window.globalSelections?.topside?.selected,    window.globalSelections?.topside?.density);
-    const backScalp   = subtotal(window.globalSelections?.backside?.selected,   window.globalSelections?.backside?.density);
-
-    const leftEyebrow  = subtotal(window.eyebrowSelections?.left,  0);
-    const rightEyebrow = subtotal(window.eyebrowSelections?.right, 0);
-
-    const leftEyelash  = subtotal(window.eyelashSelections?.left,  0);
-    const rightEyelash = subtotal(window.eyelashSelections?.right, 0);
-
-    const leftBeard    = subtotal(window.beardSelections?.["left-beard"]?.selected,    window.beardSelections?.["left-beard"]?.density);
-    const rightBeard   = subtotal(window.beardSelections?.["right-beard"]?.selected,   window.beardSelections?.["right-beard"]?.density);
-    const centralBeard = subtotal(window.beardSelections?.["central-beard"]?.selected, window.beardSelections?.["central-beard"]?.density);
-
-    const MAX = {
-      leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-      leftEyebrow: 50, rightEyebrow: 50,
-      leftEyelash: 50, rightEyelash: 50,
-      leftBeard: 40, rightBeard: 40, centralBeard: 20
-    };
-    const rel = (val, max) => max ? Math.max(0, Math.min(100, (Number(val)||0)/max*100)).toFixed(2) : "0.00";
-
-    return {
-      totals: { scalp, eyebrows, eyelashes, beard },
-      details: { leftScalp, rightScalp, topScalp, backScalp, leftEyebrow, rightEyebrow, leftEyelash, rightEyelash, leftBeard, rightBeard, centralBeard },
-      MAX, rel
-    };
-  }
-
-  function buildSummaryTextWithCode(){
-    const dt = new Date().toLocaleString();
-    const { totals, details, MAX, rel } = getTotalsAndDetails();
-    const lines = [];
-    lines.push("Alopecia Areata Calculator");
-    lines.push(dt);
-    lines.push("");
-    lines.push("Summary of Alopecia Areata Involvement");
-    lines.push(`- Total Scalp: ${totals.scalp}`);
-    lines.push(`- Total Eyebrows: ${totals.eyebrows}`);
-    lines.push(`- Total Eyelashes: ${totals.eyelashes}`);
-    lines.push(`- Total Beard: ${totals.beard}`);
-    lines.push("");
-    lines.push("Detailed Area Breakdown");
-    lines.push(`- Left Scalp: ${details.leftScalp}% (=Percentage of the area=${rel(details.leftScalp, MAX.leftScalp)}%)`);
-    lines.push(`- Right Scalp: ${details.rightScalp}% (=Percentage of the area=${rel(details.rightScalp, MAX.rightScalp)}%)`);
-    lines.push(`- Top of the Head: ${details.topScalp}% (=Percentage of the area=${rel(details.topScalp, MAX.topScalp)}%)`);
-    lines.push(`- Back of the Head: ${details.backScalp}% (=Percentage of the area=${rel(details.backScalp, MAX.backScalp)}%)`);
-    lines.push(`- Left Eyebrow: ${details.leftEyebrow}% (=Percentage of the area=${rel(details.leftEyebrow, MAX.leftEyebrow)}%)`);
-    lines.push(`- Right Eyebrow: ${details.rightEyebrow}% (=Percentage of the area=${rel(details.rightEyebrow, MAX.rightEyebrow)}%)`);
-    lines.push(`- Left Eyelash: ${details.leftEyelash}% (=Percentage of the area=${rel(details.leftEyelash, MAX.leftEyelash)}%)`);
-    lines.push(`- Right Eyelash: ${details.rightEyelash}% (=Percentage of the area=${rel(details.rightEyelash, MAX.rightEyelash)}%)`);
-    lines.push(`- Left Beard Area: ${details.leftBeard}% (=Percentage of the area=${rel(details.leftBeard, MAX.leftBeard)}%)`);
-    lines.push(`- Right Beard Area: ${details.rightBeard}% (=Percentage of the area=${rel(details.rightBeard, MAX.rightBeard)}%)`);
-    lines.push(`- Central Beard Area: ${details.centralBeard}% (=Percentage of the area=${rel(details.centralBeard, MAX.centralBeard)}%)`);
-    lines.push("");
-    lines.push(`Code: ${getAAEncodedCode()}`);
-    return lines.join("\n");
-  }
-
-  function buildSummaryHTMLWithCode(){
+  function buildSummary(){
+    const totals = getTotalsSafe();
     const now = new Date();
-    const datetime = now.toLocaleString();
-    const title = "Alopecia Areata Calculator";
-    const { totals, details, MAX, rel } = getTotalsAndDetails();
-    const code = getAAEncodedCode();
-
-    const el = document.createElement("div");
-    el.id = "pdf-summary";
-    el.style.margin = "20px";
-    el.style.fontFamily = "'Segoe UI', sans-serif";
-    el.innerHTML = `
-      <h2 style="text-align:center;">${title}</h2>
-      <p style="text-align:center;"><em>${datetime}</em></p>
-      <hr/>
-      <h3>Summary of Alopecia Areata Involvement</h3>
-      <ul>
-        <li><strong>Total Scalp:</strong> ${totals.scalp}</li>
-        <li><strong>Total Eyebrows:</strong> ${totals.eyebrows}</li>
-        <li><strong>Total Eyelashes:</strong> ${totals.eyelashes}</li>
-        <li><strong>Total Beard:</strong> ${totals.beard}</li>
-      </ul>
-      <h3>Detailed Area Breakdown</h3>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
-        <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${details.leftScalp}% (Percentage of the area: ${rel(details.leftScalp, MAX.leftScalp)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${details.rightScalp}% (Percentage of the area: ${rel(details.rightScalp, MAX.rightScalp)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${details.topScalp}% (Percentage of the area: ${rel(details.topScalp, MAX.topScalp)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${details.backScalp}% (Percentage of the area: ${rel(details.backScalp, MAX.backScalp)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${details.leftEyebrow}% (Percentage of the area: ${rel(details.leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${details.rightEyebrow}% (Percentage of the area: ${rel(details.rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${details.leftEyelash}% (Percentage of the area: ${rel(details.leftEyelash, MAX.leftEyelash)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${details.rightEyelash}% (Percentage of the area: ${rel(details.rightEyelash, MAX.rightEyelash)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.leftBeard}% (Percentage of the area: ${rel(details.leftBeard, MAX.leftBeard)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.rightBeard}% (Percentage of the area: ${rel(details.rightBeard, MAX.rightBeard)}%)</td></tr>
-        <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${details.centralBeard}% (Percentage of the area: ${rel(details.centralBeard, MAX.centralBeard)}%)</td></tr>
-      </table>
-      <p style="margin-top:12px;"><strong>Code:</strong> ${code}</p>
-    `;
-    return el;
-  }
-
-  function ensureCopyButton(){
-    const pdfBtn = document.getElementById("generate-pdf");
-    if (!pdfBtn) return null;
-    let copyBtn = document.getElementById("copy-summary");
-    if (!copyBtn){
-      copyBtn = document.createElement("button");
-      copyBtn.id = "copy-summary";
-      copyBtn.type = "button";
-      copyBtn.textContent = "Copy summary";
-      copyBtn.style.marginLeft = "8px";
-      copyBtn.style.padding = "8px 12px";
-      copyBtn.style.border = "1px solid #cbd5e1";
-      copyBtn.style.borderRadius = "8px";
-      copyBtn.style.cursor = "pointer";
-      copyBtn.style.background = "white";
-      copyBtn.style.boxShadow = "0 1px 2px rgba(0,0,0,.05)";
-      pdfBtn.insertAdjacentElement("afterend", copyBtn);
+    const dt = now.toLocaleString();
+    const L = [];
+    L.push('Alopecia Areata Calculator');
+    L.push(dt);
+    L.push('');
+    L.push('Summary of Alopecia Areata Involvement');
+    L.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||0)}%`);
+    L.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
+    L.push(`- Total Eyelashes: ${Math.round(Number(totals.Eyelashes)||0)}%`);
+    if ((Number(totals.Beard)||0) > 0) L.push(`- Total Beard: ${Math.round(Number(totals.Beard)||0)}%`);
+    const code = getCodeSafe();
+    if (code && code.length===19) {
+      L.push('');
+      L.push(`Code: ${code}`);
     }
-    return copyBtn;
+    L.push('');
+    return L.join('\
+');
   }
 
-  function rewirePdfButton(){
-    const btn = document.getElementById("generate-pdf");
-    if (!btn) return;
+  function hijackBtn(){
+    const btn = document.getElementById('copy-summary');
+    if (!btn) return false;
+    // Replace node to remove any existing listeners
     const clone = btn.cloneNode(true);
     btn.parentNode.replaceChild(clone, btn);
-    clone.addEventListener("click", function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      const section = buildSummaryHTMLWithCode();
-      document.body.appendChild(section);
+    clone.addEventListener('click', async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      const text = buildSummary();
+      const ok = await writeClipboard(text);
+      if (ok) { clone.textContent = 'Copied!'; setTimeout(()=>clone.textContent='Copy summary', 1200); }
+      else { alert('Copy failed'); }
+      return false;
+    });
+    return true;
+  }
+
+  function boot(){
+    if (!hijackBtn()) {
+      // try again a few times if the button is inserted late
+      let tries = 0;
+      const iv = setInterval(()=>{
+        if (hijackBtn()) { clearInterval(iv); return; }
+        tries++;
+        if (tries > 30) clearInterval(iv);
+      }, 250);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(function(){
+  function waitFor(pred, timeoutMs){
+    return new Promise((resolve, reject)=>{
+      const t0 = Date.now();
+      function tick(){
+        try { if (pred()) return resolve(true); } catch(e){}
+        if (Date.now() - t0 > timeoutMs) return reject(new Error("waitFor timeout"));
+        setTimeout(tick, 50);
+      }
+      tick();
+    });
+  }
+  function writeClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Promise.resolve(true);
+    } catch(e){ return Promise.resolve(false); }
+  }
+  function ensureButton(){
+    let btn = document.getElementById('copy-summary');
+    if (!btn) {
+      const pdfBtn = document.getElementById('generate-pdf');
+      btn = document.createElement('button');
+      btn.id = 'copy-summary';
+      btn.type = 'button';
+      btn.textContent = 'Copy summary';
+      btn.style.marginLeft = '8px';
+      btn.style.padding = '8px 12px';
+      btn.style.border = '1px solid #cbd5e1';
+      btn.style.borderRadius = '8px';
+      btn.style.cursor = 'pointer';
+      btn.style.background = 'white';
+      btn.style.boxShadow = '0 1px 2px rgba(0,0,0,.05)';
+      if (pdfBtn && pdfBtn.parentNode) pdfBtn.parentNode.insertBefore(btn, pdfBtn.nextSibling);
+      else (document.body || document.documentElement).insertBefore(btn, document.body.firstChild);
+    } else {
+      // drop pre-existing listeners
+      const clone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(clone, btn);
+      btn = clone;
+    }
+    return btn;
+  }
+  function composeSummary(){
+    const totals = (typeof calculateSectionTotals==='function') ? calculateSectionTotals() : {Scalp:0, Eyebrows:0, Eyelashes:0, Beard:0};
+    const dt = new Date().toLocaleString();
+    const lines = [];
+    lines.push('Alopecia Areata Calculator');
+    lines.push(dt);
+    lines.push('');
+    lines.push('Summary of Alopecia Areata Involvement');
+    lines.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||0)}%`);
+    lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
+    lines.push(`- Total Eyelashes: ${Math.round(Number(totals.Eyelashes)||0)}%`);
+    if ((Number(totals.Beard)||0) > 0) lines.push(`- Total Beard: ${Math.round(Number(totals.Beard)||0)}%`);
+    let code = '';
+    try {
+      // Unconditional attempt; if not yet defined, fallback to 18+checksum
+      code = String(encodeAA19());
+    } catch(e){
       try {
-        html2pdf().set({
-          margin: 10,
-          filename: "alopecia_areata_summary.pdf",
-          html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-        }).from(section).save().finally(()=>{ try{ document.body.removeChild(section); }catch(e){} });
-      } catch(e) { try{ document.body.removeChild(section); }catch(_){} }
+        const c18 = (typeof encodeAA18==='function') ? encodeAA18() : '';
+        if (c18 && typeof dec52==='function' && typeof enc52==='function' && typeof sumMod52==='function'){
+          const idxs = c18.split('').map(dec52);
+          const chk = sumMod52(idxs);
+          code = c18 + enc52(chk);
+        }
+      } catch(_){ code = ''; }
+    }
+    if (code) {
+      lines.push('');
+      lines.push(`Code: ${code}`);
+    }
+    lines.push('');
+    return lines.join('\n'); // real newlines
+  }
+  async function initCopySummary(){
+    // Wait for required functions
+    await waitFor(()=> typeof encodeAA19==='function' || typeof encodeAA18==='function', 5000).catch(()=>{});
+    await waitFor(()=> typeof calculateSectionTotals==='function', 5000).catch(()=>{});
+    const btn = ensureButton();
+    btn.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      ev.stopPropagation();
+      const ok = await writeClipboard(composeSummary());
+      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy summary', 1200); }
     }, true);
   }
-
-  function wireCopy(){
-    const copyBtn = ensureCopyButton();
-    if (!copyBtn) return;
-    copyBtn.onclick = async function(){
-      const text = buildSummaryTextWithCode();
-      async function writeClipboard(t){
-        try { await navigator.clipboard.writeText(t); return true; }
-        catch(e){
-          try{
-            const ta = document.createElement("textarea");
-            ta.value = t; document.body.appendChild(ta); ta.select();
-            document.execCommand("copy"); document.body.removeChild(ta);
-            return true;
-          }catch(_){ return false; }
-        }
-      }
-      const ok = await writeClipboard(text);
-      copyBtn.textContent = ok ? "Copied!" : "Copy failed";
-      setTimeout(()=>copyBtn.textContent = "Copy summary", 1200);
-    };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCopySummary);
+  } else {
+    initCopySummary();
   }
-
-  function install(){
-    rewirePdfButton();
-    wireCopy();
-  }
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install);
-  else install();
 })();
 </script>
 
 </body></html>
+<!-- removed legacy SAFE OVERRIDES -->
