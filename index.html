@@ -837,7 +837,7 @@
 <div class="ring" id="ring-scalp"><span class="ring-val" id="ring-val-scalp">0%</span><span class="ring-label">Scalp</span></div>
 <div class="ring" id="ring-eyebrows"><span class="ring-val" id="ring-val-eyebrows">0%</span><span class="ring-label">Eyebrows</span></div>
 <div class="ring" id="ring-eyelashes"><span class="ring-val" id="ring-val-eyelashes">0%</span><span class="ring-label">Eyelashes</span></div>
-<div class="ring" id="ring-beard"><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
+<div class="ring" id="ring-beard" ><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
 </div>
 <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
 <button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
@@ -2325,37 +2325,40 @@ function calculateSectionTotals() {
         Beard: 0
     };
 
-    // Compute Scalp with optional AGA adjustment
-    (function(){
-      const per = {};
-      for (const [id, data] of Object.entries(globalSelections)) {
-        const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
-        per[id] = { value: subtotal, density: data.density || 0 };
-      }
-      const checked = (document.getElementById('aga-checkbox') && document.getElementById('aga-checkbox').checked);
-      const A = typeof window.androgeneticScore === 'number' ? window.androgeneticScore : 0;
-      const agaDensity = (globalSelections['androgenetic'] ? (globalSelections['androgenetic'].density||0) : 0);
-      const AEff = Math.max(0, Math.min(100, A * (1 - agaDensity/100)));
-      if (checked) {
-        const backside = per['backside'] || {value:0, density:0};
-        const leftside = per['leftside'] || {value:0, density:0};
-        const rightside = per['rightside'] || {value:0, density:0};
-        const topside = per['topside'] || {value:0, density:0};
-        const factor = (1 - ((40 * ((100 - AEff) / 100)) + 60) / 100) + 1;
-        const totalMod =
-          (backside.value * (1 - backside.density / 100)) * factor +
-          (leftside.value * (1 - leftside.density / 100)) * factor +
-          (rightside.value * (1 - rightside.density / 100)) * factor +
-          (topside.value * (1 - topside.density / 100)) / 40 * ((100 - AEff) / 100);
-        sectionData.Scalp = totalMod;
-      } else {
-        let total = 0;
-        ['backside','leftside','rightside','topside'].forEach(k => {
-          if (per[k]) total += per[k].value * (1 - per[k].density/100);
-        });
-        sectionData.Scalp = total;
-      }
-    })();
+    // Compute Scalp with AGA adjustment using hair-density adjusted values
+(function(){
+  const per = {};
+  for (const [id, data] of Object.entries(globalSelections)) {
+    const subtotal = Array.from(data.selected).reduce((sum, val) => sum + val, 0);
+    per[id] = { value: subtotal, density: data.density || 0 };
+  }
+  const checked = (document.getElementById('aga-checkbox') && document.getElementById('aga-checkbox').checked) === true;
+  const Araw = Math.max(0, Math.min(100, (typeof window.androgeneticScore === 'number' ? window.androgeneticScore : 0)));
+  const Adens = (globalSelections['androgenetic'] && typeof globalSelections['androgenetic'].density === 'number') ? globalSelections['androgenetic'].density : 0;
+  const Aadj  = Araw * (1 - Adens/100);
+
+  if (checked) {
+    // Use density-adjusted regional values for numerator
+    function adjVal(key){
+      if (!per[key]) return 0;
+      return per[key].value * (1 - per[key].density/100);
+    }
+    const B = adjVal('backside');
+    const L = adjVal('leftside');
+    const R = adjVal('rightside');
+    const T = adjVal('topside');
+    const numerator = B + L + R + T;
+    const denominator = 60 + ((100 - Aadj) / 100 * 40);
+    sectionData.Scalp = denominator > 0 ? (numerator / denominator) * 100 : 0;
+  } else {
+    // Default: sum with each region's density slider
+    let total = 0;
+    ['backside','leftside','rightside','topside'].forEach(k => {
+      if (per[k]) total += per[k].value * (1 - per[k].density/100);
+    });
+    sectionData.Scalp = total;
+  }
+})();
 
     sectionData.Eyebrows = [...eyebrowSelections.left, ...eyebrowSelections.right]
         .reduce((sum, val) => sum + val, 0);
@@ -2837,16 +2840,14 @@ function updateScoreRings() {
   ];
   entries.forEach(([key, ringId, valId]) => {
     const prev = previous.get(ringId);
-    const prev = previous.get(ringId);
     const pct = (totals && totals[key] != null) ? Number(totals[key]) : 0;
     const ring = document.getElementById(ringId);
     const val = document.getElementById(valId);
     if (ring && val) {
-      if (ringId === 'ring-beard') { ring.style.visibility = (pct > 0.0001) ? 'visible' : 'hidden'; }
       if (prev != null && Math.abs(prev - pct) < 1e-6) return;
       // Hide beard ring when 0 to avoid flashing on unrelated updates
       if (ring.id === 'ring-beard') {
-        ring.style.visibility = (pct > 0.0001) ? 'visible' : 'hidden';
+        ring.style.display = (pct > 0.0001) ? 'grid' : 'none';
       }
       setRingPct(ring, pct.toFixed(1));
       val.textContent = `${pct.toFixed(1)}%`;
@@ -4188,100 +4189,7 @@ function showImmediatePeekFor(region) {
 
 
 
-<script>
-/* Single-source scalp total computation (native units, region caps baked in).
-   - Normal: Total = B + L + R + T
-   - With AGA checked: Total = (B + L + R) / (1 - 0.4*(A/100)) + T*(1 - A/100)
-   This increases the relative weight of non-top regions as A rises, while keeping Top=100%, A=50% case = 20%. */
-(function(){
-  function readDensity(sectionId){
-    const cont = document.getElementById(sectionId + '-density');
-    if (!cont) return 0;
-    const btn = cont.querySelector('button.selected[data-density], [data-density].selected');
-    if (btn) {
-      const v = btn.getAttribute('data-density');
-      return v != null ? +v : 0;
-    }
-    const input = cont.querySelector('input[data-density]:checked');
-    return input ? +input.getAttribute('data-density') : 0;
-  }
-  function chosenBoxValue(box){
-    const plus = box.querySelector('.plus');
-    const minus = box.querySelector('.minus');
-    const plusOn  = plus  && plus.classList.contains('glow');
-    const minusOn = minus && minus.classList.contains('glow');
-    if (plusOn)  return parseFloat(plus.title);
-    if (minusOn) return parseFloat(minus.title);
-    if (box.classList.contains('selected')) return parseFloat(box.dataset.value);
-    const input = box.querySelector('input[type="checkbox"], input[type="radio"]');
-    if (input && input.checked) return parseFloat(box.dataset.value || input.value) || 0;
-    return 0;
-  }
-  function sectionTotal(sectionId){
-    const area = document.getElementById(sectionId + '-areas');
-    if (!area) return 0;
-    let val = 0;
-    area.querySelectorAll('.area-box').forEach(box => { val += chosenBoxValue(box) || 0; });
-    const density = readDensity(sectionId);
-    const total = val * (1 - density/100);
-    return Math.max(0, Math.min(100, total || 0));
-  }
-  function readRegions(){
-    return {
-      B: sectionTotal('backside'),  // ~0..24
-      L: sectionTotal('leftside'),  // ~0..18
-      R: sectionTotal('rightside'), // ~0..18
-      T: sectionTotal('topside')    // ~0..40
-    };
-  }
-  function totalNormal(B,L,R,T){
-    return B + L + R + T;
-  }
-  function totalAGA(B,L,R,T,A){
-    A = Math.max(0, Math.min(100, +A || 0));
-    // Apply androgenetic density scaling
-    try {
-      const dens = (globalSelections['androgenetic'] && globalSelections['androgenetic'].density) ? globalSelections['androgenetic'].density : 0;
-      A = Math.max(0, Math.min(100, A * (1 - dens/100)));
-    } catch(e) {}
-    const denom = 1 - 0.4*(A/100);
-    const nonTop = denom > 0 ? (B + L + R) / denom : (B + L + R);
-    return nonTop + T * (1 - A/100);
-  }
-  function readAGA(){
-    let A = (typeof window.androgeneticScore === 'number') ? window.androgeneticScore : null;
-    if (A == null || isNaN(A)) {
-      const cand = document.querySelector('#aga-score [data-value].selected, .aga-option.selected');
-      if (cand) A = parseFloat(cand.getAttribute('data-value'));
-    }
-    if (A == null || isNaN(A)) {
-      const input = document.querySelector('#aga-score input[type="number"], input[name="androgeneticScore"], input#androgeneticScore, input#aga-score, input[name="aga"]');
-      if (input && input.value != null) A = parseFloat(input.value);
-    }
-    if (A == null || isNaN(A)) A = 0;
-    return Math.max(0, Math.min(100, +A));
-  }
-  function computeScalp(){
-    const {B,L,R,T} = readRegions();
-    const checked = document.getElementById('aga-checkbox')?.checked;
-    const A = readAGA();
-    const total = checked ? totalAGA(B,L,R,T,A) : totalNormal(B,L,R,T);
-    return Math.max(0, Math.min(100, total || 0));
-  }
-  // Wrap original UI update so our total is written last
-  
 
-  // Also run once on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function(){ try { placeFloatingLabel(); } catch(e){} });
-  } else {
-    try { placeFloatingLabel(); } catch(e){}
-  }
-  // Keep label on scroll/resize
-  window.addEventListener('scroll', function(){ try { placeFloatingLabel(); } catch(e){} }, {passive:true});
-  window.addEventListener('resize', function(){ try { placeFloatingLabel(); } catch(e){} });
-})();
-</script>
 
 <script>
 /* Keep the androgenetic option's tooltip visible as the label until another option is chosen. */
