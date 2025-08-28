@@ -560,6 +560,7 @@
   line-height: 1;
 }
 #scalp-scale .labels span { white-space: nowrap; }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <!-- Preload all beard Images -->
@@ -607,6 +608,7 @@
     font-size: 0 !important;
   }
   #results-summary > * { display: none !important; }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <style>
   /* Visually collapse banner but keep contents in DOM (for scripts that depend on them) */
@@ -619,6 +621,7 @@
     max-height: 0 !important;
     overflow: hidden !important;
   }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <style>
 /* --- Fancy ring animations --- */
@@ -658,6 +661,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ring, .ring.flash, .ring .particle { animation: none !important; transition: none !important; }
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <style>
 /* --- Floating 'peek' for offscreen ring updates --- */
@@ -711,8 +715,10 @@
 @media (prefers-reduced-motion: reduce) {
   #ring-peek, .peek-item { animation: none !important; }
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<style>.title-banner { overflow: visible !important; }</style>
+<style>.title-banner { overflow: visible !important; }.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
 <style>
     .btn-primary {
       appearance: none;
@@ -736,7 +742,8 @@
       border-radius: 10px;
       font-size: 14px;
     }
-    </style><style>
+    .pdf-top-right { position:absolute; top:6px; right:8px; }
+</style><style>
     .btn-blue {
       appearance: none;
       border: none;
@@ -756,7 +763,8 @@
       background-color: #60a5fa;
       transform: translateY(0);
     }
-    </style>
+    .pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
 
 
 
@@ -771,6 +779,7 @@
   box-shadow: 0 0 14px rgba(0, 119, 204, 0.6) !important;
   background-color: rgba(179, 217, 255, 0.85) !important;
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 
 
@@ -781,10 +790,12 @@
   width: 110px !important;
   height: 260px !important;
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 
 <style>
   .aga-help-wrap:hover #aga-help-float { display: block !important; }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 
 
@@ -799,6 +810,7 @@
   box-shadow: 0 0 0 3px rgba(220,53,69,0.35);
   border-radius: 6px;
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 
 </head>
@@ -809,6 +821,7 @@
     display: none !important;
   }
 }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <div class="title-banner" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;">
 <span class="help-icon" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">?</span>
@@ -2343,20 +2356,23 @@ function calculateSectionTotals() {
       if (!per[key]) return 0;
       return per[key].value * (1 - per[key].density/100);
     }
-    const B = adjVal('backside');
-    const L = adjVal('leftside');
-    const R = adjVal('rightside');
-    const T = adjVal('topside');
+    let B = adjVal('backside');
+    let L = adjVal('leftside');
+    let R = adjVal('rightside');
+    let T = adjVal('topside');
+    if (globalThis.__applyAgeScaling) { ({L,R,B,T} = globalThis.__applyAgeScaling({L,R,B,T})); }
     const numerator = B + L + R + T;
     const denominator = 60 + ((100 - Aadj) / 100 * 40);
     sectionData.Scalp = denominator > 0 ? (numerator / denominator) * 100 : 0;
   } else {
     // Default: sum with each region's density slider
-    let total = 0;
-    ['backside','leftside','rightside','topside'].forEach(k => {
-      if (per[k]) total += per[k].value * (1 - per[k].density/100);
-    });
-    sectionData.Scalp = total;
+    function adjVal2(key){ if (!per[key]) return 0; return per[key].value * (1 - per[key].density/100); }
+    let B2 = adjVal2('backside');
+    let L2 = adjVal2('leftside');
+    let R2 = adjVal2('rightside');
+    let T2 = adjVal2('topside');
+    if (globalThis.__applyAgeScaling) { ({L:L2,R:R2,B:B2,T:T2} = globalThis.__applyAgeScaling({L:L2,R:R2,B:B2,T:T2})); }
+    sectionData.Scalp = B2 + L2 + R2 + T2;
   }
 })();
 
@@ -2537,12 +2553,18 @@ document.addEventListener("DOMContentLoaded", () => {
         pdfButton.addEventListener("click", () => {
             const opt = {
                 margin:       0.3,
-                filename:     'alopecia_preview.pdf',
+                filename:     'alopecia_preview_disabled.pdf',
                 Image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(previewArea).save();
+            
+/* preview injection disabled */
+var __pdfPromise = null;
+/* preview injection had cleanup; nothing to clean now */ catch(e){}
+  });
+}
+
         });
     }
 
@@ -2929,25 +2951,29 @@ setInterval(updateScoreRings, 700);
     summarySection.id = "pdf-summary";
     summarySection.style.margin = "20px";
     summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-    summarySection.innerHTML = `
+    
+summarySection.innerHTML = `
       <h2 style='text-align:center;'>${title}</h2>
       <p style='text-align:center;'><em>${datetime}</em></p>
       <hr/>
 
-        <style>
+        
+      <style>
           #pdf-summary{max-width:190mm;}
           #pdf-summary table{width:100%;max-width:190mm;border-collapse:collapse;table-layout:fixed;}
           #pdf-summary td{border:1px solid #ccc;padding:6px;word-wrap:break-word;white-space:normal;}
           #pdf-summary tr{page-break-inside:avoid;break-inside:avoid;-webkit-region-break-inside:avoid;-webkit-column-break-inside:avoid;}
           #pdf-summary table, #pdf-summary td{page-break-inside:avoid;break-inside:avoid;}
-        </style>
+        .pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
 
       <h3>Summary of Alopecia Areata Involvement</h3>
       <ul>
         <li><strong>Total Scalp:</strong> ${scalp}</li>
         <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
         <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-        <li><strong>Total Beard:</strong> ${beard}</li>
+        <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>'}
       </ul>
       <h3>Detailed Area Breakdown</h3>
       <ul>
@@ -2965,7 +2991,135 @@ setInterval(updateScoreRings, 700);
       </ul>
     `;
 
-    document.body.appendChild(summarySection);
+    
+      
+      
+// Build exactly one Dominant pattern / Scalp change line for the PDF
+(function(){
+  if (window.__pdfDominantInjected) return;
+  window.__pdfDominantInjected = true;
+  try {
+    Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
+    const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
+    let changeText = '';
+    if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
+      try {
+        const cur = Number(calculateSectionTotals().Scalp);
+        if (Number.isFinite(cur)) {
+          const d = window.__baselineScalpPct - cur;
+          if (d !== 0) {
+            const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
+            changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
+          }
+        }
+      } catch(e){}
+    }
+    const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
+    if (lineText) {
+      const p = document.createElement('p');
+      p.id = 'pdf-dominant-line';
+      p.style.textAlign = 'center';
+      p.style.fontWeight = '600';
+      p.style.margin = '6px 0 0 0';
+      p.textContent = lineText;
+      const timeP = summarySection.querySelector('p em');
+      if (timeP && timeP.parentElement) timeP.parentElement.insertAdjacentElement('afterend', p);
+      else summarySection.prepend(p);
+    }
+    // Beard gating in PDF
+    const beardNum = (function(v){
+      if (typeof v === 'number') return v;
+      const n = parseFloat(String(v||'').replace('%',''));
+      return isNaN(n) ? 0 : n;
+    })(typeof beard !== 'undefined' ? beard : 0);
+    if (beardNum === 0) {
+      const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
+      if (totalLi) totalLi.remove();
+      Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
+        if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
+      });
+    }
+  } catch(e) {}
+})();// Build exactly one Dominant pattern / Scalp change line for the PDF
+      try {
+        // Remove any existing line from prior runs
+        Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
+        const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
+        let changeText = '';
+        if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
+          try {
+            const cur = Number(calculateSectionTotals().Scalp);
+            if (Number.isFinite(cur)) {
+              const d = window.__baselineScalpPct - cur;
+              if (d !== 0) {
+                const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
+                changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
+              }
+            }
+          } catch(e){}
+        }
+        const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
+        if (lineText) {
+          const p = document.createElement('p');
+          p.id = 'pdf-dominant-line';
+          p.style.textAlign = 'center';
+          p.style.fontWeight = '600';
+          p.style.margin = '6px 0 0 0';
+          p.textContent = lineText;
+          // Insert after the timestamp (<em>${datetime}</em>) if present, else at top
+          const timeP = summarySection.querySelector('p em');
+          if (timeP && timeP.parentElement) {
+            timeP.parentElement.insertAdjacentElement('afterend', p);
+          } else {
+            summarySection.prepend(p);
+          }
+        }
+        // Beard gating in PDF
+        const beardNum = (function(v){
+          if (typeof v === 'number') return v;
+          const n = parseFloat(String(v||'').replace('%',''));
+          return isNaN(n) ? 0 : n;
+        })(typeof beard !== 'undefined' ? beard : 0);
+        if (beardNum === 0) {
+          // Remove total beard line
+          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
+          if (totalLi) totalLi.remove();
+          // Remove beard detail lines
+          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
+            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
+          });
+        }
+      } catch(e) {}
+    // Normalize dominant line to a single instance and hide beard items when beard == 0
+      try {
+        // Remove duplicate dominant line nodes, keep the first
+        const _dups = summarySection.querySelectorAll('#pdf-dominant-line');
+        for (let i = 1; i < _dups.length; i++) { _dups[i].remove(); }
+
+        // Beard gating
+        const beardNum = (function(v){
+          if (typeof v === 'number') return v;
+          if (typeof v === 'string') {
+            const n = parseFloat(v.replace('%',''));
+            return isNaN(n) ? 0 : n;
+          }
+          return 0;
+        })(typeof beard !== 'undefined' ? beard : 0);
+
+        if (beardNum === 0) {
+          // remove Total Beard line
+          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
+          if (totalLi) totalLi.remove();
+
+          // remove beard detail lines
+          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
+            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) {
+              li.remove();
+            }
+          });
+        }
+      } catch(_e) {}
+document.body.appendChild(summarySection);
       // Ensure images can be rendered by html2canvas when loaded from another origin
       try {
         summarySection.querySelectorAll('img').forEach(img => {
@@ -3071,18 +3225,140 @@ setInterval(updateScoreRings, 700);
     const dt = now.toLocaleString();
     const { totals, details, MAX, rel } = getTotalsAndDetails();
         const lines = [];
+    // Helper to compute Dominant pattern with scalp-only '(diffuse)'
+    function __computeDominantScalpOnly(){
+      try {
+        var node = document.getElementById('pattern-dominant');
+        var base = (node && node.textContent) ? String(node.textContent).trim() : '';
+        base = base.replace(/\s*\(diffuse\)\s*$/i, '').trim();
+        // compute scalp densities > 0
+        var dens = [];
+        if (typeof globalSelections === 'object' && globalSelections) {
+          ['backside','topside','leftside','rightside','androgenetic'].forEach(function(id){
+            if (globalSelections[id] && typeof globalSelections[id].density !== 'undefined') {
+              dens.push(Number(globalSelections[id].density)||0);
+            }
+          });
+        }
+        var isDiffuse = dens.some(function(d){ return (Number(d)||0) > 0; });
+        return base ? (base + (isDiffuse ? " (diffuse)" : "")) : "";
+      } catch(e){ return ""; }
+    }
+    // Update existing Dominant pattern line if present; else insert near top after title
+    (function(){
+      var dp = __computeDominantScalpOnly();
+      if (!dp) return;
+      var updated = false;
+      for (var i=0; i<lines.length; i++){
+        if (/^[-\s]*Dominant pattern\s*:/i.test(String(lines[i]||""))) {
+          lines[i] = "Dominant pattern: " + dp;
+          updated = true;
+          break;
+        }
+      }
+      if (!updated) {
+        // place after title/date if present, else at start
+        var insertAt = 0;
+        if (lines.length >= 2 && /^Alopecia Areata Calculator$/i.test(lines[0])) insertAt = 2; // after title+date
+        lines.splice(insertAt, 0, "Dominant pattern: " + dp);
+      }
+    })();
+
+    // Robust dominant pattern line using scalp densities only (independent of decorators)
+    try {
+      var __patNode0 = document.getElementById('pattern-dominant');
+      var __pat0 = __patNode0 && __patNode0.textContent ? __patNode0.textContent.trim() : '';
+      // compute scalp-only diffuse flag
+      var __dens = [];
+      try {
+        if (typeof globalSelections === 'object' && globalSelections) {
+          ['backside','topside','leftside','rightside','androgenetic'].forEach(function(id){
+            if (globalSelections[id] && typeof globalSelections[id].density !== 'undefined') {
+              __dens.push(Number(globalSelections[id].density)||0);
+            }
+          });
+        }
+      } catch(__e2){}
+      var __isDiffuse = __dens.some(function(d){ return (Number(d)||0) > 0; });
+      var __patFinal = String(__pat0).replace(/\s*\(diffuse\)\s*$/i, '').trim();
+      if (__isDiffuse && __patFinal) { __patFinal += " (diffuse)"; }
+      if (__patFinal && !lines.some(function(l){ return /^[-\s]*Dominant pattern/i.test(String(l||'')); })) {
+        lines.push("Dominant pattern: " + __patFinal);
+      }
+    } catch(__e0) {}
+
+    // Ensure dominant pattern is included once, using scalp-only diffuse decoration
+    try {
+      var __patNode = document.getElementById('pattern-dominant');
+      var __patText = __patNode && __patNode.textContent ? __patNode.textContent.trim() : '';
+      if (window.__aa_decorateDominant) { __patText = window.__aa_decorateDominant(__patText); }
+      if (__patText && !lines.some(function(l){ return /^[-\s]*Dominant pattern/i.test(String(l||'')); })) {
+        lines.push('Dominant pattern: ' + __patText);
+      }
+    } catch(__e) {}
+
     lines.push("Alopecia Areata Calculator");
     lines.push(dt);
     lines.push("");
     lines.push("Summary of Alopecia Areata Involvement");
+    // Dominant pattern (scalp-only diffuse)
+    try {
+      var __patNode = document.getElementById('pattern-dominant');
+      var __patText = __patNode && __patNode.textContent ? __patNode.textContent.trim() : '';
+      if (window.decorateDominant) { __patText = window.decorateDominant(__patText); }
+      // avoid duplicates
+      if (__patText && !lines.some(function(l){ return /^[-\s]*Dominant pattern/i.test(String(l||'')); })) {
+        lines.push('Dominant pattern: ' + __patText);
+      }
+    } catch(__e) {}
+
     lines.push(`- Total Scalp: ${Number(totals.scalp).toFixed(0)}%`);
-    lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
+    
+    // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
+    (function(){ try {
+      if (typeof window.__baselineScalpPct === 'number') {
+        const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
+        const __val = Number(__cur);
+        if (Number.isFinite(__val)) {
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          }
+        }
+      }
+    } catch(__e){} })();
+lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
     lines.push(`- Total Eyelashes: ${Number(totals.eyelashes).toFixed(0)}%`);
     if (Number(totals.beard) > 0) { lines.push(`- Total Beard: ${Number(totals.beard).toFixed(0)}%`); }
     try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
     lines.push("");
 try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
-    const text = lines.join("
+    
+    // Normalize Dominant pattern line once, with scalp-only diffuse
+    (function(){
+      try {
+        var dp = (typeof __computeDominantScalpOnly === 'function') ? __computeDominantScalpOnly() : "";
+        if (dp) {
+          // remove duplicates
+          var firstIdx = -1;
+          for (var i=0; i<lines.length; i++){
+            if (/^[-\s]*Dominant pattern\s*:/i.test(String(lines[i]||""))) {
+              if (firstIdx === -1) firstIdx = i;
+              else { lines.splice(i,1); i--; }
+            }
+          }
+          if (firstIdx === -1) {
+            lines.splice(0, 0, "Dominant pattern: " + dp);
+          } else {
+            lines[firstIdx] = "Dominant pattern: " + dp;
+          }
+        }
+      } catch(e){}
+    })();
+
+const text = lines.join("
 ");
     async function writeClipboard(t){
       try {
@@ -3237,7 +3513,23 @@ document.addEventListener("DOMContentLoaded", function(){
     lines.push("");
     lines.push("Summary of Alopecia Areata Involvement");
     lines.push(`- Total Scalp: ${Number(totals.scalp).toFixed(0)}%`);
-    lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
+    
+    // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
+    (function(){ try {
+      if (typeof window.__baselineScalpPct === 'number') {
+        const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
+        const __val = Number(__cur);
+        if (Number.isFinite(__val)) {
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          }
+        }
+      }
+    } catch(__e){} })();
+lines.push(`- Total Eyebrows: ${Number(totals.eyebrows).toFixed(0)}%`);
     lines.push(`- Total Eyelashes: ${Number(totals.eyelashes).toFixed(0)}%`);
     if (Number(totals.beard) > 0) { lines.push(`- Total Beard: ${Number(totals.beard).toFixed(0)}%`); }
     try { if (typeof encodeAA19==="function") { lines.push(`Code: ${encodeAA19()}`); } } catch(e){}
@@ -3715,16 +4007,19 @@ function showImmediatePeekFor(region) {
       summarySection.id = "pdf-summary";
       summarySection.style.margin = "20px";
       summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-      summarySection.innerHTML = `
+      
+summarySection.innerHTML = `
         <h2 style='text-align:center;'>${title}</h2>
         <p style='text-align:center;'><em>${datetime}</em></p>
         <hr/>
-        <h3>Summary of Alopecia Areata Involvement</h3>
+        
+      <h3>Summary of Alopecia Areata Involvement</h3>
         <ul>
           <li><strong>Total Scalp:</strong> ${scalp}</li>
           <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
           <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-          <li><strong>Total Beard:</strong> ${beard}</li>
+          <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>'}
         </ul>
         <h3>Detailed Area Breakdown</h3>
         <table id="detail-table" style="width:100%;border-collapse:collapse;">
@@ -3742,7 +4037,88 @@ function showImmediatePeekFor(region) {
         </table>
         `;
 
-      const preview = document.getElementById("selected-preview")?.cloneNode(true);
+      
+      
+      // Build exactly one Dominant pattern / Scalp change line for the PDF
+      try {
+        // Remove any existing line from prior runs
+        Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
+        const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
+        let changeText = '';
+        if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
+          try {
+            const cur = Number(calculateSectionTotals().Scalp);
+            if (Number.isFinite(cur)) {
+              const d = window.__baselineScalpPct - cur;
+              if (d !== 0) {
+                const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
+                changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
+              }
+            }
+          } catch(e){}
+        }
+        const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
+        if (lineText) {
+          const p = document.createElement('p');
+          p.id = 'pdf-dominant-line';
+          p.style.textAlign = 'center';
+          p.style.fontWeight = '600';
+          p.style.margin = '6px 0 0 0';
+          p.textContent = lineText;
+          // Insert after the timestamp (<em>${datetime}</em>) if present, else at top
+          const timeP = summarySection.querySelector('p em');
+          if (timeP && timeP.parentElement) {
+            timeP.parentElement.insertAdjacentElement('afterend', p);
+          } else {
+            summarySection.prepend(p);
+          }
+        }
+        // Beard gating in PDF
+        const beardNum = (function(v){
+          if (typeof v === 'number') return v;
+          const n = parseFloat(String(v||'').replace('%',''));
+          return isNaN(n) ? 0 : n;
+        })(typeof beard !== 'undefined' ? beard : 0);
+        if (beardNum === 0) {
+          // Remove total beard line
+          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
+          if (totalLi) totalLi.remove();
+          // Remove beard detail lines
+          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
+            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
+          });
+        }
+      } catch(e) {}
+    // Normalize dominant line to a single instance and hide beard items when beard == 0
+      try {
+        // Remove duplicate dominant line nodes, keep the first
+        const _dups = summarySection.querySelectorAll('#pdf-dominant-line');
+        for (let i = 1; i < _dups.length; i++) { _dups[i].remove(); }
+
+        // Beard gating
+        const beardNum = (function(v){
+          if (typeof v === 'number') return v;
+          if (typeof v === 'string') {
+            const n = parseFloat(v.replace('%',''));
+            return isNaN(n) ? 0 : n;
+          }
+          return 0;
+        })(typeof beard !== 'undefined' ? beard : 0);
+
+        if (beardNum === 0) {
+          // remove Total Beard line
+          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
+          if (totalLi) totalLi.remove();
+
+          // remove beard detail lines
+          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
+            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) {
+              li.remove();
+            }
+          });
+        }
+      } catch(_e) {}
+const preview = document.getElementById("selected-preview")?.cloneNode(true);
       document.body.appendChild(summarySection);
       // Ensure images can be rendered by html2canvas when loaded from another origin
       try {
@@ -3845,7 +4221,8 @@ function showImmediatePeekFor(region) {
           <li><strong>Total Scalp:</strong> ${scalp}</li>
           <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
           <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-          <li><strong>Total Beard:</strong> ${beard}</li>
+          <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>'}
         </ul>
         <h3>Detailed Area Breakdown</h3>
         <table style="width:100%;border-collapse:collapse;">
@@ -3869,8 +4246,32 @@ function showImmediatePeekFor(region) {
         filename: 'alopecia_areata_summary_without_pictures.pdf',
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(section).save()
-        .catch((err)=>{ console && console.warn && console.warn('PDF export failed:', err); })
+      
+  // Add "Dominant pattern and change" line into the temporary section before export
+  try {
+    var extra2 = document.createElement('div');
+    extra2.id = 'pdf-extra-line';
+    extra2.style.marginTop = '8px';
+    extra2.style.fontWeight = '600';
+    var patNode2 = document.getElementById('pattern-dominant');
+    var patText2 = patNode2 && patNode2.textContent ? patNode2.textContent.trim() : '';
+    var line2 = patText2 ? ('Dominant pattern: ' + patText2 + '.') : '';
+    if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
+      try {
+        var cur2 = Number(calculateSectionTotals().Scalp);
+        if (Number.isFinite(cur2)) {
+          var d2 = window.__baselineScalpPct - cur2;
+          if (d2 !== 0) {
+            var abs2 = Math.abs(d2).toFixed(1).replace(/\.0$/, '');
+            line2 += (line2 ? ' ' : '') + (d2 > 0 ? ('Scalp improvement: ' + abs2 + '%') : ('Scalp worsening: ' + abs2 + '%'));
+          }
+        }
+      } catch(e){}
+    }
+    if (line2) { extra2.textContent = line2; extra2.style.padding = "4px 0"; if (section.firstChild) { section.insertBefore(extra2, section.firstChild); } else { section.appendChild(extra2); } }
+  } catch(e){}
+}).from(section).save().catch(
+(err)=>{ console && console.warn && console.warn('PDF export failed:', err); })
         .finally(()=>{ try { document.body.removeChild(section); } catch(e) {} window.__pdfRunning = false; });
     } catch (err) { window.__pdfRunning = false; }
     return false;
@@ -4060,6 +4461,8 @@ function showImmediatePeekFor(region) {
 
   // Apply from 18 chars
   window.applyAA18 = function(code){
+    try { window.__patternDirty = false; } catch(e) {}
+
     if (!code || code.length!==18) throw new Error("needs 18 chars");
     const a = code.split("").map(dec52);
     let i=0;
@@ -4084,6 +4487,8 @@ function showImmediatePeekFor(region) {
 
   // Apply from 19 with checksum
   window.applyAA19 = function(code){
+    try { window.__patternDirty = false; } catch(e) {}
+
     if (!code || code.length!==19) throw new Error("needs 19 chars");
     const idxs = code.split("").map(dec52);
     const data = idxs.slice(0,18);
@@ -4378,6 +4783,48 @@ function showImmediatePeekFor(region) {
       lines.push('');
       lines.push('Summary of Alopecia Areata Involvement');
       lines.push(`- Total Scalp: ${Number(totals.Scalp).toFixed(0)}%`);
+
+    // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
+    (function(){ try {
+      if (typeof window.__baselineScalpPct === 'number') {
+        const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
+        const __val = Number(__cur);
+        if (Number.isFinite(__val)) {
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          }
+        }
+      }
+    } catch(__e){} })();
+// Include percentage change if a code baseline exists and only when non-zero
+if (typeof window.__baselineScalpPct === 'number') {
+  const delta = window.__baselineScalpPct - Number(totals.Scalp);
+  if (delta !== 0) {
+    const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+    if (delta > 0) {
+      lines.push(`- Scalp improvement: ${abs}%`);
+    } else {
+      lines.push(`- Scalp worsening: ${abs}%`);
+    }
+  }
+}
+
+      // Include percentage change if a code baseline exists
+      if (typeof window.__baselineScalpPct === 'number') {
+        const delta = window.__baselineScalpPct - Number(totals.Scalp);
+        const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+        if (delta > 0) {
+          lines.push(`- Scalp improvement: ${abs}%`);
+        } else if (delta < 0) {
+          lines.push(`- Scalp worsening: ${abs}%`);
+        } else {
+          lines.push(`- Scalp improvement: 0%`);
+        }
+      }
+
       lines.push(`- Total Eyebrows: ${Number(totals.Eyebrows).toFixed(0)}%`);
       lines.push(`- Total Eyelashes: ${Number(totals.Eyelashes).toFixed(0)}%`);
       if (Number(totals.Beard) > 0) lines.push(`- Total Beard: ${Number(totals.Beard).toFixed(0)}%`);
@@ -4586,7 +5033,23 @@ function showImmediatePeekFor(region) {
     lines.push('');
     lines.push('Summary of Alopecia Areata Involvement');
     lines.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||0)}%`);
-    lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
+    
+    // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
+    (function(){ try {
+      if (typeof window.__baselineScalpPct === 'number') {
+        const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
+        const __val = Number(__cur);
+        if (Number.isFinite(__val)) {
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          }
+        }
+      }
+    } catch(__e){} })();
+lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
     lines.push(`- Total Eyelashes: ${Math.round(Number(totals.Eyelashes)||0)}%`);
     if ((Number(totals.Beard)||0) > 0) lines.push(`- Total Beard: ${Math.round(Number(totals.Beard)||0)}%`);
     let code = '';
@@ -4681,5 +5144,851 @@ function showImmediatePeekFor(region) {
   }
 })();
 </script>
+
+<style id="scalp-extra-controls-css">
+/* Extra controls for scalp boxes at 1/3 and 2/3 heights */
+.area-box .middleplus, .area-box .middleminus, .area-box .lowerplus, .area-box .lowerminus {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #888;
+  border-radius: 50%;
+  background-color: white;
+  text-align: center;
+  line-height: 18px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+.area-box .middleplus, .area-box .middleminus { top: 33.333%; transform: translateY(-50%); }
+.area-box .lowerplus, .area-box .lowerminus  { top: 66.666%; transform: translateY(-50%); }
+.area-box .middleplus, .area-box .lowerplus  { right: 2px; }
+.area-box .middleminus, .area-box .lowerminus { left: 2px; }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
+
+<script id="scalp-extra-controls-js">
+(function(){
+  if (window.__scalpExtraControlsApplied) return;
+  window.__scalpExtraControlsApplied = true;
+  const scalpIds = ['backside','topside','leftside','rightside'];
+
+  function addButtonsOnce() {
+    scalpIds.forEach(id => {
+      const root = document.getElementById(id + '-areas');
+      if (!root) return;
+      root.querySelectorAll('.area-box').forEach(box => {
+        if (box.querySelector('.middleplus') || box.querySelector('.middleminus') ||
+            box.querySelector('.lowerplus')  || box.querySelector('.lowerminus')) return;
+
+        const sectionId = (box.parentElement && box.parentElement.id)
+          ? box.parentElement.id.replace(/-areas$/, '')
+          : id;
+
+        const topPlus  = box.querySelector(':scope > .plus:not(.middleplus):not(.lowerplus)');
+        const topMinus = box.querySelector(':scope > .minus:not(.middleminus):not(.lowerminus)');
+
+        function makeBtn(kind, cls, titleVal) {
+          const d = document.createElement('div');
+          d.className = kind + ' ' + cls;
+          d.innerText = kind === 'plus' ? '+' : '−';
+          if (typeof titleVal === 'string') d.title = titleVal;
+          d.onclick = (e) => {
+            e.stopPropagation();
+            const val = parseFloat((d.title || '').replace('%',''));
+            if (Number.isFinite(val) && typeof window.toggleScalpSelection === 'function') {
+              window.toggleScalpSelection(sectionId, val);
+            }
+          };
+          return d;
+        }
+
+        if (topPlus && topPlus.title) {
+          const mPlus = makeBtn('plus', 'middleplus', topPlus.title);
+          const lPlus = makeBtn('plus', 'lowerplus',  topPlus.title);
+          box.appendChild(mPlus);
+          box.appendChild(lPlus);
+        }
+        if (topMinus && topMinus.title) {
+          const mMinus = makeBtn('minus', 'middleminus', topMinus.title);
+          const lMinus = makeBtn('minus', 'lowerminus',  topMinus.title);
+          box.appendChild(mMinus);
+          box.appendChild(lMinus);
+        }
+      });
+    });
+  }
+
+  function mirrorGlowState() {
+  scalpIds.forEach(id => {
+    const root = document.getElementById(id + '-areas');
+    if (!root) return;
+    root.querySelectorAll('.area-box').forEach(box => {
+      const primaryPlus  = box.querySelector(':scope > .plus:not(.middleplus):not(.lowerplus)');
+      const primaryMinus = box.querySelector(':scope > .minus:not(.middleminus):not(.lowerminus)');
+      const onPlus  = !!(primaryPlus  && primaryPlus.classList.contains('glow'));
+      const onMinus = !!(primaryMinus && primaryMinus.classList.contains('glow'));
+      const last = box.dataset.lastClickPos || 'upper';
+
+      function paint(selector, active, bgOn, bgOff) {
+        box.querySelectorAll(selector).forEach(el => {
+          el.classList.toggle('glow', !!active);
+          el.style.backgroundColor = active ? bgOn : 'white';
+          el.style.transform = active ? 'scale(1.3)' : 'scale(1)';
+        });
+      }
+
+      const mid = last === 'middle';
+      const low = last === 'lower';
+
+      // Clear both tiers implicitly by painting with active=false where appropriate
+      paint('.plus.middleplus',   mid && onPlus,  '#ccffcc', 'white');
+      paint('.minus.middleminus', mid && onMinus, '#ffcccc', 'white');
+      paint('.plus.lowerplus',    low && onPlus,  '#ccffcc', 'white');
+      paint('.minus.lowerminus',  low && onMinus, '#ffcccc', 'white');
+    });
+  });
+}
+
+  if (typeof window.updateScalpUI === 'function') {
+    const original = window.updateScalpUI;
+    window.updateScalpUI = function() {
+      const r = original.apply(this, arguments);
+      mirrorGlowState();
+      return r;
+    };
+  } else {
+    let tries = 0;
+    const t = setInterval(() => {
+      if (typeof window.updateScalpUI === 'function') {
+        clearInterval(t);
+        const original = window.updateScalpUI;
+        window.updateScalpUI = function() {
+          const r = original.apply(this, arguments);
+          mirrorGlowState();
+          return r;
+        };
+        mirrorGlowState();
+      } else if (++tries > 40) {
+        clearInterval(t);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(() => { addButtonsOnce(); mirrorGlowState(); }, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(() => { addButtonsOnce(); mirrorGlowState(); }, 0); });
+  }
+})();
+</script>
+
+
+<script id="pattern-score-js">
+(function(){
+  if (window.__patternScoreApplied) return;
+  window.__patternScoreApplied = true;
+
+  const scores = {
+    "Patchy alopecia areata": 0,
+    "Focal alopecia areata": 0,
+    "Ophiasis pattern": 0
+  };
+
+  const scalpIds = ['backside','leftside','rightside','topside'];
+
+  function ensureOutcomeNode(){
+    const rings = document.getElementById('score-rings');
+    if (!rings) return null;
+    let node = document.getElementById('pattern-dominant');
+    if (!node) {
+      node = document.createElement('div');
+      node.id = 'pattern-dominant';
+      node.style.font = '600 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+      node.style.textAlign = 'center';
+      node.style.marginTop = '6px';
+      rings.insertAdjacentElement('afterend', node);
+    }
+    return node;
+  }
+
+  function updateOutcome(){
+    try {
+      const totals = (typeof calculateSectionTotals === 'function') ? calculateSectionTotals() : null;
+      const scalpPct = totals && totals.Scalp != null ? Number(totals.Scalp) : 0;
+      if (Math.round(scalpPct) === 100) {
+        node.textContent = 'Alopecia totalis';
+        node.style.display = '';
+        return;
+      }
+    } catch(e) {}
+
+    const node = ensureOutcomeNode();
+    if (!node) return;
+    const total = scores["Patchy alopecia areata"] + scores["Focal alopecia areata"] + scores["Ophiasis pattern"];
+    if (total === 0) {
+      node.textContent = '';
+      node.style.display = 'none';
+      return;
+    }
+    node.style.display = '';
+    const entries = Object.entries(scores);
+    let best = entries[0];
+    for (let i=1; i<entries.length; i++){
+      if (entries[i][1] > best[1]) best = entries[i];
+    }
+    node.textContent = best[0];
+  }
+
+  const resetBtn = document.getElementById('reset-button');
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    scores["Patchy alopecia areata"] = 0;
+    scores["Focal alopecia areata"] = 0;
+    scores["Ophiasis pattern"] = 0;
+    updateOutcome();
+  });
+
+  function indexWithinSection(box){
+    const parent = box.closest('.area-container');
+    if (!parent) return -1;
+    const boxes = Array.from(parent.querySelectorAll('.area-box'));
+    return boxes.indexOf(box) + 1;
+  }
+
+  function classify(sectionId, pos, index, value){
+    if (!isFinite(value) || Number(value) === 0) return null;
+    if (pos === 'upper') return "Patchy alopecia areata";
+    if (pos === 'middle') {
+      if (sectionId === 'topside') {
+        if (index >= 2 && index <= 6) return "Focal alopecia areata";
+      } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside') {
+        if (index >= 2 && index <= 5) return "Focal alopecia areata";
+      }
+      return "Patchy alopecia areata";
+    }
+    if (pos === 'lower') return "Ophiasis pattern";
+    return "Patchy alopecia areata";
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.plus, .minus');
+    const box = e.target.closest('.area-box');
+    if (!box) return;
+    const parentId = (box.parentElement && box.parentElement.id) ? box.parentElement.id : '';
+    const sectionId = parentId.replace(/-areas$/, '');
+    if (!scalpIds.includes(sectionId)) return;
+
+    const value = parseFloat(box.dataset.value || 'NaN');
+    let pos = 'upper';
+    if (btn) {
+      if (btn.classList.contains('middleplus') || btn.classList.contains('middleminus')) pos = 'middle';
+      else if (btn.classList.contains('lowerplus') || btn.classList.contains('lowerminus')) pos = 'lower';
+      else pos = 'upper';
+    } else {
+      const rect = box.getBoundingClientRect();
+      const relY = (e.clientY - rect.top) / rect.height;
+      if (relY < 1/3) pos = 'upper';
+      else if (relY < 2/3) pos = 'middle';
+      else pos = 'lower';
+    }
+
+    const idx = indexWithinSection(box);
+    const pattern = classify(sectionId, pos, idx, value);
+    if (pattern) {
+      scores[pattern] = (scores[pattern] || 0) + 1;
+      updateOutcome();
+    }
+  }, true);
+
+  ensureOutcomeNode();
+  updateOutcome();
+})();
+</script>
+
+
+
+<style id="pattern-chip-style">
+#pattern-dominant {
+  align-self: stretch;
+  margin: 0 0 8px 0; /* place above rings with extra separation */
+  border: none;
+  background: none;
+  padding: 0;
+  font: 400 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  white-space: nowrap;
+}
+#selected-preview #pattern-dominant-preview {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 6px;
+  font: 600 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
+
+
+<script id="pattern-selection-based">
+(function(){
+  if (window.__patternSelectionBasedApplied) return;
+  window.__patternSelectionBasedApplied = true;
+  // Do not show dominant pattern until user edits after load
+  window.__patternDirty = false;
+
+  const SCALP_IDS = ['backside','leftside','rightside','topside'];
+
+  function ensurePatternNode(){
+    const rings = document.getElementById('score-rings');
+    if (!rings || !rings.parentNode) return null;
+    // Ensure rings container can host a line above it
+    const parent = rings.parentNode;
+    let node = document.getElementById('pattern-dominant');
+    if (!node) {
+      node = document.createElement('div');
+      node.id = 'pattern-dominant';
+    }
+    // Place ABOVE the rings
+    if (node.parentNode !== parent || node.nextElementSibling !== rings) {
+      parent.insertBefore(node, rings);
+    }
+    return node;
+  }
+
+  function ensurePreviewPatternNode(){
+    const prev = document.getElementById('selected-preview');
+    if (!prev) return null;
+    let node = document.getElementById('pattern-dominant-preview');
+    if (!node) {
+      node = document.createElement('div');
+      node.id = 'pattern-dominant-preview';
+      prev.prepend(node);
+    }
+    return node;
+  }
+
+  document.addEventListener('click', function(e){
+    const box = e.target.closest('.area-box');
+    if (!box) return;
+    const container = box.parentElement;
+    if (!container || !/-(?:areas)$/.test(container.id)) return;
+    const sectionId = container.id.replace(/-areas$/, '');
+    if (!SCALP_IDS.includes(sectionId)) return;
+
+    let pos = 'upper';
+    const btn = e.target.closest('.plus, .minus');
+    if (btn) {
+      if (btn.classList.contains('middleplus') || btn.classList.contains('middleminus')) pos = 'middle';
+      else if (btn.classList.contains('lowerplus') || btn.classList.contains('lowerminus')) pos = 'lower';
+      else pos = 'upper';
+    } else {
+      const r = box.getBoundingClientRect();
+      const y = (e.clientY - r.top) / r.height;
+      if (y < 1/3) pos = 'upper';
+      else if (y < 2/3) pos = 'middle';
+      else pos = 'lower';
+    }
+    box.dataset.lastClickPos = pos;
+  }, true);
+
+  function boxIndex1(box){
+    const parent = box.closest('.area-container');
+    if (!parent) return -1;
+    const boxes = Array.from(parent.querySelectorAll('.area-box'));
+    return boxes.indexOf(box) + 1;
+  }
+
+  function classify(sectionId, pos, idx, value){
+    const v = Number(value);
+    if (!Number.isFinite(v) || v === 0) return null;
+    if (pos === 'upper') return 'Patchy alopecia areata';
+    if (pos === 'middle') {
+      if (sectionId === 'topside') {
+        if (idx >= 2 && idx <= 6) return 'Focal alopecia areata';
+      } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside') {
+        if (idx >= 2 && idx <= 5) return 'Focal alopecia areata';
+      }
+      return 'Patchy alopecia areata';
+    }
+    if (pos === 'lower') return 'Ophiasis pattern';
+    return 'Patchy alopecia areata';
+  }
+
+  function computeDominantPattern(){
+    try {
+      const totals = (typeof calculateSectionTotals === 'function') ? calculateSectionTotals() : null;
+      const scalpPct = totals && totals.Scalp != null ? Number(totals.Scalp) : 0;
+      if (Math.round(scalpPct) === 100) return 'Alopecia totalis';
+    } catch(e) {}
+
+    const scores = { 'Patchy alopecia areata':0, 'Focal alopecia areata':0, 'Ophiasis pattern':0 };
+    SCALP_IDS.forEach(id => {
+      const root = document.getElementById(id + '-areas');
+      if (!root) return;
+      root.querySelectorAll('.area-box').forEach(box => {
+        if (!box.classList.contains('selected')) return;
+
+        const idx = boxIndex1(box);
+        const value = parseFloat(box.dataset.value || 'NaN');
+
+        const hasMidGlow = box.querySelector('.middleplus.glow, .middleminus.glow');
+const hasLowGlow = box.querySelector('.lowerplus.glow, .lowerminus.glow');
+const hasTopGlow = box.querySelector(':scope > .plus.glow, :scope > .minus.glow');
+
+let pos = box.dataset.lastClickPos || null;
+if (!pos) {
+  if (hasLowGlow) pos = 'lower';
+  else if (hasMidGlow) pos = 'middle';
+  else if (hasTopGlow) pos = 'upper';
+  else pos = 'upper';
+}
+
+        const p = classify(id, pos, idx, value);
+        if (p) scores[p]++;
+      });
+    });
+    const total = scores['Patchy alopecia areata'] + scores['Focal alopecia areata'] + scores['Ophiasis pattern'];
+    if (!total) return '';
+    let best = 'Patchy alopecia areata';
+    if (scores['Focal alopecia areata'] > scores[best]) best = 'Focal alopecia areata';
+    if (scores['Ophiasis pattern'] > scores[best]) best = 'Ophiasis pattern';
+    return best;
+  }
+
+  function renderPattern(){
+    if (!window.__patternDirty) {
+      const node = ensurePatternNode();
+      const prev = ensurePreviewPatternNode();
+      if (node) { node.textContent=''; node.style.display='none'; }
+      if (prev) { prev.textContent=''; prev.style.display='none'; }
+      return;
+    }
+    const name = computeDominantPattern();
+    const node = ensurePatternNode();
+    const prev = ensurePreviewPatternNode();
+    if (!node) return;
+
+    if (!name) {
+      node.textContent = '';
+      node.style.display = 'none';
+      if (prev) { prev.textContent = ''; prev.style.display = 'none'; }
+      return;
+    }
+    node.style.display = '';
+    node.textContent = name;
+    if (prev) { prev.style.display = ''; prev.textContent = 'Dominant pattern: ' + name; }
+  }
+
+  if (typeof window.updateScalpUI === 'function') {
+    const orig = window.updateScalpUI;
+    window.updateScalpUI = function(){
+      const r = orig.apply(this, arguments);
+      renderPattern();
+      return r;
+    };
+  }
+
+  // Observe for PDF summary creation and insert the pattern
+  const mo = new MutationObserver(function(list){
+    list.forEach(rec => {
+      rec.addedNodes && rec.addedNodes.forEach(node => {
+        try {
+          if (node.nodeType === 1 && node.id === 'pdf-summary') {
+            const name = computeDominantPattern();
+            if (name) {
+              const p = document.createElement('p');
+              p.innerHTML = '<strong>Dominant pattern:</strong> ' + name;
+              const totalsList = node.querySelector('h3 + ul'); // after the Totals list
+              if (totalsList) totalsList.insertAdjacentElement('afterend', p);
+              else node.prepend(p);
+            }
+          }
+        } catch(e){}
+      });
+    });
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+
+  // Patch clipboard writes: append dominant pattern and collapse multiple blank lines
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      const _orig = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = function(t){
+        try {
+                    if (typeof t === 'string') {
+            const decorate = (window.__aa_decorateDominant || window.decorateDominantScalpOnly || window.decorateDominant || (x => x));
+            const nameRaw = computeDominantPattern();
+            const name = decorate(nameRaw);
+            if (name) {
+              if ((/Dominant pattern:/i).test(t)) {
+                t = t.replace(/(^|\n)Dominant pattern:[^\n]*/i, function(_m, p1){ return p1 + 'Dominant pattern: ' + name; });
+              } else {
+                t = t + '\nDominant pattern: ' + name;
+              }
+            }
+            // Collapse double or more newlines to a single newline
+            t = t.replace(/\n{2,}/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n[ \t]+/g, '\n').trim();
+          }
+        } catch(e){}
+        return _orig(t);
+      };
+    }
+  } catch(e){}
+
+  
+  // Mark dirty on any user change and re-render
+  ['click','input','change'].forEach(function(evt){
+    document.addEventListener(evt, function(){
+      window.__patternDirty = true; // mark dirty on user action
+      try { renderPattern(); } catch(e){}
+    }, true);
+  });
+
+  // Initial render
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(renderPattern, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(renderPattern, 0); });
+  }
+})();
+</script>
+
+
+
+<script>
+(function(){
+  function getScalpPctSafe(){
+    try {
+      if (typeof calculateSectionTotals === 'function') {
+        const t = calculateSectionTotals();
+        const v = Number(t && t.Scalp);
+        return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : null;
+      }
+    } catch(e){}
+    return null;
+  }
+
+  function getPatternNode(){
+    var n = document.getElementById('pattern-dominant');
+    return n || null;
+  }
+
+  function updateScalpDelta(){
+    if (typeof window.__baselineScalpPct !== 'number') return;
+    var now = getScalpPctSafe();
+    if (now == null) return;
+
+    var delta = window.__baselineScalpPct - now; // decrease = improvement
+    var node = getPatternNode();
+    if (!node || !node.textContent) return;
+
+    var id = 'scalp-delta-badge';
+var badge = document.getElementById(id);
+if (!badge) {
+  badge = document.createElement('span');
+  badge.id = id;
+  badge.style.marginLeft = '8px';
+  badge.style.fontWeight = '600';
+  node.appendChild(badge);
+}
+
+var abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+if (delta > 0) {
+  badge.textContent = 'Scalp improvement: ' + abs + '%';
+  badge.style.color = '#16a34a';
+  badge.style.display = '';
+} else if (delta < 0) {
+  badge.textContent = 'Scalp worsening: ' + abs + '%';
+  badge.style.color = '#dc2626';
+  badge.style.display = '';
+} else {
+  // No change: hide the badge entirely
+  if (badge && badge.parentNode) {
+    badge.parentNode.removeChild(badge);
+  }
+}
+  }
+
+  function setBaselineFromCurrent(){
+    var v = getScalpPctSafe();
+    if (v != null) window.__baselineScalpPct = v;
+  }
+
+  function wrap(fnName){
+    var orig = window[fnName];
+    if (typeof orig !== 'function') return;
+    window[fnName] = function(){
+      var r = orig.apply(this, arguments);
+      try { setBaselineFromCurrent(); updateScalpDelta(); } catch(e){}
+      return r;
+    };
+  }
+
+  wrap('applyAA18');
+  wrap('applyAA19');
+  wrap('applyState');
+  wrap('loadCode');
+
+  (function hookUpdate(){
+    var prev = window.updateScalpUI;
+    if (typeof prev === 'function') {
+      window.updateScalpUI = function(){
+        var r = prev.apply(this, arguments);
+        try { updateScalpDelta(); } catch(e){}
+        return r;
+      };
+    } else {
+      var tries = 0, iv = setInterval(function(){
+        if (typeof window.updateScalpUI === 'function') {
+          clearInterval(iv);
+          var p = window.updateScalpUI;
+          window.updateScalpUI = function(){
+            var r = p.apply(this, arguments);
+            try { updateScalpDelta(); } catch(e){}
+            return r;
+          };
+        } else if (++tries > 40) clearInterval(iv);
+      }, 100);
+    }
+  })();
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(updateScalpDelta, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(updateScalpDelta, 0); });
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  function getBeardTotal(){
+    try {
+      if (typeof calculateSectionTotals === 'function') {
+        var t = calculateSectionTotals();
+        var v = Number(t && (t.Beard ?? t.beard));
+        return Number.isFinite(v) ? v : 0;
+      }
+    } catch(e){}
+    return 0;
+  }
+  function toggleBeardVisibility(){
+    var total = getBeardTotal();
+    var show = total > 0;
+    var ids = ['beard-title','right-beard-density','left-beard-density','central-beard-density'];
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.closest('div').style.display = show ? '' : 'none';
+    });
+  }
+  // Hook common update paths
+  ['updateBeardUI','updateScalpUI'].forEach(function(name){
+    var orig = window[name];
+    if (typeof orig === 'function'){
+      window[name] = function(){
+        var r = orig.apply(this, arguments);
+        try { toggleBeardVisibility(); } catch(e){}
+        return r;
+      };
+    }
+  });
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(toggleBeardVisibility, 50); });
+})();
+</script>
+
+
+<script>
+(function(){
+  function anyDensityPositive(){
+    try {
+      var dens = [];
+      if (typeof globalSelections === 'object' && globalSelections) {
+        ['backside','topside','leftside','rightside','androgenetic'].forEach(function(id){
+          if (globalSelections[id] && typeof globalSelections[id].density !== 'undefined') {
+            dens.push(Number(globalSelections[id].density)||0);
+          }
+        });
+      }
+      if (typeof beardSelections === 'object' && beardSelections) {
+        ['left-beard','right-beard','central-beard'].forEach(function(id){
+          if (beardSelections[id] && typeof beardSelections[id].density !== 'undefined') {
+            dens.push(Number(beardSelections[id].density)||0);
+          }
+        });
+      }
+      return dens.some(function(d){ return (Number(d)||0) > 0; });
+    } catch(e){ return false; }
+  }
+
+  function decorate(txt){
+    if (!txt) return txt;
+    var base = String(txt).replace(/\s*\(diffuse\)\s*$/i, '').trim();
+    if (anyDensityPositive()) return base + " (diffuse)";
+    return base;
+  }
+
+  function refreshDominant(){
+    try {
+      var node = document.getElementById('pattern-dominant');
+      if (node && node.textContent != null) {
+        var newTxt = decorate(node.textContent);
+        if (newTxt !== node.textContent) node.textContent = newTxt;
+      }
+    } catch(e){}
+  }
+
+  // Make functions available for other code paths (PDF/clipboard readers can call this)
+  window.__aa_anyDensityPositive = anyDensityPositive;
+  window.__aa_decorateDominant = decorate;
+  window.__aa_refreshDominant = refreshDominant;
+
+  // Hook UI changes without modifying existing functions
+  document.addEventListener("click", function(ev){
+    // Many density changes happen via button clicks
+    setTimeout(refreshDominant, 0);
+  }, true);
+  document.addEventListener("input", function(){ setTimeout(refreshDominant, 0); }, true);
+  document.addEventListener("DOMContentLoaded", function(){ setTimeout(refreshDominant, 0); });
+})();
+</script>
+
+
+<script>
+// Override helpers to make '(diffuse)' depend only on scalp densities
+(function(){
+  window.__aa_anyDensityPositive = function(){
+    try {
+      var dens = [];
+      if (typeof globalSelections === 'object' && globalSelections) {
+        ['backside','topside','leftside','rightside','androgenetic'].forEach(function(id){
+          if (globalSelections[id] && typeof globalSelections[id].density !== 'undefined') {
+            dens.push(Number(globalSelections[id].density)||0);
+          }
+        });
+      }
+      return dens.some(function(d){ return (Number(d)||0) > 0; });
+    } catch(e){ return false; }
+  };
+  window.__aa_decorateDominant = function(txt){
+    if (!txt) return txt;
+    var base = String(txt).replace(/\s*\(diffuse\)\s*$/i, '').trim();
+    if (window.__aa_anyDensityPositive && window.__aa_anyDensityPositive()) return base + " (diffuse)";
+    return base;
+  };
+  // Refresh once on load
+  try { if (window.__aa_refreshDominant) setTimeout(window.__aa_refreshDominant, 0); } catch(e){}
+})();
+</script>
+
+
+
+
+
+<style>
+  .age-controls { display:flex; align-items:center; gap:8px; }
+  .age-controls .label { font-weight:600; margin-right:4px; }
+  .age-btn {
+    padding: 4px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    background: white;
+    color: #111827;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .age-btn.selected { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .title-topbar { display:flex; align-items:center; justify-content:space-between; margin-top: 10px; }
+.pdf-top-right { position:absolute; top:6px; right:8px; }
+</style>
+<script>
+(function(){
+  // default age group
+  globalThis.__ageGroup = globalThis.__ageGroup || 'over12';
+
+  // scaling function
+  globalThis.__applyAgeScaling = function(parts){
+    const g = globalThis.__ageGroup || 'over12';
+    let {L=0,R=0,B=0,T=0} = parts || {};
+    if (g === '6to11') {
+      L *= (19/18); R *= (19/18); B *= (23/24); T *= (39/40);
+    } else if (g === 'under6') {
+      L *= (19/18); R *= (19/18); B *= (24/24); T *= (38/40);
+    }
+    return {L,R,B,T};
+  };
+
+  function installAgeControls(){
+    const banner = document.querySelector('.title-banner');
+    const pdfBtn = document.getElementById('generate-pdf');
+    if (!banner || !pdfBtn) return;
+
+    // bar sits a bit lower - place after subtitle if present, else append
+    const topbar = document.createElement('div');
+    topbar.className = 'title-topbar';
+
+    // left controls
+    const left = document.createElement('div');
+    left.className = 'age-controls';
+    left.innerHTML = `
+      <span class="label">Age</span>
+      <button type="button" class="age-btn" data-age="over12" aria-pressed="true">12+</button>
+      <button type="button" class="age-btn" data-age="6to11">6 to 11</button>
+      <button type="button" class="age-btn" data-age="under6">Under 6</button>
+    `;
+
+    // right - put existing PDF button here to be on the same line
+    const right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.alignItems = 'center';
+    right.style.gap = '8px';
+    right.style.marginTop = '6px';
+    right.appendChild(pdfBtn);
+
+    topbar.appendChild(left);
+
+    const subtitle = banner.querySelector('.title-sub');
+    if (subtitle) subtitle.insertAdjacentElement('afterend', topbar);
+    else banner.appendChild(topbar);
+
+    if (!banner.style.position) banner.style.position = 'relative';
+    const pdfHolder = document.createElement('div');
+    pdfHolder.className = 'pdf-top-right';
+    pdfHolder.appendChild(pdfBtn);
+    banner.appendChild(pdfHolder);
+
+    function setAge(g){
+      globalThis.__ageGroup = g;
+      left.querySelectorAll('.age-btn').forEach(btn => {
+        const on = btn.getAttribute('data-age') === g;
+        btn.classList.toggle('selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      try { globalThis.updateScalpUI && globalThis.updateScalpUI(); } catch(e){}
+      try { globalThis.updateScoreRings && globalThis.updateScoreRings(); } catch(e){}
+    }
+    left.querySelectorAll('.age-btn').forEach(btn => {
+      btn.addEventListener('click', () => setAge(btn.getAttribute('data-age')));
+    });
+    setAge(globalThis.__ageGroup || 'over12');
+
+    // keep pdf visibility consistent with existing app behavior
+    const preview = document.getElementById('selected-preview');
+    function syncPdfVisibility(){
+      try {
+        const show = preview && preview.children && preview.children.length > 0;
+        pdfBtn.style.display = show ? '' : 'none';
+      } catch(e){}
+    }
+    syncPdfVisibility();
+    try { if (preview) new MutationObserver(syncPdfVisibility).observe(preview, { childList: true }); } catch(e){}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installAgeControls);
+  } else {
+    installAgeControls();
+  }
+})();
+</script>
+
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
