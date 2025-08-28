@@ -1090,7 +1090,8 @@ function toggleScalpSelection(sectionId, value) {
   if (alreadySelected) {
     selection.selected.forEach(v => {
       if (v.toString() === valueStr) selection.selected.delete(v);
-    });
+  if (typeof updateScoreRings === 'function') updateScoreRings();
+});
   } else {
     selection.selected.clear();
     selection.selected.add(value);
@@ -1677,7 +1678,8 @@ function toggleEyebrowSelection(side, value) {
   const alreadySelected = Array.from(eyebrowSelections[side]).some(v => v === val);
   if (alreadySelected) {
     eyebrowSelections[side].delete(val);
-  } else {
+  if (typeof updateScoreRings === 'function') updateScoreRings();
+} else {
     eyebrowSelections[side].clear();
     eyebrowSelections[side].add(val);
   }
@@ -1939,7 +1941,8 @@ function toggleEyelashSelection(side, value) {
   const alreadySelected = Array.from(eyelashSelections[side]).some(v => v === val);
   if (alreadySelected) {
     eyelashSelections[side].delete(val);
-  } else {
+  if (typeof updateScoreRings === 'function') updateScoreRings();
+} else {
     eyelashSelections[side].clear();
     eyelashSelections[side].add(val);
   }
@@ -2149,7 +2152,8 @@ function toggleBeardSelection(sectionId, value) {
   const alreadySelected = Array.from(selection.selected).some(v => v === val);
   if (alreadySelected) {
     selection.selected.delete(val);
-  } else {
+  if (typeof updateScoreRings === 'function') updateScoreRings();
+} else {
     selection.selected.clear();
     selection.selected.add(val);
   }
@@ -4461,8 +4465,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
 
   // Apply from 18 chars
   window.applyAA18 = function(code){
-    try { window.__patternDirty = false; } catch(e) {}
-
     if (!code || code.length!==18) throw new Error("needs 18 chars");
     const a = code.split("").map(dec52);
     let i=0;
@@ -4487,8 +4489,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
 
   // Apply from 19 with checksum
   window.applyAA19 = function(code){
-    try { window.__patternDirty = false; } catch(e) {}
-
     if (!code || code.length!==19) throw new Error("needs 19 chars");
     const idxs = code.split("").map(dec52);
     const data = idxs.slice(0,18);
@@ -5431,8 +5431,6 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
 (function(){
   if (window.__patternSelectionBasedApplied) return;
   window.__patternSelectionBasedApplied = true;
-  // Do not show dominant pattern until user edits after load
-  window.__patternDirty = false;
 
   const SCALP_IDS = ['backside','leftside','rightside','topside'];
 
@@ -5554,13 +5552,6 @@ if (!pos) {
   }
 
   function renderPattern(){
-    if (!window.__patternDirty) {
-      const node = ensurePatternNode();
-      const prev = ensurePreviewPatternNode();
-      if (node) { node.textContent=''; node.style.display='none'; }
-      if (prev) { prev.textContent=''; prev.style.display='none'; }
-      return;
-    }
     const name = computeDominantPattern();
     const node = ensurePatternNode();
     const prev = ensurePreviewPatternNode();
@@ -5632,15 +5623,6 @@ if (!pos) {
       };
     }
   } catch(e){}
-
-  
-  // Mark dirty on any user change and re-render
-  ['click','input','change'].forEach(function(evt){
-    document.addEventListener(evt, function(){
-      window.__patternDirty = true; // mark dirty on user action
-      try { renderPattern(); } catch(e){}
-    }, true);
-  });
 
   // Initial render
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -5990,5 +5972,42 @@ if (delta > 0) {
 })();
 </script>
 
+
+<script>
+
+// Conservative listener to refresh rings after any +/- or area-box click
+document.addEventListener('click', function(e){
+  if (e.target && (e.target.closest('.area-box') || e.target.closest('.plus') || e.target.closest('.minus'))) {
+    if (typeof updateScoreRings === 'function') setTimeout(updateScoreRings, 0);
+  }
+}, true);
+
+</script>
+
+<script>
+// Peek guard helper
+function showRingPeek(label, value){
+  if (window.scrollY < 150) { return; }
+  const peek = document.getElementById('ring-peek');
+  if (!peek) return;
+  // No-op body. The original implementation should still run elsewhere.
+}
+</script>
+<script>
+
+// Auto-hide ring peek near top
+(function(){
+  var last = -1;
+  function hidePeekTop(){
+    if (window.scrollY < 150) {
+      var el = document.getElementById('ring-peek');
+      if (el) el.style.display = 'none';
+    }
+  }
+  window.addEventListener('scroll', hidePeekTop, {passive:true});
+  document.addEventListener('DOMContentLoaded', hidePeekTop);
+})();
+
+</script>
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
