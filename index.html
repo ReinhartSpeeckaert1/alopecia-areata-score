@@ -562,7 +562,6 @@
 #scalp-scale .labels span { white-space: nowrap; }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
 <link as="Image" fetchpriority="high" href="Images/left-beard-1.jpg" rel="preload"/>
@@ -765,12 +764,6 @@
     }
     .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
-
-
-
-
-
 <style id="aga-selected-style">
 /* Strong visual marker for selected AGA option */
 #androgenetic-areas .area-box.selected {
@@ -781,9 +774,6 @@
 }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
-
-
 <style>
 /* Override size for androgenetic alopecia boxes only */
 #androgenetic-areas .area-box {
@@ -792,13 +782,10 @@
 }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
 <style>
   .aga-help-wrap:hover #aga-help-float { display: block !important; }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
-
 <style>
 #androgenetic-areas .plus.glow {
   outline: 3px solid #28a745; /* green */
@@ -812,11 +799,6 @@
 }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
-
-
-
-
 <style>
 /* --- Title banner hero image integration v4: extra compact, visible --- */
 .title-banner.has-hero { position: relative; overflow: hidden; min-height: 84px; }
@@ -841,14 +823,10 @@
   .title-banner.has-hero { padding-right: 100px; }
 }
 </style>
-
-
 <style>
 .action-toolbar{ display:inline-flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
 .action-toolbar > *{ margin:0 !important; }
 </style>
-
-
 <style>
 /* Override to nudge hero figure left */
 .title-banner.has-hero::before{ background-position: 68% center !important; }
@@ -856,13 +834,6 @@
   .title-banner.has-hero::before{ background-position: 58% center !important; }
 }
 </style>
-
-
-
-
-
-
-
 <style>
 /* Center the hero figure more */
 .title-banner.has-hero::before{ background-position: 52% center !important; }
@@ -870,8 +841,6 @@
   .title-banner.has-hero::before{ background-position: 50% center !important; }
 }
 </style>
-
-
 <style>
 /* Shift hero figure more to the right */
 .title-banner.has-hero::before{ background-position: 72% center !important; }
@@ -879,8 +848,6 @@
   .title-banner.has-hero::before{ background-position: 66% center !important; }
 }
 </style>
-
-
 <style>
 /* Extra right shift for hero figure */
 .title-banner.has-hero::before{ background-position: 82% center !important; }
@@ -888,15 +855,6 @@
   .title-banner.has-hero::before{ background-position: 74% center !important; }
 }
 </style>
-
-
-
-
-
-
-
-
-
 <style>
 /* Remove backgrounds from preview/peek overlays */
 #selected-preview,
@@ -919,16 +877,182 @@
   background-color: transparent !important;
 }
 </style>
-
-
 <style>
 .copy-pdf-inline{ display:inline-flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
 .copy-pdf-inline > *{ margin:0 !important; }
 </style>
-
-</head>
-<body>
 <style>
+#pdf-icon-container{
+  display: inline-flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 8px 0 12px 0 !important;
+  text-align: right !important;
+}
+#pdf-icon-container > *{ margin:0 !important; }
+</style>
+<style>
+.title-banner.has-hero { position: relative; overflow: hidden; min-height: 90px; }
+.title-banner.has-hero > * { position: relative; z-index: 1; }
+.title-banner.has-hero::before{
+  content:"";
+  position:absolute; inset:0;
+  background-repeat:no-repeat;
+  background-position:right center;
+  background-size: clamp(160px, 30vw, 420px) auto;
+  opacity:.28; z-index:0; pointer-events:none;
+}
+@media (max-width:640px){
+  .title-banner.has-hero{ min-height:76px; }
+  .title-banner.has-hero::before{ background-size: clamp(140px, 38vw, 320px) auto; background-position: 88% center; }
+}
+</style>
+<style>
+#pdf-icon-container{
+  display: inline-flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 8px 0 12px 0 !important;
+  text-align: right !important;
+}
+#pdf-icon-container > *{ margin: 0 !important; }
+</style>
+<style>
+/* Prevent text caret and selection on plus/minus controls */
+.plus, .minus, .pm-btn, button[data-delta], button[data-density]{
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  caret-color: transparent !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+.plus:focus, .minus:focus, .pm-btn:focus, button[data-delta]:focus, button[data-density]:focus{ outline: none !important; }
+</style>
+<style>
+/* Tight, right-aligned toolbar under banner */
+#pdf-icon-container{
+  display: inline-flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 4px !important;           /* minimal spacing */
+  width: 100% !important;
+  margin: 6px 0 10px 0 !important;
+  text-align: right !important;
+}
+#pdf-icon-container > *{ margin:0 !important; }
+</style>
+<style>
+/* Toolbar under banner, right-aligned, tight spacing */
+#pdf-icon-container{
+  display: inline-flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+  margin: 6px 0 10px 0 !important;
+  text-align: right !important;
+}
+#pdf-icon-container > *{ margin: 0 !important; }
+</style>
+<style>
+#pdf-icon-container{
+  display: inline-flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin: 8px 0 10px 0 !important;
+}
+#pdf-icon-container > *{ margin:0 !important; }
+</style>
+<style>#generate-pdf{border-radius:9999px;padding:8px 14px;}</style><style>
+/* ensure PDF/Copy controls are visible in the title banner */
+.title-banner { position: relative; }
+.title-banner .banner-actions {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  transform: none;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: auto;
+}
+.title-banner .banner-actions button { margin: 0; }
+</style><style>
+/* Compact, modern icon button for Copy */
+.copy-icon-btn{
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+.copy-icon-btn:hover{ background: #f8fafc; border-color: #94a3b8; }
+.copy-icon-btn:active{ transform: translateY(0.5px); }
+.copy-icon-btn:focus-visible{ outline: 2px solid #60a5fa; outline-offset: 2px; }
+.copy-icon-btn svg{ display: block; }
+</style><style>
+/* Make controls sit a bit higher in the banner and modernize buttons */
+.pdf-download-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+.pdf-download-btn:hover{ opacity: .92; }
+.pdf-download-btn:focus-visible{ outline: 2px solid #60a5fa; outline-offset: 2px; }
+
+/* Copy icon color */
+.copy-icon-btn{ color: #2563eb; border-color: #93c5fd; background: #ffffff; }
+.copy-icon-btn:hover{ background: #f0f7ff; border-color: #60a5fa; }
+.copy-icon-btn svg{ width: 12px; height: 12px; }
+</style><style>
+/* PDF pill icon color */
+.pdf-download-btn svg { stroke: #8B0000; }
+</style><style>
+/* Force red stroke for the PDF icon */
+.pdf-download-btn svg { stroke: #8B0000 !important; }
+</style><style>
+/* Controls row placed just above the Reset button */
+.controls-row-above-reset{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+/* Keep the banner absolute placement disabled */
+.title-banner .banner-actions{ position: static; transform: none; top: auto; right: auto; }
+</style><style>
+/* Left alignment and red PDF label */
+.pdf-download-btn .btn-label{ color:#8B0000 !important; font-weight:600; letter-spacing:.2px; }
+#generate-pdf .btn-label{ color:#8B0000 !important; font-weight:600; letter-spacing:.2px; }
+/* Fallback: force icon red */
+#generate-pdf svg{ stroke:#8B0000 !important; }
+</style></head>
+<body>
+<div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 1200px) {
   #floating-preview, #floating-close-btn {
     display: none !important;
@@ -945,16 +1069,7 @@
 <h2 id="main-title">Alopecia areata calculator</h2>
 <div class="title-sub">Select the options that best fit with the extent of alopecia areata</div>
 </div>
-<div id="pdf-icon-container" style="display: none; text-align: right; margin-bottom: 8px;">
-<button id="generate-pdf" style="color: red; font-weight: bold;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-        color: red;
-    " title="Download PDF">
-        📄 PDF
-    </button>
+<div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;">
 </div><div id="selected-preview" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;"></div>
 <div id="results-summary" style="padding: 10px; font-size: 18px; background: #e0f0ff; border-radius: 8px; box-shadow: 0 0 5px #ccc;">
 <!-- Results will be populated here -->
@@ -963,42 +1078,43 @@
 <div class="ring" id="ring-scalp"><span class="ring-val" id="ring-val-scalp">0%</span><span class="ring-label">Scalp</span></div>
 <div class="ring" id="ring-eyebrows"><span class="ring-val" id="ring-val-eyebrows">0%</span><span class="ring-label">Eyebrows</span></div>
 <div class="ring" id="ring-eyelashes"><span class="ring-val" id="ring-val-eyelashes">0%</span><span class="ring-label">Eyelashes</span></div>
-<div class="ring" id="ring-beard" ><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
+<div class="ring" id="ring-beard"><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
 </div>
-<div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
+<div class="controls-row-above-reset" id="controls-row-above-reset"><button id="generate-pdf" style="color: red; font-weight: bold;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: red;
+    ;display:none;" title="Download">
+        📄 
+    <span class="btn-label">PDF</span></button></div><div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
 <button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 </div>
 <div class="area-container" id="areaContainer"></div>
-
 <!-- Androgenetic toggle -->
 <div id="aga-toggle-container" style="display: none;"></div>
 <div id="aga-ui-wrapper" style="display: none; flex-direction: column; gap: 6px;">
-  
-  <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
-    <span>Androgenetic alopecia</span>
-    <span class="aga-help-wrap" style="position: relative; display: inline-block;">
-      <span id="aga-help" 
-            style="cursor: pointer; font-weight: bold; border: 1px solid #ccc; border-radius: 50%; 
+<h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
+<span>Androgenetic alopecia</span>
+<span class="aga-help-wrap" style="position: relative; display: inline-block;">
+<span id="aga-help" style="cursor: pointer; font-weight: bold; border: 1px solid #ccc; border-radius: 50%; 
                    width: 18px; height: 18px; display: inline-flex; align-items: center; 
-                   justify-content: center; background-color: white;" 
-            title="Help">?</span>
-      <div id="aga-help-float" 
-           style="display:none; position: absolute; left: 26px; top: 0; 
+                   justify-content: center; background-color: white;" title="Help">?</span>
+<div id="aga-help-float" style="display:none; position: absolute; left: 26px; top: 0; 
                   background: white; border: 1px solid #999; 
                   box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
-        <img src="Androgenetichelp.jpg" alt="Androgenetic alopecia help" style="max-width: 360px; height: auto;">
-      </div>
-    </span>
-  </h3>
-
-  
+<img alt="Androgenetic alopecia help" src="Androgenetichelp.jpg" style="max-width: 360px; height: auto;"/>
+</div>
+</span>
+</h3>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
-<div class="density-container" id="androgenetic-density"><label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></label><button data-density="0" class="selected"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button></div>
+<div class="density-container" id="androgenetic-density"><label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button></div>
 </div>
 <div class="area-container" id="androgenetic-areas" style="margin-top: 6px;"></div>
-  <div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
+<div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
 </div>
 <div id="result" style="text-align: center; margin: 10px 0; font-size: 20px; font-weight: bold;">Total Scalp Alopecia Areata: 0%</div><div id="scalp-progress"><div></div></div>
 <div aria-hidden="true" id="scalp-scale">
@@ -2963,300 +3079,6 @@ function updateBeardPreview() {
 }
 </script>
 <script>
-// --- Added: ring meters + progress bar updater ---
-function setRingPct(el, pct) {
-  pct = Math.max(0, Math.min(100, Number(pct) || 0));
-  el.style.background = `conic-gradient(#22c55e 0% ${pct}%, #e5e7eb ${pct}% 100%)`;
-}
-function updateScoreRings() {
-  if (typeof calculateSectionTotals !== 'function') return;
-  const totals = calculateSectionTotals();
-  const entries = [
-    ['Scalp', 'ring-scalp', 'ring-val-scalp'],
-    ['Eyebrows','ring-eyebrows','ring-val-eyebrows'],
-    ['Eyelashes','ring-eyelashes','ring-val-eyelashes'],
-    ['Beard','ring-beard','ring-val-beard'],
-  ];
-  entries.forEach(([key, ringId, valId]) => {
-    const prev = previous.get(ringId);
-    const pct = (totals && totals[key] != null) ? Number(totals[key]) : 0;
-    const ring = document.getElementById(ringId);
-    const val = document.getElementById(valId);
-    if (ring && val) {
-      if (prev != null && Math.abs(prev - pct) < 1e-6) return;
-      // Hide beard ring when 0 to avoid flashing on unrelated updates
-      if (ring.id === 'ring-beard') {
-        ring.style.display = (pct > 0.0001) ? 'grid' : 'none';
-      }
-      setRingPct(ring, pct.toFixed(1));
-      val.textContent = `${pct.toFixed(1)}%`;
-    }
-  });
-  // also update the total scalp progress bar
-  const progressBar = document.querySelector('#scalp-progress > div');
-  const scalpPct = (totals && totals['Scalp'] != null) ? Number(totals['Scalp']) : 0;
-  if (progressBar) progressBar.style.width = `${Math.max(0, Math.min(100, scalpPct))}%`;
-}
-setInterval(updateScoreRings, 700);
-
-// --- Enhance banner title text to include scalp % dynamically (keeps existing behavior) ---
-(function() {
-  const origUpdate = (typeof updateScalpUI === 'function') ? updateScalpUI : null;
-  if (origUpdate) {
-    window.updateScalpUI = function() {
-      origUpdate();
-      updateScoreRings();
-    };
-  }
-})();
-
-// --- Replace PDF click handler to include Percentage of the areas ---
-(function() {
-  const oldBtn = document.getElementById("generate-pdf");
-  if (!oldBtn) return;
-  const newBtn = oldBtn.cloneNode(true);
-  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-  newBtn.addEventListener("click", function () {
-    const now = new Date();
-    const datetime = now.toLocaleString();
-    const title = "Alopecia Areata Calculator";
-
-    const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
-    const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
-    const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
-    const beard = document.getElementById("beard-title").innerText.match(/\((.*?)\)/)[1];
-
-    function getSubtotal(selections, density = 0) {
-      let total = 0;
-      for (const val of selections) total += val;
-      total = total * (1 - (density||0) / 100);
-      return Number(total.toFixed(2));
-    }
-
-    // Subtotals (density-adjusted where applicable)
-    const leftScalp = getSubtotal(globalSelections["leftside"].selected, globalSelections["leftside"].density);
-    const rightScalp = getSubtotal(globalSelections["rightside"].selected, globalSelections["rightside"].density);
-    const topScalp = getSubtotal(globalSelections["topside"].selected, globalSelections["topside"].density);
-    const backScalp = getSubtotal(globalSelections["backside"].selected, globalSelections["backside"].density);
-
-    const leftEyebrow = getSubtotal(eyebrowSelections.left, 0);
-    const rightEyebrow = getSubtotal(eyebrowSelections.right, 0);
-
-    const leftEyelash = getSubtotal(eyelashSelections.left, 0);
-    const rightEyelash = getSubtotal(eyelashSelections.right, 0);
-
-    const leftBeard = getSubtotal(beardSelections["left-beard"].selected, beardSelections["left-beard"].density);
-    const rightBeard = getSubtotal(beardSelections["right-beard"].selected, beardSelections["right-beard"].density);
-    const centralBeard = getSubtotal(beardSelections["central-beard"].selected, beardSelections["central-beard"].density);
-
-    // Max possible per area (100% loss in that area)
-    const MAX = {
-      leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-      leftEyebrow: 50, rightEyebrow: 50,
-      leftEyelash: 50, rightEyelash: 50,
-      leftBeard: 40, rightBeard: 40, centralBeard: 20
-    };
-
-    function rel(val, max) {
-      if (!max) return "0.00";
-      const pct = Math.max(0, Math.min(100, (val / max) * 100));
-      return pct.toFixed(2);
-    }
-
-    const summarySection = document.createElement("div");
-    summarySection.id = "pdf-summary";
-    summarySection.style.margin = "20px";
-    summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-    
-summarySection.innerHTML = `
-      <h2 style='text-align:center;'>${title}</h2>
-      <p style='text-align:center;'><em>${datetime}</em></p>
-      <hr/>
-
-        
-      <style>
-          #pdf-summary{max-width:190mm;}
-          #pdf-summary table{width:100%;max-width:190mm;border-collapse:collapse;table-layout:fixed;}
-          #pdf-summary td{border:1px solid #ccc;padding:6px;word-wrap:break-word;white-space:normal;}
-          #pdf-summary tr{page-break-inside:avoid;break-inside:avoid;-webkit-region-break-inside:avoid;-webkit-column-break-inside:avoid;}
-          #pdf-summary table, #pdf-summary td{page-break-inside:avoid;break-inside:avoid;}
-        .pdf-top-right { position:absolute; top:6px; right:8px; }
-</style>
-
-      <h3>Summary of Alopecia Areata Involvement</h3>
-      <ul>
-        <li><strong>Total Scalp:</strong> ${scalp}</li>
-        <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
-        <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-        <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
-</style>'}
-      </ul>
-      <h3>Detailed Area Breakdown</h3>
-      <ul>
-        <li><strong>Left Scalp:</strong> ${leftScalp}% (=Percentage of the area=${rel(leftScalp, MAX.leftScalp)}%)</li>
-        <li><strong>Right Scalp:</strong> ${rightScalp}% (=Percentage of the area=${rel(rightScalp, MAX.rightScalp)}%)</li>
-        <li><strong>Top of the Head:</strong> ${topScalp}% (=Percentage of the area=${rel(topScalp, MAX.topScalp)}%)</li>
-        <li><strong>Back of the Head:</strong> ${backScalp}% (=Percentage of the area=${rel(backScalp, MAX.backScalp)}%)</li>
-        <li><strong>Left Eyebrow:</strong> ${leftEyebrow}% (=Percentage of the area=${rel(leftEyebrow, MAX.leftEyebrow)}%)</li>
-        <li><strong>Right Eyebrow:</strong> ${rightEyebrow}% (=Percentage of the area=${rel(rightEyebrow, MAX.rightEyebrow)}%)</li>
-        <li><strong>Left Eyelash:</strong> ${leftEyelash}% (=Percentage of the area=${rel(leftEyelash, MAX.leftEyelash)}%)</li>
-        <li><strong>Right Eyelash:</strong> ${rightEyelash}% (=Percentage of the area=${rel(rightEyelash, MAX.rightEyelash)}%)</li>
-        <li><strong>Left Beard Area:</strong> ${leftBeard}% (=Percentage of the area=${rel(leftBeard, MAX.leftBeard)}%)</li>
-        <li><strong>Right Beard Area:</strong> ${rightBeard}% (=Percentage of the area=${rel(rightBeard, MAX.rightBeard)}%)</li>
-        <li><strong>Central Beard Area:</strong> ${centralBeard}% (=Percentage of the area=${rel(centralBeard, MAX.centralBeard)}%)</li>
-      </ul>
-    `;
-
-    
-      
-      
-// Build exactly one Dominant pattern / Scalp change line for the PDF
-(function(){
-  if (window.__pdfDominantInjected) return;
-  window.__pdfDominantInjected = true;
-  try {
-    Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
-    const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
-    let changeText = '';
-    if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
-      try {
-        const cur = Number(calculateSectionTotals().Scalp);
-        if (Number.isFinite(cur)) {
-          const d = window.__baselineScalpPct - cur;
-          if (d !== 0) {
-            const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
-            changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
-          }
-        }
-      } catch(e){}
-    }
-    const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
-    if (lineText) {
-      const p = document.createElement('p');
-      p.id = 'pdf-dominant-line';
-      p.style.textAlign = 'center';
-      p.style.fontWeight = '600';
-      p.style.margin = '6px 0 0 0';
-      p.textContent = lineText;
-      const timeP = summarySection.querySelector('p em');
-      if (timeP && timeP.parentElement) timeP.parentElement.insertAdjacentElement('afterend', p);
-      else summarySection.prepend(p);
-    }
-    // Beard gating in PDF
-    const beardNum = (function(v){
-      if (typeof v === 'number') return v;
-      const n = parseFloat(String(v||'').replace('%',''));
-      return isNaN(n) ? 0 : n;
-    })(typeof beard !== 'undefined' ? beard : 0);
-    if (beardNum === 0) {
-      const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
-      if (totalLi) totalLi.remove();
-      Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
-        if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
-      });
-    }
-  } catch(e) {}
-})();// Build exactly one Dominant pattern / Scalp change line for the PDF
-      try {
-        // Remove any existing line from prior runs
-        Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
-        const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
-        let changeText = '';
-        if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
-          try {
-            const cur = Number(calculateSectionTotals().Scalp);
-            if (Number.isFinite(cur)) {
-              const d = window.__baselineScalpPct - cur;
-              if (d !== 0) {
-                const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
-                changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
-              }
-            }
-          } catch(e){}
-        }
-        const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
-        if (lineText) {
-          const p = document.createElement('p');
-          p.id = 'pdf-dominant-line';
-          p.style.textAlign = 'center';
-          p.style.fontWeight = '600';
-          p.style.margin = '6px 0 0 0';
-          p.textContent = lineText;
-          // Insert after the timestamp (<em>${datetime}</em>) if present, else at top
-          const timeP = summarySection.querySelector('p em');
-          if (timeP && timeP.parentElement) {
-            timeP.parentElement.insertAdjacentElement('afterend', p);
-          } else {
-            summarySection.prepend(p);
-          }
-        }
-        // Beard gating in PDF
-        const beardNum = (function(v){
-          if (typeof v === 'number') return v;
-          const n = parseFloat(String(v||'').replace('%',''));
-          return isNaN(n) ? 0 : n;
-        })(typeof beard !== 'undefined' ? beard : 0);
-        if (beardNum === 0) {
-          // Remove total beard line
-          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
-          if (totalLi) totalLi.remove();
-          // Remove beard detail lines
-          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
-            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
-          });
-        }
-      } catch(e) {}
-    // Normalize dominant line to a single instance and hide beard items when beard == 0
-      try {
-        // Remove duplicate dominant line nodes, keep the first
-        const _dups = summarySection.querySelectorAll('#pdf-dominant-line');
-        for (let i = 1; i < _dups.length; i++) { _dups[i].remove(); }
-
-        // Beard gating
-        const beardNum = (function(v){
-          if (typeof v === 'number') return v;
-          if (typeof v === 'string') {
-            const n = parseFloat(v.replace('%',''));
-            return isNaN(n) ? 0 : n;
-          }
-          return 0;
-        })(typeof beard !== 'undefined' ? beard : 0);
-
-        if (beardNum === 0) {
-          // remove Total Beard line
-          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
-          if (totalLi) totalLi.remove();
-
-          // remove beard detail lines
-          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
-            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) {
-              li.remove();
-            }
-          });
-        }
-      } catch(_e) {}
-document.body.appendChild(summarySection);
-      // Ensure images can be rendered by html2canvas when loaded from another origin
-      try {
-        summarySection.querySelectorAll('img').forEach(img => {
-          if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
-          // If images are data: URLs this has no effect, but it is safe.
-        });
-      } catch(e) {}
-    
-
-    html2pdf().set({ margin: 10, pagebreak: { mode: ['css','legacy'], avoid: ['tr','td','.no-split'] },
-      filename: 'alopecia_areata_detailed_summary.pdf',
-      html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(summarySection).save().then(() => {
-      document.body.removeChild(summarySection);
-    });
-  });
-})();
-</script>
-<script>
 // Override ring color: 0% = green (h~120), 100% = red (h~0)
 (function(){
   window.setRingPct = function(el, pct) {
@@ -3275,15 +3097,11 @@ document.body.appendChild(summarySection);
   const copyBtn = document.createElement("button");
   copyBtn.id = "copy-summary";
   copyBtn.type = "button";
-  copyBtn.textContent = "Copy summary";
-  copyBtn.style.marginLeft = "8px";
-  copyBtn.style.padding = "8px 12px";
-  copyBtn.style.border = "1px solid #cbd5e1";
-  copyBtn.style.borderRadius = "8px";
-  copyBtn.style.cursor = "pointer";
-  copyBtn.style.background = "white";
-  copyBtn.style.boxShadow = "0 1px 2px rgba(0,0,0,.05)";
-  pdfBtn.insertAdjacentElement("afterend", copyBtn);
+  copyBtn.innerHTML = `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+copyBtn.setAttribute("aria-label","Copy summary");
+copyBtn.title = "Copy summary";
+copyBtn.classList.add("copy-icon-btn");
+pdfBtn.insertAdjacentElement("afterend", copyBtn);
 
   function getTotalsAndDetails(){
     const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
@@ -3501,7 +3319,7 @@ const text = lines.join("
     const ok = await writeClipboard(text);
     if (ok) {
       copyBtn.textContent = "Copied!";
-      setTimeout(()=>copyBtn.textContent="Copy summary", 1200);
+      setTimeout(()=>copyBtn.textContent="Copy", 1200);
     } else {
       alert("Sorry, copying to clipboard failed.");
     }
@@ -3514,7 +3332,6 @@ document.addEventListener("DOMContentLoaded", function(){
   if (pdfWrap) pdfWrap.style.display = "block";
 });
 </script>
-
 <script>
 (function(){
   function injectCopy(){
@@ -3524,7 +3341,7 @@ document.addEventListener("DOMContentLoaded", function(){
     const copyBtn = document.createElement("button");
     copyBtn.id = "copy-summary";
     copyBtn.type = "button";
-    copyBtn.textContent = "Copy summary";
+    copyBtn.textContent = "Copy";
     copyBtn.style.marginLeft = "8px";
     copyBtn.style.padding = "8px 12px";
     copyBtn.style.border = "1px solid #cbd5e1";
@@ -3644,7 +3461,7 @@ const text = lines.join("
     const ok = await writeClipboard(text);
       if (ok) {
         copyBtn.textContent = "Copied!";
-        setTimeout(()=>copyBtn.textContent="Copy summary", 1200);
+        setTimeout(()=>copyBtn.textContent="Copy", 1200);
       } else {
         alert("Sorry, copying to clipboard failed.");
       }
@@ -3659,7 +3476,6 @@ const text = lines.join("
   document.addEventListener("DOMContentLoaded", tryInject);
 })();
 </script>
-
 <!-- MICRO-SCROLL-GLOBAL -->
 <script>
 (function() {
@@ -3996,359 +3812,7 @@ function showImmediatePeekFor(region) {
   });
 })();
 </script>
-<script>
-(function(){
-  ));
-    }
-    
-    catch (err) {
-            // Tainted canvas; hide the image to avoid blocking export
-            img.style.display = 'none';
-          }
-        } catch (e) {
-          img.style.display = 'none';
-        }
-      }
-    }
-
-    async function buildAndSavePdf(e){
-    try{
-      if (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
-      if (window.__pdfRunning) return;
-      window.__pdfRunning = true;
-
-      const now = new Date();
-      const datetime = now.toLocaleString();
-      const title = "Alopecia Areata Calculator";
-
-      const scalp = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
-      const eyebrows = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-      const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-      const beard = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-
-      function getSubtotal(selections, density){
-        let total = 0;
-        if (selections && typeof selections.forEach === "function") {
-          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
-        } else if (Array.isArray(selections)) {
-          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
-        }
-        return total.toFixed(2);
-      }
-
-      
-      const MAX = {
-        leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-        leftEyebrow: 50, rightEyebrow: 50,
-        leftEyelash: 50, rightEyelash: 50,
-        leftBeard: 40, rightBeard: 40, centralBeard: 20
-      };
-      function rel(val, max){ try { return ( (Number(val)||0) / (Number(max)||1) * 100 ).toFixed(2); } catch(e){ return "0.00"; } }
-    const leftScalp  = getSubtotal((globalSelections?.leftside||{}).selected,  globalSelections?.leftside?.density);
-      const rightScalp = getSubtotal((globalSelections?.rightside||{}).selected, globalSelections?.rightside?.density);
-      const topScalp   = getSubtotal((globalSelections?.topside||{}).selected,   globalSelections?.topside?.density);
-      const backScalp  = getSubtotal((globalSelections?.backside||{}).selected,  globalSelections?.backside?.density);
-
-      const leftEyebrow  = getSubtotal(eyebrowSelections?.left, 0);
-      const rightEyebrow = getSubtotal(eyebrowSelections?.right, 0);
-
-      const leftEyelash  = getSubtotal(eyelashSelections?.left, 0);
-      const rightEyelash = getSubtotal(eyelashSelections?.right, 0);
-
-      const leftBeard    = getSubtotal(beardSelections?.["left-beard"]?.selected,    beardSelections?.["left-beard"]?.density);
-      const rightBeard   = getSubtotal(beardSelections?.["right-beard"]?.selected,   beardSelections?.["right-beard"]?.density);
-      const centralBeard = getSubtotal(beardSelections?.["central-beard"]?.selected, beardSelections?.["central-beard"]?.density);
-
-      const summarySection = document.createElement("div");
-      summarySection.id = "pdf-summary";
-      summarySection.style.margin = "20px";
-      summarySection.style.fontFamily = "'Segoe UI', sans-serif";
-      
-summarySection.innerHTML = `
-        <h2 style='text-align:center;'>${title}</h2>
-        <p style='text-align:center;'><em>${datetime}</em></p>
-        <hr/>
-        
-      <h3>Summary of Alopecia Areata Involvement</h3>
-        <ul>
-          <li><strong>Total Scalp:</strong> ${scalp}</li>
-          <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
-          <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-          <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
-</style>'}
-        </ul>
-        <h3>Detailed Area Breakdown</h3>
-        <table id="detail-table" style="width:100%;border-collapse:collapse;">
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${leftScalp}% (Percentage of the area: ${rel(leftScalp, MAX.leftScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${rightScalp}% (Percentage of the area: ${rel(rightScalp, MAX.rightScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${topScalp}% (Percentage of the area: ${rel(topScalp, MAX.topScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${backScalp}% (Percentage of the area: ${rel(backScalp, MAX.backScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${leftEyebrow}% (Percentage of the area: ${rel(leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${rightEyebrow}% (Percentage of the area: ${rel(rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${leftEyelash}% (Percentage of the area: ${rel(leftEyelash, MAX.leftEyelash)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${rightEyelash}% (Percentage of the area: ${rel(rightEyelash, MAX.rightEyelash)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${leftBeard}% (Percentage of the area: ${rel(leftBeard, MAX.leftBeard)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${rightBeard}% (Percentage of the area: ${rel(rightBeard, MAX.rightBeard)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${centralBeard}% (Percentage of the area: ${rel(centralBeard, MAX.centralBeard)}%)</td></tr>
-        </table>
-        `;
-
-      
-      
-      // Build exactly one Dominant pattern / Scalp change line for the PDF
-      try {
-        // Remove any existing line from prior runs
-        Array.from(summarySection.querySelectorAll('#pdf-dominant-line')).forEach(n=>n.remove());
-        const patText = (document.getElementById('pattern-dominant')?.textContent || '').trim();
-        let changeText = '';
-        if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
-          try {
-            const cur = Number(calculateSectionTotals().Scalp);
-            if (Number.isFinite(cur)) {
-              const d = window.__baselineScalpPct - cur;
-              if (d !== 0) {
-                const abs = Math.abs(d).toFixed(1).replace(/\.0$/, '');
-                changeText = d > 0 ? ('Scalp improvement: ' + abs + '%') : ('Scalp worsening: ' + abs + '%');
-              }
-            }
-          } catch(e){}
-        }
-        const lineText = [patText ? ('Dominant pattern: ' + patText + '.') : '', changeText].filter(Boolean).join(' ');
-        if (lineText) {
-          const p = document.createElement('p');
-          p.id = 'pdf-dominant-line';
-          p.style.textAlign = 'center';
-          p.style.fontWeight = '600';
-          p.style.margin = '6px 0 0 0';
-          p.textContent = lineText;
-          // Insert after the timestamp (<em>${datetime}</em>) if present, else at top
-          const timeP = summarySection.querySelector('p em');
-          if (timeP && timeP.parentElement) {
-            timeP.parentElement.insertAdjacentElement('afterend', p);
-          } else {
-            summarySection.prepend(p);
-          }
-        }
-        // Beard gating in PDF
-        const beardNum = (function(v){
-          if (typeof v === 'number') return v;
-          const n = parseFloat(String(v||'').replace('%',''));
-          return isNaN(n) ? 0 : n;
-        })(typeof beard !== 'undefined' ? beard : 0);
-        if (beardNum === 0) {
-          // Remove total beard line
-          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
-          if (totalLi) totalLi.remove();
-          // Remove beard detail lines
-          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
-            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) li.remove();
-          });
-        }
-      } catch(e) {}
-    // Normalize dominant line to a single instance and hide beard items when beard == 0
-      try {
-        // Remove duplicate dominant line nodes, keep the first
-        const _dups = summarySection.querySelectorAll('#pdf-dominant-line');
-        for (let i = 1; i < _dups.length; i++) { _dups[i].remove(); }
-
-        // Beard gating
-        const beardNum = (function(v){
-          if (typeof v === 'number') return v;
-          if (typeof v === 'string') {
-            const n = parseFloat(v.replace('%',''));
-            return isNaN(n) ? 0 : n;
-          }
-          return 0;
-        })(typeof beard !== 'undefined' ? beard : 0);
-
-        if (beardNum === 0) {
-          // remove Total Beard line
-          const totalLi = Array.from(summarySection.querySelectorAll('ul li')).find(li => /Total\s*Beard/i.test(li.textContent||''));
-          if (totalLi) totalLi.remove();
-
-          // remove beard detail lines
-          Array.from(summarySection.querySelectorAll('ul li')).forEach(li => {
-            if (/Left\s*Beard\s*Area|Right\s*Beard\s*Area|Central\s*Beard\s*Area/i.test(li.textContent||'')) {
-              li.remove();
-            }
-          });
-        }
-      } catch(_e) {}
-const preview = document.getElementById("selected-preview")?.cloneNode(true);
-      document.body.appendChild(summarySection);
-      // Ensure images can be rendered by html2canvas when loaded from another origin
-      try {
-        summarySection.querySelectorAll('img').forEach(img => {
-          if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
-          // If images are data: URLs this has no effect, but it is safe.
-        });
-      } catch(e) {}
-    
-      html2pdf().set({
-        margin: 10,
-        filename: 'alopecia_areata_summary_with_details.pdf',
-        html2canvas: { scale: 2, useCORS: true, allowTaint: false, imageTimeout: 15000 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(summarySection).save()
-      .then(() => { /* success */ })
-      .catch((err) => { console && console.warn && console.warn('PDF export failed:', err); })
-      .finally(() => { try { document.body.removeChild(summarySection); } catch(e) {} window.__pdfRunning = false; });
-    }catch(err){ window.__pdfRunning = false; }
-    return false;
-  }
-
-  function install(){
-    const btn = document.getElementById("generate-pdf");
-    if (!btn) return;
-    const clone = btn.cloneNode(true); // strips all listeners
-    btn.parentNode.replaceChild(clone, btn);
-    clone.addEventListener("click", (ev)=>{ buildAndSavePdf(ev); }, true); // capture
-  }
-
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(install, 0);
-  } else {
-    document.addEventListener("DOMContentLoaded", install);
-  }
-})();
-</script>
-<script>
-(function(){
-  function buildAndSavePdf(e){
-    try {
-      if (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
-      if (window.__pdfRunning) return false;
-      window.__pdfRunning = true;
-
-      const now = new Date();
-      const datetime = now.toLocaleString();
-      const title = "Alopecia Areata Calculator";
-
-      const scalp = (document.getElementById("result")?.innerText || "").replace("Total Scalp Alopecia Areata: ", "");
-      const eyebrows = (document.getElementById("eyebrow-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-      const eyelashes = (document.getElementById("eyelash-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-      const beard = (document.getElementById("beard-title")?.innerText.match(/\((.*?)\)/)||[, "0.00%"])[1];
-
-      function getSubtotal(selections, density){
-        let total = 0;
-        if (selections && typeof selections.forEach === "function") {
-          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
-        } else if (Array.isArray(selections)) {
-          selections.forEach(v => total += Number(v) * (1 - Number(density||0)/100));
-        }
-        return total.toFixed(2);
-      }
-
-      // Compute detailed values
-      const leftScalp  = getSubtotal((globalSelections?.leftside||{}).selected,  globalSelections?.leftside?.density);
-      const rightScalp = getSubtotal((globalSelections?.rightside||{}).selected, globalSelections?.rightside?.density);
-      const topScalp   = getSubtotal((globalSelections?.topside||{}).selected,   globalSelections?.topside?.density);
-      const backScalp  = getSubtotal((globalSelections?.backside||{}).selected,  globalSelections?.backside?.density);
-
-      const leftEyebrow  = getSubtotal(eyebrowSelections?.left, 0);
-      const rightEyebrow = getSubtotal(eyebrowSelections?.right, 0);
-
-      const leftEyelash  = getSubtotal(eyelashSelections?.left, 0);
-      const rightEyelash = getSubtotal(eyelashSelections?.right, 0);
-
-      const leftBeard    = getSubtotal(beardSelections?.["left-beard"]?.selected,    beardSelections?.["left-beard"]?.density);
-      const rightBeard   = getSubtotal(beardSelections?.["right-beard"]?.selected,   beardSelections?.["right-beard"]?.density);
-      const centralBeard = getSubtotal(beardSelections?.["central-beard"]?.selected, beardSelections?.["central-beard"]?.density);
-
-      const MAX = {
-        leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-        leftEyebrow: 50, rightEyebrow: 50,
-        leftEyelash: 50, rightEyelash: 50,
-        leftBeard: 40, rightBeard: 40, centralBeard: 20
-      };
-      function pctArea(val, max){ try { return ( (Number(val)||0) / (Number(max)||1) * 100 ).toFixed(2); } catch(e){ return "0.00"; } }
-
-      // Compose export section (no pictures)
-      const section = document.createElement("div");
-      section.id = "pdf-summary";
-      section.style.margin = "20px";
-      section.style.fontFamily = "'Segoe UI', sans-serif";
-      section.innerHTML = `
-        <h2 style='text-align:center;'>${title}</h2>
-        <p style='text-align:center;'><em>${datetime}</em></p>
-        <hr/>
-        <h3>Summary of Alopecia Areata Involvement</h3>
-        <ul>
-          <li><strong>Total Scalp:</strong> ${scalp}</li>
-          <li><strong>Total Eyebrows:</strong> ${eyebrows}</li>
-          <li><strong>Total Eyelashes:</strong> ${eyelashes}</li>
-          <li><strong>Total Beard:</strong> ${beard}</li>${(String(beard).replace('%',''))!=='0.00' && String(beard)!=='0%' ? '' : '<style>#pdf-summary .beard-only{display:none;}.pdf-top-right { position:absolute; top:6px; right:8px; }
-</style>'}
-        </ul>
-        <h3>Detailed Area Breakdown</h3>
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Scalp</td><td style="border:1px solid #ccc;padding:6px;">${leftScalp}% (Percentage of the area: ${pctArea(leftScalp, MAX.leftScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Scalp</td><td style="border:1px solid #ccc;padding:6px;">${rightScalp}% (Percentage of the area: ${pctArea(rightScalp, MAX.rightScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Top of the Head</td><td style="border:1px solid #ccc;padding:6px;">${topScalp}% (Percentage of the area: ${pctArea(topScalp, MAX.topScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Back of the Head</td><td style="border:1px solid #ccc;padding:6px;">${backScalp}% (Percentage of the area: ${pctArea(backScalp, MAX.backScalp)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${leftEyebrow}% (Percentage of the area: ${pctArea(leftEyebrow, MAX.leftEyebrow)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyebrow</td><td style="border:1px solid #ccc;padding:6px;">${rightEyebrow}% (Percentage of the area: ${pctArea(rightEyebrow, MAX.rightEyebrow)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${leftEyelash}% (Percentage of the area: ${pctArea(leftEyelash, MAX.leftEyelash)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Eyelash</td><td style="border:1px solid #ccc;padding:6px;">${rightEyelash}% (Percentage of the area: ${pctArea(rightEyelash, MAX.rightEyelash)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Left Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${leftBeard}% (Percentage of the area: ${pctArea(leftBeard, MAX.leftBeard)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Right Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${rightBeard}% (Percentage of the area: ${pctArea(rightBeard, MAX.rightBeard)}%)</td></tr>
-          <tr><td style="border:1px solid #ccc;padding:6px;">Central Beard Area</td><td style="border:1px solid #ccc;padding:6px;">${centralBeard}% (Percentage of the area: ${pctArea(centralBeard, MAX.centralBeard)}%)</td></tr>
-        </table>
-      `;
-
-      document.body.appendChild(section);
-      html2pdf().set({
-        margin: 10,
-        filename: 'alopecia_areata_summary_without_pictures.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      
-  // Add "Dominant pattern and change" line into the temporary section before export
-  try {
-    var extra2 = document.createElement('div');
-    extra2.id = 'pdf-extra-line';
-    extra2.style.marginTop = '8px';
-    extra2.style.fontWeight = '600';
-    var patNode2 = document.getElementById('pattern-dominant');
-    var patText2 = patNode2 && patNode2.textContent ? patNode2.textContent.trim() : '';
-    var line2 = patText2 ? ('Dominant pattern: ' + patText2 + '.') : '';
-    if (typeof window.__baselineScalpPct === 'number' && typeof calculateSectionTotals === 'function') {
-      try {
-        var cur2 = Number(calculateSectionTotals().Scalp);
-        if (Number.isFinite(cur2)) {
-          var d2 = window.__baselineScalpPct - cur2;
-          if (d2 !== 0) {
-            var abs2 = Math.abs(d2).toFixed(1).replace(/\.0$/, '');
-            line2 += (line2 ? ' ' : '') + (d2 > 0 ? ('Scalp improvement: ' + abs2 + '%') : ('Scalp worsening: ' + abs2 + '%'));
-          }
-        }
-      } catch(e){}
-    }
-    if (line2) { extra2.textContent = line2; extra2.style.padding = "4px 0"; if (section.firstChild) { section.insertBefore(extra2, section.firstChild); } else { section.appendChild(extra2); } }
-  } catch(e){}
-}).from(section).save().catch(
-(err)=>{ console && console.warn && console.warn('PDF export failed:', err); })
-        .finally(()=>{ try { document.body.removeChild(section); } catch(e) {} window.__pdfRunning = false; });
-    } catch (err) { window.__pdfRunning = false; }
-    return false;
-  }
-
-  function install(){
-    const btn = document.getElementById("generate-pdf");
-    if (!btn) return;
-    const clone = btn.cloneNode(true);   // strips ALL previous listeners
-    btn.parentNode.replaceChild(clone, btn);
-    clone.addEventListener("click", buildAndSavePdf, true); // capture phase
-  }
-
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(install, 0);
-  } else {
-    document.addEventListener("DOMContentLoaded", install);
-  }
-})();
-</script>
-<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue" id="btnCopyCode18">📋 Copy Score</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue" id="btnLoadCode18">📥 Load Score</button></div><script>
+<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue" id="btnCopyCode18" title="Copy">📋 Copy</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue" id="btnLoadCode18">📥 Load Score</button></div><script>
 (function(){
   // 52-symbol alphabet: uppercase + lowercase
   const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -4589,9 +4053,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
   else init();
 })();
 </script>
-
-
-
 <script>
 /* Robust selection marker for AGA options:
    - Works for .aga-option, [data-aga-option], [data-value], and .area-box inside #aga-score
@@ -4642,12 +4103,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
-
-
-
-
-
-
 <script>
 /* Keep the androgenetic option's tooltip visible as the label until another option is chosen. */
 (function(){
@@ -4689,7 +4144,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
   }
 })();
 </script>
-
 <script>
 /* AGA persistent tooltip click augmentation.
    - On click inside #androgenetic-areas, mark the clicked box as selected,
@@ -4735,7 +4189,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
   }
 })();
 </script>
-
 <script>
 (function(){
   function refreshAgaTooltip(){
@@ -4774,11 +4227,6 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
   }
 })();
 </script>
-
-
-
-
-
 <script>
 (function(){
   function ensureCopyButton(){
@@ -4789,7 +4237,7 @@ const preview = document.getElementById("selected-preview")?.cloneNode(true);
     var btn = document.createElement('button');
     btn.id = 'copy-summary';
     btn.type = 'button';
-    btn.textContent = 'Copy summary';
+    btn.textContent = 'Copy';
     btn.style.marginLeft = '8px';
     btn.style.padding = '8px 12px';
     btn.style.border = '1px solid #cbd5e1';
@@ -4889,7 +4337,7 @@ if (typeof window.__baselineScalpPct === 'number') {
       lines.push('');
       const ok = await writeClipboard(lines.join('\
 '));
-      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy summary', 1200); }
+      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy', 1200); }
       else { alert('Copy failed'); }
     });
   }
@@ -4911,11 +4359,6 @@ if (typeof window.__baselineScalpPct === 'number') {
   }, 300);
 })();
 </script>
-
-
-
-
-
 <script>
 (function(){
   function writeClipboard(text){
@@ -4987,7 +4430,7 @@ if (typeof window.__baselineScalpPct === 'number') {
       ev.stopPropagation();
       const text = buildSummary();
       const ok = await writeClipboard(text);
-      if (ok) { clone.textContent = 'Copied!'; setTimeout(()=>clone.textContent='Copy summary', 1200); }
+      if (ok) { clone.textContent = 'Copied!'; setTimeout(()=>clone.textContent='Copy', 1200); }
       else { alert('Copy failed'); }
       return false;
     });
@@ -5013,17 +4456,6 @@ if (typeof window.__baselineScalpPct === 'number') {
   }
 })();
 </script>
-
-
-
-
-
-
-
-
-
-
-
 <script>
 (function(){
   function waitFor(pred, timeoutMs){
@@ -5058,7 +4490,7 @@ if (typeof window.__baselineScalpPct === 'number') {
       btn = document.createElement('button');
       btn.id = 'copy-summary';
       btn.type = 'button';
-      btn.textContent = 'Copy summary';
+      btn.textContent = 'Copy';
       btn.style.marginLeft = '8px';
       btn.style.padding = '8px 12px';
       btn.style.border = '1px solid #cbd5e1';
@@ -5134,7 +4566,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
       ev.preventDefault();
       ev.stopPropagation();
       const ok = await writeClipboard(composeSummary());
-      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy summary', 1200); }
+      if (ok) { btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy', 1200); }
     }, true);
   }
   if (document.readyState === 'loading') {
@@ -5144,12 +4576,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
   }
 })();
 </script>
-
-
-
 <!-- PATCH v2: MutationObserver to mirror "Beard Area (...%)" into the beard ring -->
-
-
 <style id="scalp-extra-controls-css">
 /* Extra controls for scalp boxes at 1/3 and 2/3 heights */
 .area-box .middleplus, .area-box .middleminus, .area-box .lowerplus, .area-box .lowerminus {
@@ -5171,7 +4598,6 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
 .area-box .middleminus, .area-box .lowerminus { left: 2px; }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
 <script id="scalp-extra-controls-js">
 (function(){
   if (window.__scalpExtraControlsApplied) return;
@@ -5247,10 +4673,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
       const low = last === 'lower';
 
       // Clear both tiers implicitly by painting with active=false where appropriate
-      paint('.plus.middleplus',   mid && onPlus,  '#ccffcc', 'white');
-      paint('.minus.middleminus', mid && onMinus, '#ffcccc', 'white');
-      paint('.plus.lowerplus',    low && onPlus,  '#ccffcc', 'white');
-      paint('.minus.lowerminus',  low && onMinus, '#ffcccc', 'white');
+      paint('.plus.middleplus',   onPlus,  '#ccffcc', 'white');paint('.minus.middleminus', onMinus, '#ffcccc', 'white');paint('.plus.lowerplus',    onPlus,  '#ccffcc', 'white');paint('.minus.lowerminus',  onMinus, '#ffcccc', 'white');
     });
   });
 }
@@ -5287,8 +4710,6 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
   }
 })();
 </script>
-
-
 <script id="pattern-score-js">
 (function(){
   if (window.__patternScoreApplied) return;
@@ -5409,9 +4830,6 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
   updateOutcome();
 })();
 </script>
-
-
-
 <style id="pattern-chip-style">
 #pattern-dominant {
   align-self: stretch;
@@ -5430,8 +4848,6 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
 }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-
-
 <script id="pattern-selection-based">
 (function(){
   if (window.__patternSelectionBasedApplied) return;
@@ -5637,9 +5053,6 @@ if (!pos) {
   }
 })();
 </script>
-
-
-
 <script>
 (function(){
   function getScalpPctSafe(){
@@ -5744,8 +5157,6 @@ if (delta > 0) {
   }
 })();
 </script>
-
-
 <script>
 (function(){
   function getBeardTotal(){
@@ -5781,8 +5192,6 @@ if (delta > 0) {
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(toggleBeardVisibility, 50); });
 })();
 </script>
-
-
 <script>
 (function(){
   function anyDensityPositive(){
@@ -5837,8 +5246,6 @@ if (delta > 0) {
   document.addEventListener("DOMContentLoaded", function(){ setTimeout(refreshDominant, 0); });
 })();
 </script>
-
-
 <script>
 // Override helpers to make '(diffuse)' depend only on scalp densities
 (function(){
@@ -5865,11 +5272,6 @@ if (delta > 0) {
   try { if (window.__aa_refreshDominant) setTimeout(window.__aa_refreshDominant, 0); } catch(e){}
 })();
 </script>
-
-
-
-
-
 <style>
   .age-controls { display:flex; align-items:center; gap:8px; }
   .age-controls .label { font-weight:600; margin-right:4px; }
@@ -5895,9 +5297,9 @@ if (delta > 0) {
   globalThis.__applyAgeScaling = function(parts){
     const g = globalThis.__ageGroup || 'over12';
     let {L=0,R=0,B=0,T=0} = parts || {};
-    if (g === '6to11') {
+    if (g === '6-11') {
       L *= (19/18); R *= (19/18); B *= (23/24); T *= (39/40);
-    } else if (g === 'under6') {
+    } else if (g === '&lt;6') {
       L *= (19/18); R *= (19/18); B *= (24/24); T *= (38/40);
     }
     return {L,R,B,T};
@@ -5918,8 +5320,8 @@ if (delta > 0) {
     left.innerHTML = `
       <span class="label">Age</span>
       <button type="button" class="age-btn" data-age="over12" aria-pressed="true">12+</button>
-      <button type="button" class="age-btn" data-age="6to11">6 to 11</button>
-      <button type="button" class="age-btn" data-age="under6">Under 6</button>
+      <button type="button" class="age-btn" data-age="6-11">6-11</button>
+      <button type="button" class="age-btn" data-age="&lt;6">&lt;6</button>
     `;
 
     // right - put existing PDF button here to be on the same line
@@ -5976,8 +5378,6 @@ if (delta > 0) {
   }
 })();
 </script>
-
-
 <script>
 
 // Conservative listener to refresh rings after any +/- or area-box click
@@ -5988,7 +5388,6 @@ document.addEventListener('click', function(e){
 }, true);
 
 </script>
-
 <script>
 // Peek guard helper
 function showRingPeek(label, value){
@@ -6014,116 +5413,672 @@ function showRingPeek(label, value){
 })();
 
 </script>
+<script>
+// Safe normalizer: run *after* the app's own handlers (no preventDefault/stopPropagation), using setTimeout.
+document.addEventListener('click', function(ev){
+  const btn = ev.target.closest('.plus, .minus, .pm-btn, button[data-delta], button[data-density]');
+  if (!btn) return;
+  // Defer to end of the event loop so the app can do its updates first.
+  setTimeout(function(){
+    try {
+      function isPM(x){
+        if (!x) return false;
+        const t = (x.textContent || '').trim();
+        return x.matches('.plus, .minus, .pm-btn, button[data-delta], button[data-density]') || /^[+−-]\s*\d*$/.test(t);
+      }
+      function signOf(x){
+        if (!x) return '';
+        if (x.classList.contains('plus')) return 'plus';
+        if (x.classList.contains('minus')) return 'minus';
+        const t = (x.textContent || '').trim();
+        if (/^[+]/.test(t)) return 'plus';
+        if (/^[-−]/.test(t)) return 'minus';
+        if ((x.dataset.delta||'').startsWith('+') || (x.dataset.density||'').startsWith('+')) return 'plus';
+        if ((x.dataset.delta||'').startsWith('-') || (x.dataset.density||'').startsWith('-')) return 'minus';
+        return '';
+      }
+      // Side container is closest ancestor with id ending in "-areas"
+      let side = btn.closest('[id$="-areas"]');
+      if (!side) side = document.getElementById('scalp-scale') || document.body;
+      const sign = signOf(btn);
+      if (!sign) return;
+      const all = Array.from(side.querySelectorAll('.plus, .minus, .pm-btn, button[data-delta], button[data-density]')).filter(isPM);
+      const same = all.filter(b => signOf(b) === sign);
+      const other = all.filter(b => signOf(b) && signOf(b) !== sign);
+      // Group-wide: light up same-sign, clear other-sign
+      same.forEach(b => b.classList.add('selected'));
+      other.forEach(b => b.classList.remove('selected'));
+      // Clear any base controls outside this side
+      document.querySelectorAll('.plus.base.selected, .minus.base.selected').forEach(el => {
+        if (!side.contains(el)) el.classList.remove('selected');
+      });
+      if (typeof window.updateDominantPatternForButton === 'function') {
+        try { same.forEach(b => window.updateDominantPatternForButton(b, true)); other.forEach(b => window.updateDominantPatternForButton(b, false)); } catch(e){}
+      }
+    } catch(e){ /* no-op */ }
+  }, 0);
+}, false);
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    const banner = document.querySelector('.title-banner');
+    const wrap   = document.getElementById('pdf-icon-container');
+    const pdf    = document.getElementById('generate-pdf');
 
+    function ensureCopy(){
+      let copy = document.getElementById('copy-summary');
+      if (!copy && typeof ensureButton === 'function') {
+        try { copy = ensureButton(); } catch(e){}
+      }
+      copy = document.getElementById('copy-summary') || copy;
+      if (wrap && pdf && copy && copy.parentElement !== wrap) {
+        pdf.insertAdjacentElement('afterend', copy);
+      }
+      return copy;
+    }
 
+    function placeToolbar(){
+      if (banner && wrap && banner.nextElementSibling !== wrap) {
+        banner.parentNode.insertBefore(wrap, banner.nextSibling);
+      }
+      if (wrap){
+        wrap.style.display = 'none';
+        wrap.style.display = 'none';
+        wrap.style.justifyContent = 'flex-end';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '8px';
+        wrap.style.width = '100%';
+      }
+      if (pdf) pdf.style.display = 'none';
+      const copy = ensureCopy();
+      if (copy) copy.style.display = 'none';
+    }
 
+    function hasScore(){
+      try {
+        if (typeof calculateSectionTotals === 'function') {
+          const t = calculateSectionTotals();
+          const sum = (t.Scalp||0) + (t.Eyebrows||0) + (t.Eyelashes||0) + (t.Beard||0);
+          return Number(sum) > 0;
+        }
+      } catch(e){}
+      return Array.from(document.querySelectorAll('.ring-val'))
+        .some(el => (parseFloat((el.textContent||'0').replace('%',''))||0) > 0);
+    }
 
+    function updateVisibility(){
+      const copy = ensureCopy();
+      const show = hasScore();
+      if (wrap) wrap.style.display = show ? 'inline-flex' : 'none';
+      if (pdf)  pdf.style.display  = show ? 'inline-block' : 'none';
+      if (copy) copy.style.display = show ? 'inline-block' : 'none';
+    }
 
+    // Place toolbar now, after load, and briefly with a timer in case DOM reorders
+    placeToolbar();
+    window.addEventListener('load', placeToolbar);
+    let t = 0;
+    const mo = setInterval(function(){ placeToolbar(); if (++t > 10) clearInterval(mo); }, 300);
 
+    // Visibility rules
+    document.addEventListener('change', updateVisibility, true);
+    document.addEventListener('input',  updateVisibility, true);
+    document.addEventListener('click',  updateVisibility, true);
+    window.addEventListener('load', updateVisibility);
+    let tries = 0;
+    const iv = setInterval(()=>{ updateVisibility(); if (++tries > 40) clearInterval(iv); }, 300);
+  } catch(e){ /* no-op */ }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    function placeToolbar(){
+      const banner = document.querySelector('.title-banner');
+      const wrap   = document.getElementById('pdf-icon-container');
+      if (banner && wrap && banner.nextElementSibling !== wrap){
+        banner.parentNode.insertBefore(wrap, banner.nextSibling);
+      }
+      if (wrap){
+        wrap.style.display = wrap.style.display || 'none';
+        wrap.style.justifyContent = 'flex-end';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '8px';
+        wrap.style.width = '100%';
+      }
+    }
+    placeToolbar();
+    window.addEventListener('load', placeToolbar);
+    let tries = 0;
+    const iv = setInterval(function(){ placeToolbar(); if (++tries > 20) clearInterval(iv); }, 300);
+  }catch(e){}
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    const banner = document.querySelector('.title-banner');
+    const wrap   = document.getElementById('pdf-icon-container');
+    const pdf    = document.getElementById('generate-pdf');
 
+    function ensureCopy(){
+      let copy = document.getElementById('copy-summary');
+      if (!copy && typeof ensureButton === 'function'){
+        try { copy = ensureButton(); } catch(e){}
+      }
+      copy = document.getElementById('copy-summary') || copy;
+      if (wrap && pdf && copy && copy.parentElement !== wrap){
+        pdf.insertAdjacentElement('afterend', copy);
+      }
+      return copy;
+    }
 
+    function place(){
+      if (banner && wrap && banner.nextElementSibling !== wrap){
+        banner.parentNode.insertBefore(wrap, banner.nextSibling);
+      }
+      // keep right aligned + tight
+      if (wrap){
+        wrap.style.display = wrap.style.display || 'none';
+        wrap.style.justifyContent = 'flex-end';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '4px';
+        wrap.style.width = '100%';
+      }
+      ensureCopy();
+    }
+
+    place();
+    window.addEventListener('load', place);
+    let tries = 0;
+    const iv = setInterval(()=>{ place(); if(++tries>20) clearInterval(iv); }, 300);
+  } catch(e){ /* no-op */ }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    const banner = document.querySelector('.title-banner');
+    const wrap   = document.getElementById('pdf-icon-container');
+    const pdf    = document.getElementById('generate-pdf');
+
+    // Ensure Copy summary exists and sits immediately after the PDF button
+    function ensureCopy(){
+      let copy = document.getElementById('copy-summary');
+      if (!copy && typeof ensureButton === 'function'){
+        try { copy = ensureButton(); } catch(e){}
+      }
+      copy = document.getElementById('copy-summary') || copy;
+      if (wrap && pdf && copy && copy.parentElement !== wrap){
+        pdf.insertAdjacentElement('afterend', copy);
+      }
+      return copy;
+    }
+
+    function placeToolbar(){
+      if (banner && wrap && banner.nextElementSibling !== wrap){
+        banner.parentNode.insertBefore(wrap, banner.nextSibling);
+      }
+      if (wrap){
+        wrap.style.display = wrap.style.display || ''; // don't force gating here
+        wrap.style.justifyContent = 'flex-end';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '4px';
+        wrap.style.width = '100%';
+      }
+      ensureCopy();
+    }
+
+    placeToolbar();
+    // Re-assert placement briefly in case other scripts move it
+    let tries = 0;
+    const iv = setInterval(()=>{ placeToolbar(); if (++tries > 20) clearInterval(iv); }, 300);
+    window.addEventListener('load', placeToolbar);
+  } catch(e){ /* no-op */ }
+});
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   try {
     const ring = document.getElementById('ring-beard');
     const valEl = document.getElementById('ring-val-beard');
-    if (!ring || !valEl) return;
-    function numericFromText(t){
+
+    function parsePercentText(t){
       if (!t) return 0;
       const m = String(t).match(/([0-9]+(?:\.[0-9]+)?)/);
       return m ? parseFloat(m[1]) : 0;
     }
-    function updateBeardRingVisibility(){
-      const v = numericFromText(valEl.textContent);
-      if (v > 0) {
-        ring.style.display = '';
-      } else {
-        ring.style.display = 'none';
-      }
+
+    function currentBeardTotal(){
+      try {
+        if (typeof calculateSectionTotals === 'function'){
+          const t = calculateSectionTotals();
+          return Number((t && t.Beard) || 0);
+        }
+      } catch(e){}
+      return valEl ? parsePercentText(valEl.textContent) : 0;
     }
-    // Initial toggle
+
+    function updateBeardRingVisibility(){
+      if (!ring) return;
+      const beard = currentBeardTotal();
+      ring.style.display = (beard > 0) ? '' : 'none';
+    }
+
+    // Initial
     updateBeardRingVisibility();
+
     // Listen to typical UI interactions
     document.addEventListener('change', updateBeardRingVisibility, true);
-    document.addEventListener('input', updateBeardRingVisibility, true);
-    document.addEventListener('click', updateBeardRingVisibility, true);
-    // Observe text changes on the value span specifically (lightweight)
-    const mo = new MutationObserver(updateBeardRingVisibility);
-    mo.observe(valEl, {childList:true, characterData:true, subtree:true});
+    document.addEventListener('input',  updateBeardRingVisibility, true);
+    document.addEventListener('click',  updateBeardRingVisibility, true);
+
+    // Observe changes on the beard value span specifically
+    if (valEl){
+      const mo = new MutationObserver(updateBeardRingVisibility);
+      mo.observe(valEl, {childList:true, characterData:true, subtree:true});
+    }
   } catch(e){ /* no-op */ }
 });
 </script>
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   try {
     const banner = document.querySelector('.title-banner');
-    const allBtns = Array.from(document.querySelectorAll('button, a'));
+    let wrap = document.getElementById('pdf-icon-container');
+    const pdf  = document.getElementById('generate-pdf');
 
-    // Find buttons
-    const copyBtn = allBtns.find(el =>
-      /\bcopy\s*summary\b/i.test((el.textContent||'')) ||
-      /copy-summary/i.test(el.id||'') || /copy-summary/i.test(el.className||'') ||
-      /copy\s*summary/i.test((el.getAttribute('aria-label')||''))
-    );
-    const pdfBtn = allBtns.find(el =>
-      /(\bdownload\s*pdf\b|^\s*pdf\s*$)/i.test((el.textContent||'')) ||
-      /pdf/i.test(el.id||'') || /pdf/i.test(el.className||'') ||
-      /pdf/i.test((el.getAttribute('aria-label')||''))
-    );
+    function ensureWrap(){
+// Use the existing container for the controls
+  var banner = document.querySelector('.title-banner');
+  wrap = document.getElementById('pdf-icon-container') || wrap;
+  pdf  = document.getElementById('generate-pdf') || pdf;
+  if (!banner || !wrap) return;
 
-    // Move PDF out of banner, next to Copy summary
-    if (copyBtn) {
-      const parent = copyBtn.parentElement || copyBtn;
-      parent.classList.add('copy-pdf-inline');
-      if (pdfBtn && banner && banner.contains(pdfBtn)) {
-        const spacer = document.createElement('span');
-        spacer.style.display = 'inline-block';
-        spacer.style.width = '.5rem';
-        copyBtn.insertAdjacentElement('afterend', spacer);
-        spacer.insertAdjacentElement('afterend', pdfBtn);
+  // Move container inside the banner
+  if (wrap.parentElement !== banner) {
+    banner.appendChild(wrap);
+  }
+
+  // Make sure it's visible and aligned top-right without affecting banner height
+  wrap.classList.add('banner-actions');
+  wrap.style.display = 'flex';
+  wrap.style.position = 'absolute';
+  wrap.style.top = '10px';
+  wrap.style.right = '16px';
+  wrap.style.transform = 'none';
+  wrap.style.justifyContent = 'flex-end';
+  wrap.style.alignItems = 'center';
+  wrap.style.gap = '10px';
+  wrap.style.zIndex = '9999';
+}
+
+    function moveCopyIntoWrap(node){
+      const copy = node && node.id === 'copy-summary' ? node : document.getElementById('copy-summary');
+      if (!copy || !wrap || !pdf) return;
+      if (copy.parentElement !== wrap){
+        pdf.insertAdjacentElement('afterend', copy);
       }
     }
 
-    // Force-hide both on init
-    const targets = [copyBtn, pdfBtn].filter(Boolean);
-    targets.forEach(btn => { if (btn) btn.style.display = 'none'; });
+    // Initial placement
+    ensureWrap();
+    moveCopyIntoWrap(null);
 
-    function hasSelection(){
-      // Radios/checkboxes
-      if (document.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked')) return true;
-      // Selects
-      const selects = Array.from(document.querySelectorAll('select'));
-      if (selects.some(sel => (sel.selectedIndex||0) > 0 || ((sel.value||'').trim() !== ''))) return true;
-      // Textual inputs
-      const textInputs = Array.from(document.querySelectorAll('input[type="text"], input[type="search"], input[type="number"], textarea'));
-      if (textInputs.some(el => (el.value||'').trim() !== '')) return true;
-      // ARIA/custom toggles
-      if (document.querySelector('[aria-checked="true"], [aria-selected="true"], [aria-pressed="true"]')) return true;
-      // Common CSS/data markers
-      if (document.querySelector('.selected, .is-selected, .active, .is-active, .checked, [data-selected="true"], [data-selected="1"], [data-selected="yes"]')) return true;
-      return false;
-    }
-
-    function updateVisibility(){
-      const show = hasSelection();
-      targets.forEach(btn => {
-        if (!btn) return;
-        btn.style.display = show ? '' : 'none';
+    // Observe DOM for creation or move of the copy button
+    const mo = new MutationObserver((mutations) => {
+      mutations.forEach(m => {
+        m.addedNodes && m.addedNodes.forEach(n => {
+          if (n.nodeType === 1) {
+            if (n.id === 'copy-summary' || (n.querySelector && n.querySelector('#copy-summary'))) {
+              ensureWrap();
+              moveCopyIntoWrap(n.id === 'copy-summary' ? n : n.querySelector('#copy-summary'));
+            }
+          }
+        });
+        // Also re-ensure wrap is directly after the banner
+        ensureWrap();
       });
-    }
+    });
+    mo.observe(document.body, {subtree:true, childList:true});
 
-    // Lightweight listeners
-    document.addEventListener('change', updateVisibility, true);
-    document.addEventListener('input', updateVisibility, true);
-    document.addEventListener('click', updateVisibility, true);
-
-    // Initial check
-    updateVisibility();
+    // Reassert a few times in case other scripts shuffle DOM
+    let tries = 0;
+    const iv = setInterval(()=>{ ensureWrap(); moveCopyIntoWrap(null); if (++tries > 40) clearInterval(iv); }, 300);
+    window.addEventListener('load', ensureWrap);
   } catch(e){ /* no-op */ }
 });
 </script>
+<script>
+(function(){
+  const MAX = {
+    leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
+    leftEyebrow: 50, rightEyebrow: 50,
+    leftEyelash: 50, rightEyelash: 50,
+    leftBeard: 40, rightBeard: 40, centralBeard: 20
+  };
+  const BTN_ID = 'generate-pdf';
 
-</body></html>
+  function getTotalsSafe(){
+    try { if (typeof calculateSectionTotals === 'function') return calculateSectionTotals(); } catch(e){}
+    try { if (typeof window.getTotals === 'function') return window.getTotals(); } catch(e){}
+    return { Scalp: 0, Eyebrows: 0, Eyelashes: 0, Beard: 0 };
+  }
+  function anyPositiveTotals(t){
+    const vals = [Number(t.Scalp||t.scalp)||0, Number(t.Eyebrows||t.eyebrows)||0, Number(t.Eyelashes||t.eyelashes)||0, Number(t.Beard||t.beard)||0];
+    return vals.some(v => v > 0);
+  }
+  function getSubtotal(sel, density){
+    let t = 0;
+    if (sel && typeof sel.forEach === 'function') sel.forEach(v => t += Number(v)||0);
+    else if (Array.isArray(sel)) sel.forEach(v => t += Number(v)||0);
+    const d = Number(density)||0;
+    return Number((t * (1 - d/100)).toFixed(2));
+  }
+  function pctOfRegion(val, max){
+    const m = Number(max)||0;
+    if (!m) return 0;
+    return Number(((Number(val)||0) / m * 100).toFixed(2));
+  }
+  function collectDetails(){
+    const details = {
+      leftScalp:  getSubtotal(window.globalSelections?.leftside?.selected,   window.globalSelections?.leftside?.density),
+      rightScalp: getSubtotal(window.globalSelections?.rightside?.selected,  window.globalSelections?.rightside?.density),
+      topScalp:   getSubtotal(window.globalSelections?.topside?.selected,    window.globalSelections?.topside?.density),
+      backScalp:  getSubtotal(window.globalSelections?.backside?.selected,   window.globalSelections?.backside?.density),
+
+      leftEyebrow:  getSubtotal(window.eyebrowSelections?.left,  0),
+      rightEyebrow: getSubtotal(window.eyebrowSelections?.right, 0),
+
+      leftEyelash:  getSubtotal(window.eyelashSelections?.left,  0),
+      rightEyelash: getSubtotal(window.eyelashSelections?.right, 0),
+
+      leftBeard:    getSubtotal(window.beardSelections?.['left-beard']?.selected,    window.beardSelections?.['left-beard']?.density),
+      rightBeard:   getSubtotal(window.beardSelections?.['right-beard']?.selected,   window.beardSelections?.['right-beard']?.density),
+      centralBeard: getSubtotal(window.beardSelections?.['central-beard']?.selected, window.beardSelections?.['central-beard']?.density)
+    };
+    const percentages = {};
+    Object.keys(details).forEach(k => { percentages[k] = pctOfRegion(details[k], MAX[k]); });
+    return { details, percentages };
+  }
+  function preparePayload(){
+    const totals = getTotalsSafe();
+    const includeScalp     = Number(totals.Scalp||totals.scalp) > 0;
+    const includeEyebrows  = Number(totals.Eyebrows||totals.eyebrows) > 0;
+    const includeEyelashes = Number(totals.Eyelashes||totals.eyelashes) > 0;
+    const includeBeard     = Number(totals.Beard||totals.beard) > 0;
+
+    const { details, percentages } = collectDetails();
+
+    let code = '';
+    try { if (typeof window.encodeAA19 === 'function') code = String(window.encodeAA19()||''); } catch(e){}
+    if (code && code.length !== 19) code = '';
+
+    const now = new Date().toLocaleString();
+    const lines = [];
+    lines.push('Alopecia Areata Calculator');
+    lines.push(now);
+    lines.push('');
+    lines.push('Summary of Alopecia Areata Involvement');
+    if (includeScalp)    lines.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||Number(totals.scalp)||0)}%`);
+    if (includeEyebrows) lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||Number(totals.eyebrows)||0)}%`);
+    if (includeEyelashes)lines.push(`- Total Eyelashes: ${Math.round(Number(totals.Eyelashes)||Number(totals.eyelashes)||0)}%`);
+    if (includeBeard)    lines.push(`- Total Beard: ${Math.round(Number(totals.Beard)||Number(totals.beard)||0)}%`);
+    if (code) { lines.push(''); lines.push(`Code: ${code}`); }
+    lines.push('');
+    lines.push('Detailed Area Breakdown');
+    if (includeScalp){
+      lines.push(`- Left Scalp: ${details.leftScalp}% - ${percentages.leftScalp}% of region`);
+      lines.push(`- Right Scalp: ${details.rightScalp}% - ${percentages.rightScalp}% of region`);
+      lines.push(`- Top of the Head: ${details.topScalp}% - ${percentages.topScalp}% of region`);
+      lines.push(`- Back of the Head: ${details.backScalp}% - ${percentages.backScalp}% of region`);
+    }
+    if (includeEyebrows){
+      lines.push(`- Left Eyebrow: ${details.leftEyebrow}% - ${percentages.leftEyebrow}% of region`);
+      lines.push(`- Right Eyebrow: ${details.rightEyebrow}% - ${percentages.rightEyebrow}% of region`);
+    }
+    if (includeEyelashes){
+      lines.push(`- Left Eyelash: ${details.leftEyelash}% - ${percentages.leftEyelash}% of region`);
+      lines.push(`- Right Eyelash: ${details.rightEyelash}% - ${percentages.rightEyelash}% of region`);
+    }
+    if (includeBeard){
+      lines.push(`- Left Beard Area: ${details.leftBeard}% - ${percentages.leftBeard}% of region`);
+      lines.push(`- Right Beard Area: ${details.rightBeard}% - ${percentages.rightBeard}% of region`);
+      lines.push(`- Central Beard Area: ${details.centralBeard}% - ${percentages.centralBeard}% of region`);
+    }
+
+    return {
+      title: 'Alopecia Areata Calculator',
+      datetime: now,
+      totals,
+      includeScalp, includeEyebrows, includeEyelashes, includeBeard,
+      details, percentages, max: MAX,
+      summaryLines: lines,
+      text: lines.join('\\n')
+    };
+  }
+
+  // --- Byte-accurate PDF builder (single page, Helvetica) ---
+  function asciiSafe(s){
+    return String(s||'')
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ' ')
+      .replace(/[^\x20-\x7E\r\n\t]/g, '?');
+  }
+  function escapePdfText(s){
+    return asciiSafe(s).replace(/([()\\])/g, '\\\\$1').replace(/\r?\n/g, '\\n');
+  }
+  function byteLen(s){
+    return new TextEncoder().encode(s).length;
+  }
+
+  function makePdf(lines){
+    const pageWidth = 595.28, pageHeight = 841.89;
+    const margin = 48, fontSize = 11, leading = 15;
+    let y = pageHeight - margin;
+
+    const safeLines = lines.map(escapePdfText);
+
+    const ops = ['BT', '/F1 ' + fontSize + ' Tf'];
+    for (const ln of safeLines){
+      y -= leading;
+      ops.push('1 0 0 1 ' + margin + ' ' + y + ' Tm (' + ln + ') Tj');
+    }
+    ops.push('ET');
+    const content = ops.join('\n');
+
+    // Object bodies (without "obj ... endobj")
+    const obj4 = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\n';
+    const obj5 = '<< /Length ' + byteLen(content) + ' >>\nstream\n' + content + '\nendstream\n';
+    const obj3 = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageWidth + ' ' + pageHeight + '] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\n';
+    const obj2 = '<< /Type /Pages /Count 1 /Kids [3 0 R] >>\n';
+    const obj1 = '<< /Type /Catalog /Pages 2 0 R >>\n';
+
+    const header = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n';
+    const objs = [
+      '1 0 obj\n' + obj1 + 'endobj\n',
+      '2 0 obj\n' + obj2 + 'endobj\n',
+      '3 0 obj\n' + obj3 + 'endobj\n',
+      '4 0 obj\n' + obj4 + 'endobj\n',
+      '5 0 obj\n' + obj5 + 'endobj\n'
+    ];
+
+    // Calculate xref offsets
+    const enc = new TextEncoder();
+    let offsets = [0];
+    let pos = enc.encode(header).length;
+    for (const o of objs){
+      offsets.push(pos);
+      pos += enc.encode(o).length;
+    }
+    const xrefStart = pos;
+    let xref = 'xref\n0 6\n0000000000 65535 f \n';
+    for (let i = 1; i <= 5; i++){
+      const off = String(offsets[i]).padStart(10, '0');
+      xref += off + ' 00000 n \n';
+    }
+    const trailer = 'trailer << /Size 6 /Root 1 0 R >>\nstartxref\n' + xrefStart + '\n%%EOF';
+
+    // Assemble final bytes
+    const parts = [header, ...objs, xref, trailer];
+    const bytes = parts.map(p => enc.encode(p));
+    let totalLen = 0;
+    for (const b of bytes) totalLen += b.length;
+    const out = new Uint8Array(totalLen);
+    let offset = 0;
+    for (const b of bytes){ out.set(b, offset); offset += b.length; }
+    return out.buffer;
+  }
+
+  function downloadPdf(lines, filename){
+    const buf = makePdf(lines);
+    const blob = new Blob([buf], {type: 'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+
+  function install(){
+    const btn = document.getElementById(BTN_ID);
+    if (!btn) return;
+
+    function toggleBtn(){
+      try {
+        const t = getTotalsSafe();
+        btn.style.display = anyPositiveTotals(t) ? 'inline-block' : 'none';
+      } catch(e){
+        btn.style.display = 'none';
+      }
+    }
+    toggleBtn();
+    // Poll in case host app doesn't emit change events
+    let tries = 0;
+    const visIv = setInterval(() => { if (++tries > 1800) clearInterval(visIv); toggleBtn(); }, 500);
+
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+    clone.textContent = clone.textContent || 'Download PDF';
+
+    clone.addEventListener('click', function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const payload = preparePayload();
+      if (!anyPositiveTotals(payload.totals)){
+        alert('Please select a score first.');
+        return;
+      }
+      const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+      const name = 'AA-report-' + stamp + '.pdf';
+      downloadPdf(payload.summaryLines, name);
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install);
+  } else {
+    install();
+  }
+  // Retry a few times in case the pill is injected late
+  let tries = 0;
+  const iv = setInterval(() => { if (++tries > 20) return clearInterval(iv); install(); }, 500);
+})();
+</script>
+<script>
+(function(){
+  function assertBannerControls(){
+    var banner = document.querySelector('.title-banner');
+    var wrap = document.getElementById('pdf-icon-container');
+    if (!banner || !wrap) return;
+    if (wrap.parentNode !== banner) banner.appendChild(wrap);
+    wrap.classList.add('banner-actions');
+    wrap.style.display = 'flex';
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', assertBannerControls);
+  } else {
+    assertBannerControls();
+  }
+  var mo = new MutationObserver(assertBannerControls);
+  mo.observe(document.documentElement || document.body, {subtree:true, childList:true});
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('copy-summary');
+  if (!btn) return;
+  if (!btn.classList.contains('copy-icon-btn')) btn.classList.add('copy-icon-btn');
+  // If text slipped back in, restore the icon
+  if (!btn.querySelector('svg')) {
+    btn.innerHTML = '<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+  }
+});
+</script>
+<script>
+(function(){
+  function upgradePdfIcon(){ 
+    var btn = document.getElementById('generate-pdf');
+    if (!btn) return;
+    // Preserve any existing label if present
+    var label = btn.getAttribute('data-label') || btn.textContent.trim() || 'Download PDF';
+    btn.setAttribute('data-label', label);
+    btn.classList.add('pdf-download-btn');
+    btn.innerHTML = `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" style="stroke:#8B0000; margin-right:6px;" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span class="btn-label">` + label + `</span>`;
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', upgradePdfIcon);
+  } else {
+    upgradePdfIcon();
+  }
+})();
+</script>
+<script>
+(function(){
+  function placeControls(){
+    var reset = document.getElementById('reset-button');
+    if (!reset) return;
+    var row = document.getElementById('controls-row-above-reset');
+    if (!row){
+      row = document.createElement('div');
+      row.id = 'controls-row-above-reset';
+      row.className = 'controls-row-above-reset';
+      reset.parentNode.insertBefore(row, reset.parentNode.firstChild);
+    }
+    var pdf = document.getElementById('generate-pdf');
+    var copy = document.getElementById('copy-summary');
+    if (pdf && pdf.parentNode !== row) row.appendChild(pdf);
+    if (copy && copy.parentNode !== row) row.appendChild(copy);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){
+      placeControls(); 
+      colorPdfIcon();
+    });
+  } else {
+      placeControls();
+      colorPdfIcon();
+  }
+  var mo = new MutationObserver(function(){ placeControls(); colorPdfIcon(); });
+  mo.observe(document.documentElement || document.body, {subtree:true, childList:true});
+
+  // Force the PDF icon to red (#8B0000) regardless of inherited colors
+  function colorPdfIcon(){
+    var pdf = document.getElementById('generate-pdf');
+    if (!pdf) return;
+    var svg = pdf.querySelector('svg');
+    if (!svg) return;
+    // Set stroke on svg and all common child elements
+    svg.style.stroke = '#8B0000';
+    ['path','polyline','line','polygon','circle','rect','ellipse'].forEach(function(sel){
+      svg.querySelectorAll(sel).forEach(function(el){
+        el.style.stroke = '#8B0000';
+      });
+    });
+  }
+})();
+</script></body></html>
 <!-- removed legacy SAFE OVERRIDES -->
