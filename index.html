@@ -447,7 +447,7 @@
   width: 200px;
   max-height: 300px;
   overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.95);
+  
   border: 2px solid #0077cc;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -863,18 +863,18 @@
 .peek-item,
 .peek-ring,
 .peek-ring::after {
-  background: none !important;
-  background-image: none !important;
-  background-color: transparent !important;
+  
+  
+  
   box-shadow: none !important;
 }
 /* If a gradient is applied inline, neutralize via backdrop */
 #selected-preview *,
 #floating-preview *,
 #beard-floating-preview * {
-  background: none !important;
-  background-image: none !important;
-  background-color: transparent !important;
+  
+  
+  
 }
 </style>
 <style>
@@ -1050,6 +1050,20 @@
 #generate-pdf .btn-label{ color:#8B0000 !important; font-weight:600; letter-spacing:.2px; }
 /* Fallback: force icon red */
 #generate-pdf svg{ stroke:#8B0000 !important; }
+</style><style>
+/* Normalize the copy button back to a standard text button */
+#copy-summary{ display:inline-flex; align-items:center; gap:6px; line-height:1; }
+</style><style>
+/* Preview fix: allow background images to show */
+#selected-preview, #floating-preview {  }
+</style><style>
+.controls-inline-left{ display:flex; align-items:center; gap:8px; justify-content:flex-start; }
+</style><style>
+/* Transparent preview window backgrounds (containers only) */
+#selected-preview,
+#floating-preview{
+  background-color: transparent !important;
+}
 </style></head>
 <body>
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
@@ -2812,7 +2826,7 @@ var __pdfPromise = null;
 /* removed previous generate-pdf listener */
 });
 </script>
-<div id="floating-preview" style="position: fixed; top: 20px; right: 20px; width: 250px; height: 250px; padding: 0; margin: 0; overflow: hidden; z-index: 9999; display: none; background: none !important; border: none !important; pointer-events: none;">
+<div id="floating-preview" style="position: fixed; top: 20px; right: 20px; width: 250px; height: 250px; padding: 0; margin: 0; overflow: hidden; z-index: 9999; display: none;  border: none !important; pointer-events: none;">
 <div id="floating-close-btn" style="
         position: absolute;
         top: 2px;
@@ -3097,10 +3111,9 @@ function updateBeardPreview() {
   const copyBtn = document.createElement("button");
   copyBtn.id = "copy-summary";
   copyBtn.type = "button";
-  copyBtn.innerHTML = `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+  copyBtn.textContent = "Copy summary";
 copyBtn.setAttribute("aria-label","Copy summary");
 copyBtn.title = "Copy summary";
-copyBtn.classList.add("copy-icon-btn");
 pdfBtn.insertAdjacentElement("afterend", copyBtn);
 
   function getTotalsAndDetails(){
@@ -3341,8 +3354,8 @@ document.addEventListener("DOMContentLoaded", function(){
     const copyBtn = document.createElement("button");
     copyBtn.id = "copy-summary";
     copyBtn.type = "button";
-    copyBtn.textContent = "Copy";
-    copyBtn.style.marginLeft = "8px";
+    copyBtn.textContent = "Copy summary";
+copyBtn.style.marginLeft = "8px";
     copyBtn.style.padding = "8px 12px";
     copyBtn.style.border = "1px solid #cbd5e1";
     copyBtn.style.borderRadius = "8px";
@@ -5989,34 +6002,6 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 <script>
-(function(){
-  function assertBannerControls(){
-    var banner = document.querySelector('.title-banner');
-    var wrap = document.getElementById('pdf-icon-container');
-    if (!banner || !wrap) return;
-    if (wrap.parentNode !== banner) banner.appendChild(wrap);
-    wrap.classList.add('banner-actions');
-    wrap.style.display = 'flex';
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', assertBannerControls);
-  } else {
-    assertBannerControls();
-  }
-  var mo = new MutationObserver(assertBannerControls);
-  mo.observe(document.documentElement || document.body, {subtree:true, childList:true});
-})();
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  var btn = document.getElementById('copy-summary');
-  if (!btn) return;
-  if (!btn.classList.contains('copy-icon-btn')) btn.classList.add('copy-icon-btn');
-  // If text slipped back in, restore the icon
-  if (!btn.querySelector('svg')) {
-    btn.innerHTML = '<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-  }
-});
 </script>
 <script>
 (function(){
@@ -6038,47 +6023,74 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 <script>
 (function(){
-  function placeControls(){
+  function initControlsOnce(){
     var reset = document.getElementById('reset-button');
     if (!reset) return;
-    var row = document.getElementById('controls-row-above-reset');
-    if (!row){
-      row = document.createElement('div');
-      row.id = 'controls-row-above-reset';
-      row.className = 'controls-row-above-reset';
-      reset.parentNode.insertBefore(row, reset.parentNode.firstChild);
+    var row = reset.parentNode;
+    // Ensure row styles
+    try {
+      row.style.display = row.style.display || 'flex';
+      row.style.alignItems = row.style.alignItems || 'center';
+      row.style.justifyContent = row.style.justifyContent || 'space-between';
+      row.style.gap = row.style.gap || '8px';
+    } catch(e){}
+    // Left group for PDF + Copy
+    var group = document.getElementById('controls-inline-left');
+    if (!group){
+      group = document.createElement('div');
+      group.id = 'controls-inline-left';
+      group.className = 'controls-inline-left';
+      row.insertBefore(group, reset);
     }
-    var pdf = document.getElementById('generate-pdf');
-    var copy = document.getElementById('copy-summary');
-    if (pdf && pdf.parentNode !== row) row.appendChild(pdf);
-    if (copy && copy.parentNode !== row) row.appendChild(copy);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function(){
-      placeControls(); 
-      colorPdfIcon();
+    // Move buttons once
+    ['generate-pdf','copy-summary'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el && el.parentNode !== group) group.appendChild(el);
     });
+    // Ensure PDF shows red icon + red 'PDF' label
+    var pdf = document.getElementById('generate-pdf');
+    if (pdf){
+      var label = 'PDF';
+      pdf.classList.add('pdf-download-btn');
+      var hasSvg = !!pdf.querySelector('svg');
+      if (!hasSvg){
+        pdf.insertAdjacentHTML('afterbegin',
+          '<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>'
+        );
+      } else {
+        var s = pdf.querySelector('svg');
+        s && (s.style.stroke = '#8B0000');
+      }
+      var sp = pdf.querySelector('.btn-label');
+      if (!sp){
+        sp = document.createElement('span');
+        sp.className = 'btn-label';
+        pdf.appendChild(sp);
+      }
+      sp.textContent = label;
+      sp.style.color = '#8B0000';
+      sp.style.fontWeight = '600';
+    }
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initControlsOnce, { once: true });
   } else {
-      placeControls();
-      colorPdfIcon();
-  }
-  var mo = new MutationObserver(function(){ placeControls(); colorPdfIcon(); });
-  mo.observe(document.documentElement || document.body, {subtree:true, childList:true});
-
-  // Force the PDF icon to red (#8B0000) regardless of inherited colors
-  function colorPdfIcon(){
-    var pdf = document.getElementById('generate-pdf');
-    if (!pdf) return;
-    var svg = pdf.querySelector('svg');
-    if (!svg) return;
-    // Set stroke on svg and all common child elements
-    svg.style.stroke = '#8B0000';
-    ['path','polyline','line','polygon','circle','rect','ellipse'].forEach(function(sel){
-      svg.querySelectorAll(sel).forEach(function(el){
-        el.style.stroke = '#8B0000';
-      });
-    });
+    initControlsOnce();
   }
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('copy-summary');
+  if (!btn) return;
+  // Remove any SVG children
+  var svgs = btn.querySelectorAll('svg');
+  svgs.forEach(function(n){ n.remove(); });
+  // Restore label and basic padding
+  btn.textContent = 'Copy summary';
+  if (!btn.style.padding) btn.style.padding = '8px 12px';
+  if (!btn.style.border) btn.style.border = '1px solid #cbd5e1';
+  if (!btn.style.borderRadius) btn.style.borderRadius = '8px';
+  if (!btn.style.background) btn.style.background = '#ffffff';
+}, { once: true });
 </script></body></html>
 <!-- removed legacy SAFE OVERRIDES -->
