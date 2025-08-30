@@ -561,6 +561,42 @@
 }
 #scalp-scale .labels span { white-space: nowrap; }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
+
+/* Modernized copy button */
+
+
+
+
+
+
+
+/* Modernized copy button with light background and dark text */
+#copy-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f9fafb;
+  color: #111827;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+#copy-summary:hover {
+  background-color: #f3f4f6;
+}
+#copy-summary:active {
+  transform: scale(0.98);
+}
+#copy-summary svg {
+  width: 16px;
+  height: 16px;
+}
+
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
@@ -1052,7 +1088,7 @@
 #generate-pdf svg{ stroke:#8B0000 !important; }
 </style><style>
 /* Normalize the copy button back to a standard text button */
-#copy-summary{ display:inline-flex; align-items:center; gap:6px; line-height:1; }
+
 </style><style>
 /* Preview fix: allow background images to show */
 #selected-preview, #floating-preview {  }
@@ -1100,7 +1136,7 @@
         cursor: pointer;
         font-size: 18px;
         color: red;
-    ;display:none;" title="Download">
+    " title="Download" class="pdf-download-btn"><svg data-icon="download" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:middle; margin-right:6px;"><path d="M12 3v10m0 0l-4-4m4 4l4-4M4 17v4h16v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         📄 
     <span class="btn-label">PDF</span></button></div><div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
 <button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
@@ -2789,8 +2825,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const iconContainer = document.getElementById("pdf-icon-container");
     const previewArea = document.getElementById("selected-preview");
 
+    function hasContent() {
+        try {
+            const summaryNode = document.getElementById("results-summary");
+            const hasPreview = previewArea && previewArea.children.length > 0;
+            const hasSummary = summaryNode && summaryNode.textContent.trim().length > 0;
+            return !!(hasPreview || hasSummary);
+        } catch(e){ return false; }
+    }
+
     function updatePdfIconVisibility() {
-        iconContainer.style.display = previewArea.children.length > 0 ? "block" : "none";
+        if (!iconContainer || !pdfButton) return;
+        if (hasContent()) {
+            iconContainer.style.display = "block";
+            pdfButton.style.display = "inline-flex";
+            pdfButton.style.alignItems = "center";
+            pdfButton.style.gap = "6px";
+        } else {
+            iconContainer.style.display = "none";
+        }
     }
 
     const originalUpdateSelectedPreview = updateSelectedPreview;
@@ -2798,6 +2851,12 @@ document.addEventListener("DOMContentLoaded", () => {
         originalUpdateSelectedPreview();
         updatePdfIconVisibility();
     }
+
+    // Also observe preview area mutations in case other code updates it without calling updateSelectedPreview
+    try {
+        const mo = new MutationObserver(() => updatePdfIconVisibility());
+        if (previewArea) mo.observe(previewArea, {childList: true, subtree: true});
+    } catch(e){}
 
     if (pdfButton) {
         pdfButton.addEventListener("click", () => {
@@ -3114,12 +3173,14 @@ function updateBeardPreview() {
   const copyBtn = document.createElement("button");
   copyBtn.id = "copy-summary";
   copyBtn.type = "button";
-  copyBtn.textContent = "Copy summary";
-copyBtn.setAttribute("aria-label","Copy summary");
-copyBtn.title = "Copy summary";
+  copyBtn.innerHTML = `<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M16 4H8a2 2 0 0 0-2 2v10h2V6h8V4zm0 4h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2h8a2 2 0 0 0 2-2V8z" fill="currentColor"/></svg><span>Copy</span>`;
+copyBtn.setAttribute("aria-label","Copy");
+copyBtn.title = "Copy";
 pdfBtn.insertAdjacentElement("afterend", copyBtn);
 
-  function getTotalsAndDetails(){
+  
+copyBtn.classList.add('modern-copy-btn');
+function getTotalsAndDetails(){
     const scalp = document.getElementById("result").innerText.replace("Total Scalp Alopecia Areata: ", "");
     const eyebrows = document.getElementById("eyebrow-title").innerText.match(/\((.*?)\)/)[1];
     const eyelashes = document.getElementById("eyelash-title").innerText.match(/\((.*?)\)/)[1];
@@ -3357,7 +3418,7 @@ document.addEventListener("DOMContentLoaded", function(){
     const copyBtn = document.createElement("button");
     copyBtn.id = "copy-summary";
     copyBtn.type = "button";
-    copyBtn.textContent = "Copy summary";
+    copyBtn.textContent = "Copy";
 copyBtn.style.marginLeft = "8px";
     copyBtn.style.padding = "8px 12px";
     copyBtn.style.border = "1px solid #cbd5e1";
@@ -4735,7 +4796,8 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
   const scores = {
     "Patchy alopecia areata": 0,
     "Focal alopecia areata": 0,
-    "Ophiasis pattern": 0
+    "Ophiasis pattern": 0,
+    "Reticular pattern": 0
   };
 
   const scalpIds = ['backside','leftside','rightside','topside'];
@@ -4768,7 +4830,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
 
     const node = ensureOutcomeNode();
     if (!node) return;
-    const total = scores["Patchy alopecia areata"] + scores["Focal alopecia areata"] + scores["Ophiasis pattern"];
+    const total = scores["Patchy alopecia areata"] + scores["Focal alopecia areata"] + scores["Ophiasis pattern"] + scores["Reticular pattern"];
     if (total === 0) {
       node.textContent = '';
       node.style.display = 'none';
@@ -4776,11 +4838,9 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
     }
     node.style.display = '';
     const entries = Object.entries(scores);
-    let best = entries[0];
-    for (let i=1; i<entries.length; i++){
-      if (entries[i][1] > best[1]) best = entries[i];
-    }
-    node.textContent = best[0];
+    const max = Math.max(...entries.map(e => e[1]));
+    const tops = entries.filter(e => e[1] === max).map(e => e[0]).filter(Boolean);
+    node.textContent = tops.join(' & ');
   }
 
   const resetBtn = document.getElementById('reset-button');
@@ -4788,6 +4848,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
     scores["Patchy alopecia areata"] = 0;
     scores["Focal alopecia areata"] = 0;
     scores["Ophiasis pattern"] = 0;
+    scores["Reticular pattern"] = 0;
     updateOutcome();
   });
 
@@ -4807,7 +4868,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
       } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside') {
         if (index >= 2 && index <= 5) return "Focal alopecia areata";
       }
-      return "Patchy alopecia areata";
+      return "Reticular pattern";
     }
     if (pos === 'lower') return "Ophiasis pattern";
     return "Patchy alopecia areata";
@@ -4942,7 +5003,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
       } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside') {
         if (idx >= 2 && idx <= 5) return 'Focal alopecia areata';
       }
-      return 'Patchy alopecia areata';
+      return 'Reticular pattern';
     }
     if (pos === 'lower') return 'Ophiasis pattern';
     return 'Patchy alopecia areata';
@@ -4955,7 +5016,7 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
       if (Math.round(scalpPct) === 100) return 'Alopecia totalis';
     } catch(e) {}
 
-    const scores = { 'Patchy alopecia areata':0, 'Focal alopecia areata':0, 'Ophiasis pattern':0 };
+    const scores = { 'Patchy alopecia areata':0, 'Focal alopecia areata':0, 'Ophiasis pattern':0, 'Reticular pattern':0 };
     SCALP_IDS.forEach(id => {
       const root = document.getElementById(id + '-areas');
       if (!root) return;
@@ -4981,12 +5042,11 @@ if (!pos) {
         if (p) scores[p]++;
       });
     });
-    const total = scores['Patchy alopecia areata'] + scores['Focal alopecia areata'] + scores['Ophiasis pattern'];
+    const total = scores['Patchy alopecia areata'] + scores['Focal alopecia areata'] + scores['Ophiasis pattern'] + scores['Reticular pattern'];
     if (!total) return '';
-    let best = 'Patchy alopecia areata';
-    if (scores['Focal alopecia areata'] > scores[best]) best = 'Focal alopecia areata';
-    if (scores['Ophiasis pattern'] > scores[best]) best = 'Ophiasis pattern';
-    return best;
+    const max = Math.max(...Object.values(scores));
+    const tops = Object.keys(scores).filter(k => scores[k] === max);
+    return tops.join(' & ');
   }
 
   function renderPattern(){
@@ -5624,7 +5684,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const wrap   = document.getElementById('pdf-icon-container');
     const pdf    = document.getElementById('generate-pdf');
 
-    // Ensure Copy summary exists and sits immediately after the PDF button
+    // Ensure Copy exists and sits immediately after the PDF button
     function ensureCopy(){
       let copy = document.getElementById('copy-summary');
       if (!copy && typeof ensureButton === 'function'){
@@ -6103,7 +6163,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var svgs = btn.querySelectorAll('svg');
   svgs.forEach(function(n){ n.remove(); });
   // Restore label and basic padding
-  btn.textContent = 'Copy summary';
+  btn.textContent = 'Copy';
   if (!btn.style.padding) btn.style.padding = '8px 12px';
   if (!btn.style.border) btn.style.border = '1px solid #cbd5e1';
   if (!btn.style.borderRadius) btn.style.borderRadius = '8px';
