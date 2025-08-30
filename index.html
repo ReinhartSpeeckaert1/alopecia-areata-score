@@ -1242,6 +1242,7 @@ const scalpSections = {
 
 const totalResultDiv = document.getElementById("result");
 let globalSelections = {};
+window.globalSelections = globalSelections;
 
 function renderScalpSection(section) {
   const container = document.createElement('div');
@@ -1875,6 +1876,7 @@ let eyebrowSelections = {
   left: new Set(),
   right: new Set()
 };
+window.eyebrowSelections = eyebrowSelections;
 
 function renderEyebrow(side) {
   const container = document.getElementById(`${side}-eyebrow-areas`);
@@ -2138,6 +2140,7 @@ let eyelashSelections = {
   left: new Set(),
   right: new Set()
 };
+window.eyelashSelections = eyelashSelections;
 
 function renderEyelash(side) {
   const container = document.getElementById(`${side}-eyelash-areas`);
@@ -3535,6 +3538,7 @@ const text = lines.join("
       root.id = 'ring-peek';
       document.body.appendChild(root);
     }
+    try { root.style.display = 'flex'; } catch(e){}
     return root;
   }
 
@@ -5416,11 +5420,15 @@ function showRingPeek(label, value){
 (function(){
   var last = -1;
   function hidePeekTop(){
-    if (window.scrollY < 150) {
-      var el = document.getElementById('ring-peek');
-      if (el) el.style.display = 'none';
-    }
+  var el = document.getElementById('ring-peek');
+  if (!el) return;
+  if (window.scrollY < 150) {
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'flex';
   }
+}
+
   window.addEventListener('scroll', hidePeekTop, {passive:true});
   document.addEventListener('DOMContentLoaded', hidePeekTop);
 })();
@@ -5773,6 +5781,15 @@ document.addEventListener('DOMContentLoaded', function(){
   };
   const BTN_ID = 'generate-pdf';
 
+  // Fallback denominators for Detailed Area Breakdown
+  const DEFAULT_MAX = {
+    leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
+    leftEyebrow: 50, rightEyebrow: 50,
+    leftEyelash: 50, rightEyelash: 50,
+    leftBeard: 40, rightBeard: 40, centralBeard: 20
+  };
+
+
   function getTotalsSafe(){
     try { if (typeof calculateSectionTotals === 'function') return calculateSectionTotals(); } catch(e){}
     try { if (typeof window.getTotals === 'function') return window.getTotals(); } catch(e){}
@@ -5812,7 +5829,7 @@ document.addEventListener('DOMContentLoaded', function(){
       centralBeard: getSubtotal(window.beardSelections?.['central-beard']?.selected, window.beardSelections?.['central-beard']?.density)
     };
     const percentages = {};
-    Object.keys(details).forEach(k => { percentages[k] = pctOfRegion(details[k], MAX[k]); });
+    Object.keys(details).forEach(k => { const M = (typeof MAX !== 'undefined' && MAX && MAX[k]!=null) ? MAX : DEFAULT_MAX; percentages[k] = pctOfRegion(details[k], M[k]); });
     return { details, percentages };
   }
   function preparePayload(){
