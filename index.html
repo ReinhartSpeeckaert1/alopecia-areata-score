@@ -597,6 +597,26 @@
   height: 16px;
 }
 
+
+/* Full blue frame around the whole tile when selected */
+.area-box.selected::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #0077cc;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Adjust androgenetic-areas selected style */
+#androgenetic-areas .area-box.selected {
+  border-color: #0077cc;
+  background-color: rgba(179,217,255,.85);
+  box-shadow: 0 0 0 3px #0077cc, 0 0 14px rgba(0,119,204,.6);
+}
+
+.ml-minus-labels{ display:inline-flex; gap:6px; align-items:center; }
+.ml-minus-labels span{ font-size:12px; }
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
@@ -1100,14 +1120,224 @@
 #floating-preview{
   background-color: transparent !important;
 }
-</style></head>
-<body>
-<div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
-@media (max-width: 1200px) {
-  #floating-preview, #floating-close-btn {
+</style>
+<style>
+  /* Scalp third-segment overlay highlight */
+  .area-box { position: relative; }
+  .area-box .segment-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    background-color: rgba(255, 165, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 119, 204, 0.5);
+    border: 2px solid #0077cc;
+  }
+  .area-box .segment-overlay.top    { top: 0;              height: 33.3333%; border-bottom: none; }
+  .area-box .segment-overlay.middle { top: 33.3333%;       height: 33.3333%; border-top: none; border-bottom: none; }
+  .area-box .segment-overlay.bottom { top: 66.6666%;       height: 33.3333%; border-top: none; }
+
+  /* Limit full-box selected visuals for scalp to overlay only */
+  
+</style>
+<style id="injected-middle-lower-css">
+/* middle/lower +/- aligned to thirds of box, unified look with top +/- */
+.area-box { position: relative; }
+.middleplus, .middleminus, .lowerplus, .lowerminus {
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 1px solid #888;
+  border-radius: 50%;
+  background: white;
+  text-align: center;
+  line-height: 18px;
+  font-weight: bold; font-size: 14px;
+  cursor: pointer; user-select: none; z-index: 3;
+  transition: transform 0.2s;
+
+  display: flex; align-items: center; justify-content: center;
+}
+.middleplus  { top: 33.333%; right: 2px; transform: translateY(-50%); }
+.middleminus { top: 33.333%; left:  2px; transform: translateY(-50%); }
+.lowerplus   { top: 66.666%; right: 2px; transform: translateY(-50%); }
+.lowerminus  { top: 66.666%; left:  2px; transform: translateY(-50%); }
+</style>
+<style id="uniform-glow-css">
+/* Unified soft glow + inner color for scalp +/- including middle/lower */
+#backside-areas :is(.plus,.middleplus,.lowerplus).glow,
+#leftside-areas  :is(.plus,.middleplus,.lowerplus).glow,
+#rightside-areas :is(.plus,.middleplus,.lowerplus).glow,
+#topside-areas   :is(.plus,.middleplus,.lowerplus).glow {
+  /* green soft glow */
+  box-shadow: 0 0 6px 3px #00ff00;
+  outline: none;
+  background-color: #ccffcc;
+}
+#backside-areas :is(.minus,.middleminus,.lowerminus).glow,
+#leftside-areas  :is(.minus,.middleminus,.lowerminus).glow,
+#rightside-areas :is(.minus,.middleminus,.lowerminus).glow,
+#topside-areas   :is(.minus,.middleminus,.lowerminus).glow {
+  /* red soft glow */
+  box-shadow: 0 0 6px 3px #ff0000;
+  outline: none;
+  background-color: #ffcccc;
+}
+</style>
+<style id="ml-float-fix-css">
+/* Ensure middle/lower anchored float bubbles render on top and are not clipped */
+.area-box { overflow: visible; }
+.area-box .ml-float {
+  z-index: 99999 !important;
+  pointer-events: none;
+}
+</style>
+<style id="injected-tooltip-suppress-css">
+/* Suppress tooltips when hovering middle/lower +/-; fallback via data attribute */
+.area-box:has(.middleplus:hover, .middleminus:hover, .lowerplus:hover, .lowerminus:hover) .tooltip { 
+  display: none !important; 
+}
+.area-box[data-suppress-tooltip="1"] .tooltip { 
+  display: none !important; 
+}
+</style>
+<style id="suppress-on-load">
+  body[data-no-overlay] .segment-overlay { display: none !important; }
+  body[data-no-pattern] #pattern-dominant,
+  body[data-no-pattern] #pattern-dominant-preview { display: none !important; }
+</style>
+<style id="hide-ml-non-scalp">
+  /* Hide middle/lower +/- for non-scalp regions */
+  #left-eyebrow-areas  .middleplus, #left-eyebrow-areas  .middleminus,
+  #right-eyebrow-areas .middleplus, #right-eyebrow-areas .middleminus,
+  #left-eyelash-areas  .middleplus, #left-eyelash-areas  .middleminus,
+  #right-eyelash-areas .middleplus, #right-eyelash-areas .middleminus,
+  #left-beard-areas    .middleplus, #left-beard-areas    .middleminus,
+  #central-beard-areas .middleplus, #central-beard-areas .middleminus,
+  #right-beard-areas   .middleplus, #right-beard-areas   .middleminus,
+  #left-eyebrow-areas  .lowerplus,  #left-eyebrow-areas  .lowerminus,
+  #right-eyebrow-areas .lowerplus,  #right-eyebrow-areas .lowerminus,
+  #left-eyelash-areas  .lowerplus,  #left-eyelash-areas  .lowerminus,
+  #right-eyelash-areas .lowerplus,  #right-eyelash-areas .lowerminus,
+  #left-beard-areas    .lowerplus,  #left-beard-areas    .lowerminus,
+  #central-beard-areas .lowerplus,  #central-beard-areas .lowerminus,
+  #right-beard-areas   .lowerplus,  #right-beard-areas   .lowerminus {
     display: none !important;
   }
-}
+</style>
+<style id="floating-right-tweak">
+  /* Force the anchored floating preview to the right */
+  #floating-preview.anchored,
+  #floating-preview {
+    left: auto !important;
+    right: 32px !important;
+  }
+  #floating-close-btn.anchored,
+  #floating-close-btn {
+    left: auto !important;
+    right: 36px !important;
+  }
+</style>
+<style id="floating-preview-size-tweak">
+  /* Smaller anchored floating preview */
+  #floating-preview {
+    width: 320px !important;
+    max-width: 92vw !important;
+    max-height: 70vh !important;
+    overflow: hidden !important;
+    padding: 6px !important;
+    border-radius: 10px !important;
+  }
+  /* Scale contents cleanly inside */
+  #floating-preview img,
+  #floating-preview canvas,
+  #floating-preview .preview-image,
+  #floating-preview .preview-canvas,
+  #floating-preview #selected-preview {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 62vh !important;
+    object-fit: contain !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+  }
+  /* Make header text inside the preview compact */
+  #floating-preview .preview-title,
+  #floating-preview .preview-subtitle,
+  #floating-preview .legend,
+  #floating-preview .note {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+  /* Keep it hidden on small screens */
+  @media (max-width: 900px) {
+    #floating-preview,
+    #floating-close-btn {
+      display: none !important;
+    }
+  }
+</style>
+<style id="floating-preview-1of8-right">
+  /* Keep hidden on small screens */
+  @media (max-width: 900px) {
+    #floating-preview,
+    #floating-close-btn {
+      display: none !important;
+    }
+  }
+
+  /* On larger screens, cap the preview to 1/8 of viewport width and align to the right margin */
+  @media (min-width: 901px) {
+    #floating-preview {
+      left: auto !important;
+      right: 8px !important;
+      max-width: 12.5vw !important;  /* 1/8th of page width */
+      width: auto !important;
+      max-height: 70vh !important;
+      padding: 6px !important;
+      border-radius: 10px !important;
+      overflow: hidden !important;
+    }
+    #floating-close-btn {
+      left: auto !important;
+      right: 12px !important;
+    }
+    /* Scale internal content to fit */
+    #floating-preview img,
+    #floating-preview canvas,
+    #floating-preview .preview-image,
+    #floating-preview .preview-canvas,
+    #floating-preview #selected-preview {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 62vh !important;
+      object-fit: contain !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+    }
+  }
+</style>
+
+<style id="aga-no-yellow">
+  #androgenetic-areas .area-box.selected {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+  #androgenetic-areas .area-box.selected::after {
+    border-color: #0077cc;
+  }
+  #androgenetic-areas .tooltip {
+    background-color: #ffffff !important;
+  }
+  #androgenetic-areas .segment-overlay {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+<div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
+@media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
 <div class="title-banner has-hero" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;">
@@ -1130,13 +1360,13 @@
 <div class="ring" id="ring-eyelashes"><span class="ring-val" id="ring-val-eyelashes">0%</span><span class="ring-label">Eyelashes</span></div>
 <div class="ring" id="ring-beard"><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
 </div>
-<div class="controls-row-above-reset" id="controls-row-above-reset"><button id="generate-pdf" style="color: red; font-weight: bold;
+<div class="controls-row-above-reset" id="controls-row-above-reset"><button class="pdf-download-btn" id="generate-pdf" style="color: red; font-weight: bold;
         background: none;
         border: none;
         cursor: pointer;
         font-size: 18px;
         color: red;
-    " title="Download" class="pdf-download-btn"><svg data-icon="download" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:middle; margin-right:6px;"><path d="M12 3v10m0 0l-4-4m4 4l4-4M4 17v4h16v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    " title="Download"><svg aria-hidden="true" data-icon="download" height="18" style="vertical-align:middle; margin-right:6px;" viewbox="0 0 24 24" width="18"><path d="M12 3v10m0 0l-4-4m4 4l4-4M4 17v4h16v-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
         📄 
     <span class="btn-label">PDF</span></button></div><div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
 <button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
@@ -1328,7 +1558,7 @@ function renderScalpSection(section) {
       minus.title = `${area.minus}%`;
       minus.onclick = (e) => {
         e.stopPropagation();
-        toggleScalpSelection(section.id, area.minus);
+        toggleScalpSelection(section.id, area.minus, true);
       };
       box.appendChild(minus);
     }
@@ -1340,12 +1570,22 @@ function renderScalpSection(section) {
       plus.title = `${area.plus}%`;
       plus.onclick = (e) => {
         e.stopPropagation();
-        toggleScalpSelection(section.id, area.plus);
+        toggleScalpSelection(section.id, area.plus, true);
       };
       box.appendChild(plus);
     }
 
-    box.onclick = () => {
+    box.onclick = (ev) => {
+      const rect = box.getBoundingClientRect();
+      const y = ev.clientY - rect.top;
+      const h = rect.height;
+      let segment = 'top';
+      if (y >= h * 2/3) segment = 'bottom';
+      else if (y >= h / 3) segment = 'middle';
+      // ensure only one scalp box has a segment at a time
+      document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box')
+        .forEach(b => b.removeAttribute('data-selected-segment'));
+      box.setAttribute('data-selected-segment', segment);
       toggleScalpSelection(section.id, area.value);
     };
 
@@ -1363,19 +1603,24 @@ function renderScalpSection(section) {
 }
 
 
-function toggleScalpSelection(sectionId, value) {
+
+function toggleScalpSelection(sectionId, value, forceReplace){
   const selection = globalSelections[sectionId];
   const valueStr = value.toString();
   const alreadySelected = Array.from(selection.selected).some(v => v.toString() === valueStr);
-  if (alreadySelected) {
-    selection.selected.forEach(v => {
-      if (v.toString() === valueStr) selection.selected.delete(v);
-  if (typeof updateScoreRings === 'function') updateScoreRings();
-});
+
+  if (forceReplace) {
+    selection.selected.clear();
+    selection.selected.add(value);
+  } else if (alreadySelected) {
+    // Toggle off if the same value is clicked
+    selection.selected.forEach(v => { if (v.toString() === valueStr) selection.selected.delete(v); });
   } else {
+    // Replace within this section
     selection.selected.clear();
     selection.selected.add(value);
   }
+  if (typeof updateScoreRings === 'function') updateScoreRings();
   updateScalpUI();
 }
 function updateScalpUI() {
@@ -1411,6 +1656,16 @@ function updateScalpUI() {
           minusEl.style.backgroundColor = on ? "#ffcccc" : "white";
           minusEl.style.transform = on ? "scale(1.3)" : "scale(1)";
           minusEl.classList.toggle("glow", on);
+          // Remove old segment overlays
+          box.querySelectorAll(".segment-overlay").forEach(n => n.remove());
+          // If this box is selected in any way, draw the segment overlay (default to middle if not set)
+          if (isSelected || isPlusSelected || isMinusSelected) {
+            const seg = box.getAttribute("data-selected-segment") || "middle";
+            const ov = document.createElement("div");
+            ov.className = "segment-overlay " + seg;
+            box.appendChild(ov);
+          }
+
         }
       });
     }
@@ -6169,5 +6424,1011 @@ document.addEventListener('DOMContentLoaded', function(){
   if (!btn.style.borderRadius) btn.style.borderRadius = '8px';
   if (!btn.style.background) btn.style.background = '#ffffff';
 }, { once: true });
-</script></body></html>
+</script>
+<script>
+// Document-level handler to infer upper/middle/lower clicks for scalp +/- and highlight that segment
+(function(){
+  const SCALP_IDS = ['backside','topside','leftside','rightside'];
+  function isScalpBox(el){
+    if (!el) return false;
+    const cont = el.closest('.area-container');
+    if (!cont || !cont.id) return false;
+    return SCALP_IDS.some(id => cont.id === id + '-areas');
+  }
+  function inferSegmentFromClick(box, clientY){
+    const r = box.getBoundingClientRect();
+    const y = clientY - r.top;
+    const h = r.height || 1;
+    if (y >= (2*h)/3) return 'bottom';
+    if (y >= (1*h)/3) return 'middle';
+    return 'top';
+  }
+  document.addEventListener('click', function(e){
+    const t = e.target;
+    if (!(t && (t.classList && (t.classList.contains('plus') || t.classList.contains('minus'))))) return;
+    const box = t.closest('.area-box');
+    if (!box || !isScalpBox(box)) return;
+    const seg = inferSegmentFromClick(box, e.clientY);
+    // Ensure only one segment overlay across scalp boxes at a time
+    document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box')
+      .forEach(b => b.removeAttribute('data-selected-segment'));
+    box.setAttribute('data-selected-segment', seg);
+    // No need to call updateScalpUI(); the existing onclick on +/- triggers selection and UI update.
+  }, true); // capture so it runs before per-element handlers that stopPropagation
+})();
+</script>
+<script>
+(function(){
+  if (window.__orig_updateScoreRings_hooked) return;
+  window.__orig_updateScoreRings_hooked = true;
+  if (typeof window.updateScoreRings === 'function'){
+    const __orig = window.updateScoreRings;
+    window.updateScoreRings = function(){
+      try { __orig.apply(this, arguments); } finally {
+        try { 
+          if (typeof window.ensureCopyButton === 'function') window.ensureCopyButton(); 
+        } catch(e){}
+      }
+    };
+  }
+  // Expose ensureCopyButton globally if defined inside an IIFE
+  try{
+    if (typeof ensureCopyButton === 'function') window.ensureCopyButton = ensureCopyButton;
+  } catch(e){}
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.updateScalpUI === 'function') {
+    const __orig_updateScalpUI = window.updateScalpUI;
+    window.updateScalpUI = function() {
+      __orig_updateScalpUI.apply(this, arguments);
+      const containers = ['#backside-areas', '#topside-areas', '#leftside-areas', '#rightside-areas'];
+      containers.forEach(function(sel) {
+        document.querySelectorAll(sel + ' .area-box').forEach(function(box) {
+          const isSelected = box.classList.contains('selected') ||
+                             box.classList.contains('selected-plus') ||
+                             box.classList.contains('selected-minus');
+          // Always refresh the segment overlay
+          box.querySelectorAll('.segment-overlay').forEach(function(n) { n.remove(); });
+          if (isSelected) {
+            const seg = box.getAttribute('data-selected-segment') || 'middle';
+            const ov = document.createElement('div');
+            ov.className = 'segment-overlay ' + seg;
+            box.appendChild(ov);
+          }
+        });
+      });
+    };
+    try { window.updateScalpUI(); } catch(e) {}
+  }
+});
+</script>
+<script id="injected-middle-lower-script">
+/* === Middle/Lower percentage configuration per BOX (edit in code) === */
+window.ML_PERCENT_DEFAULTS = { middleplus: 70, lowerplus: 70 };
+window.ML_PERCENT_CONFIG = {
+  topside:   { },
+  backside:  {
+    "0.5": { middleplus: 2.5, lowerplus: 2.5 },
+    "1":   { middleplus: 10,  lowerplus: 10  },
+    "4":   { middleplus: 20,  lowerplus: 20  },
+    "7":   { middleplus: 35,  lowerplus: 35  },
+    "10":  { middleplus: 45,  lowerplus: 45  },
+    "13":  { middleplus: 60,  lowerplus: 60  },
+    "16":  { middleplus: 70,  lowerplus: 70  },
+    "19":  { middleplus: 85,  lowerplus: 85  },
+    "22":  { middleplus: 95,  lowerplus: 95  }
+  },
+  leftside:  { },
+  rightside: { }
+};
+/* === End configuration === */
+
+(function(){
+  if (window.__middleLowerInitFinal) return; window.__middleLowerInitFinal = true;
+
+  function getSectionIdFromBox(box){
+    const areas = box.closest('[id$="-areas"]');
+    if (!areas) return null;
+    return areas.id.slice(0, -'-areas'.length);
+  }
+  function parsePctTitle(el){
+    if (!el) return null;
+    const v = parseFloat(el.title);
+    return isNaN(v) ? null : v;
+  }
+  function mirrorGlow(box){
+    const plus = box.querySelector('.plus');
+    const minus = box.querySelector('.minus');
+    const mp = box.querySelector('.middleplus');
+    const mm = box.querySelector('.middleminus');
+    const lp = box.querySelector('.lowerplus');
+    const lm = box.querySelector('.lowerminus');
+    const plusGlow = !!(plus && plus.classList.contains('glow'));
+    const minusGlow = !!(minus && minus.classList.contains('glow'));
+    [mp, lp].forEach(b => { if (b) b.classList.toggle('glow', plusGlow); });
+    [mm, lm].forEach(b => { if (b) b.classList.toggle('glow', minusGlow); });
+  }
+
+  function ensureButtons(box){
+    // only add if at least one original exists
+    const plus = box.querySelector('.plus');
+    const minus = box.querySelector('.minus');
+    if (!plus && !minus) return;
+
+    const sectionId = getSectionIdFromBox(box);
+    if (!sectionId) return;
+
+    // avoid duplicates
+    if (box.querySelector('.middleplus, .middleminus, .lowerplus, .lowerminus')) {
+      mirrorGlow(box);
+      return;
+    }
+
+    const plusVal = parsePctTitle(plus);
+    const minusVal = parsePctTitle(minus);
+
+    function setUniformGlow(type){
+      const container = box.closest('[id$="-areas"]') || document;
+      container.querySelectorAll('.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus')
+        .forEach(el=>el.classList.remove('glow'));
+      const topPlus = box.querySelector('.plus');
+      const topMinus = box.querySelector('.minus');
+      if (type === 'plus' && topPlus) topPlus.classList.add('glow');
+      if (type === 'minus' && topMinus) topMinus.classList.add('glow');
+    }
+
+    function setSuppress(on){ if (on) box.setAttribute('data-suppress-tooltip','1'); else box.removeAttribute('data-suppress-tooltip'); }
+    function suppressTips(){ const container = box.closest('[id$="-areas"]') || document; container.querySelectorAll('.tooltip').forEach(t=>t.style.display='none'); }
+
+    function select(segment, value, ev){
+      if (ev) ev.stopPropagation();
+      // clear segment on all boxes to match native behavior
+      document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box, #androgenetic-areas .area-box')
+        .forEach(b => b.removeAttribute('data-selected-segment'));
+      box.setAttribute('data-selected-segment', segment);
+      if (typeof toggleScalpSelection === 'function') toggleScalpSelection(sectionId, value, true);
+    }
+
+    function simulateBottomClick(box){
+      try {
+        const rect = box.getBoundingClientRect();
+        const evt = new MouseEvent('click', {
+          bubbles: true, cancelable: true, view: window,
+          clientX: rect.left + Math.max(4, Math.min(rect.width-4, rect.width/2)),
+          clientY: rect.top + rect.height * 0.9
+        });
+        box.dispatchEvent(evt);
+      } catch (e) {}
+    }
+
+    if (minus && minusVal !== null){
+      const mm = document.createElement('div');
+      mm.className = 'middleminus'; mm.textContent = '−';
+      mm.addEventListener('mouseenter', suppressTips);
+      mm.addEventListener('pointerenter', ()=>setSuppress(true));
+      mm.addEventListener('pointerleave', ()=>setSuppress(false));
+      mm.addEventListener('mouseover', suppressTips);
+      mm.addEventListener('click', function(ev){ setUniformGlow('minus'); select('middle', minusVal, ev); });
+      box.appendChild(mm);
+
+      const lm = document.createElement('div');
+      lm.className = 'lowerminus'; lm.textContent = '−';
+      lm.addEventListener('mouseenter', suppressTips);
+      lm.addEventListener('pointerenter', ()=>setSuppress(true));
+      lm.addEventListener('pointerleave', ()=>setSuppress(false));
+      lm.addEventListener('mouseover', suppressTips);
+      lm.addEventListener('click', function(ev){ simulateBottomClick(box); setUniformGlow('minus'); select('bottom', minusVal, ev); });
+      box.appendChild(lm);
+    }
+    if (plus && plusVal !== null){
+      const mp = document.createElement('div');
+      mp.className = 'middleplus'; mp.textContent = '+';
+      mp.addEventListener('mouseenter', suppressTips);
+      mp.addEventListener('pointerenter', ()=>setSuppress(true));
+      mp.addEventListener('pointerleave', ()=>setSuppress(false));
+      mp.addEventListener('mouseover', suppressTips);
+      mp.addEventListener('click', function(ev){ setUniformGlow('plus'); select('middle', plusVal, ev); });
+      box.appendChild(mp);
+
+      const lp = document.createElement('div');
+      lp.className = 'lowerplus'; lp.textContent = '+';
+      lp.addEventListener('mouseenter', suppressTips);
+      lp.addEventListener('pointerenter', ()=>setSuppress(true));
+      lp.addEventListener('pointerleave', ()=>setSuppress(false));
+      lp.addEventListener('mouseover', suppressTips);
+      lp.addEventListener('click', function(ev){ simulateBottomClick(box); setUniformGlow('plus'); select('bottom', plusVal, ev); });
+      box.appendChild(lp);
+    }
+
+    // Observe glow changes on original plus/minus and mirror to new buttons
+    const obs = new MutationObserver(()=>mirrorGlow(box));
+    if (plus) obs.observe(plus, { attributes:true, attributeFilter:['class'] });
+    if (minus) obs.observe(minus, { attributes:true, attributeFilter:['class'] });
+
+    mirrorGlow(box);
+  }
+
+  function initAll(){
+    document.querySelectorAll('.area-box').forEach(ensureButtons);
+  }
+
+  // Floating percentage window: anchored to the box (absolute), per-box percentages, only for middleplus/lowerplus, and only show the percentage
+  function ensureFloatForBox(box){
+    let el = box.querySelector('.ml-float');
+    if (!el){
+      el = document.createElement('div');
+      el.className = 'ml-float';
+      Object.assign(el.style, {
+        position:'absolute', top:'-9999px', left:'-9999px', padding:'8px 10px',
+        borderRadius:'8px', boxShadow:'0 6px 18px rgba(0,0,0,0.2)',
+        color:'#111', fontWeight:'600', fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif',
+        fontSize:'13px', zIndex:'10', pointerEvents:'none', border:'1px solid rgba(0,0,0,0.15)', whiteSpace:'nowrap', display:'none'
+      });
+      box.appendChild(el);
+    }
+    return el;
+  }
+  function colorForPercent(p){ const clamped = Math.max(0, Math.min(100, Number(p)||0)); const hue = 120 - (clamped * 1.2); return `hsl(${hue}, 80%, 70%)`; }
+  function percentFor(el){
+    const box = el.closest('.area-box');
+    const areas = box && box.closest('[id$="-areas"]');
+    const sectionId = areas ? areas.id.slice(0, -'-areas'.length) : 'topside';
+    const valKey = box ? (box.dataset.value || '').toString() : '';
+    const cfgSection = (window.ML_PERCENT_CONFIG && window.ML_PERCENT_CONFIG[sectionId]) || {};
+    const defaults = window.ML_PERCENT_DEFAULTS || { middleplus:70, lowerplus:70 };
+    const entry = cfgSection[valKey] || {};
+    const key = el.classList.contains('middleplus') ? 'middleplus' : 'lowerplus';
+    const v = (typeof entry[key] === 'number') ? entry[key] : defaults[key];
+    return Math.max(0, Math.min(100, Number(v)||0));
+  }
+  function positionFloatAbove(el){
+    const box = el.closest('.area-box');
+    const floatEl = ensureFloatForBox(box);
+    const btnRect = el.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    const x = (btnRect.left - boxRect.left) + btnRect.width/2;
+    const y = (btnRect.top - boxRect.top) - 10; // above
+    floatEl.style.left = Math.max(4, x - floatEl.offsetWidth/2) + 'px';
+    floatEl.style.top  = Math.max(4, y - floatEl.offsetHeight) + 'px';
+  }
+  let pinnedEl = null;
+  function showFloatFor(el){
+  const box = el.closest('.area-box');
+  const floatEl = ensureFloatForBox(box);
+  const areas = box && box.closest('[id$="-areas"]');
+  const sectionId = areas ? areas.id.slice(0, -'-areas'.length) : '';
+  const isMinus = el.classList.contains('middleminus') || el.classList.contains('lowerminus') || el.classList.contains('minus');
+  const isPlus  = el.classList.contains('middleplus') || el.classList.contains('lowerplus') || el.classList.contains('plus');
+
+  function valueByIndex(labels){
+    const allBoxes = areas ? Array.from(areas.querySelectorAll('.area-box')) : [];
+    let indexBoxes = allBoxes;
+
+    // When in any scalp section and in a minus context, index only among boxes that have a minus control
+    const scalpSections = new Set(['topside','backside','leftside','rightside']);
+    if (scalpSections.has(sectionId) && isMinus){
+      const hasMinus = (b) => !!b.querySelector('.middleminus, .lowerminus, .minus');
+      indexBoxes = allBoxes.filter(hasMinus);
+
+      // If current box is not in the filtered list, compute its rank among minus-bearing boxes up to this position
+      if (indexBoxes.indexOf(box) === -1){
+        let count = 0;
+        for (const b of allBoxes){
+          if (b === box) break;
+          if (hasMinus(b)) count++;
+        }
+        const idx = Math.max(0, Math.min(count, labels.length - 1));
+        return labels[idx] || labels[labels.length - 1];
+      }
+    }
+
+    const idx0 = indexBoxes.indexOf(box);
+    const idx = idx0 < 0 ? 0 : idx0;
+    return labels[idx] || labels[labels.length - 1];
+  }
+        const idx = Math.max(0, Math.min(count, labels.length - 1));
+        return labels[idx] || labels[labels.length - 1];
+      }
+    }
+
+    const idx0 = indexBoxes.indexOf(box);
+    const idx = idx0 < 0 ? 0 : idx0;
+    return labels[idx] || labels[labels.length - 1];
+  }
+
+  let usedFixed = false;
+  let val = "";
+
+  if (sectionId === 'backside' && isMinus){
+    const labels = ["1%","3.5%","12.5%","25%","37.5%","50%","62.5%","75%","87.5%"];
+    val = valueByIndex(labels);
+    usedFixed = true;
+  } else if (sectionId === 'topside') {
+    if (isMinus){
+      const labels = ["0.5%","2%","7.5%","15%","22.5%","30%","37.5%","45%","52.5%","60%","67.5%","75","82.5%","90","96%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    } else if (isPlus){
+      const labels = ["1.7%","5%","12.5%","20%","27.5%","35%","42.5%","50%","57.5%","65%","72.5%","80%","87.5%","95%","100%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    }
+  } else if (sectionId === 'leftside') {
+    if (isMinus){
+      const labels = ["1%","4.5%","9%","20%","40%","55%","70%","90%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    } else if (isPlus){
+      const labels = ["4%","7.5%","15%","30%","50%","65%","85%","100%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    }
+  } else if (sectionId === 'rightside') {
+    if (isMinus){
+      const labels = ["1%","4.5%","9%","20%","40%","55%","70%","90%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    } else if (isPlus){
+      const labels = ["4%","7.5%","15%","30%","50%","65%","85%","100%"];
+      val = valueByIndex(labels);
+      usedFixed = true;
+    }
+  }
+
+  if (usedFixed){
+    floatEl.innerHTML = `<span style="font-variant-numeric:tabular-nums">${val}</span>`;
+    const p = parseFloat(val);
+    floatEl.style.background = colorForPercent(p);
+    floatEl.style.border = '1px solid rgba(0,0,0,0.15)';
+    floatEl.style.display = 'block';
+    requestAnimationFrame(()=>positionFloatAbove(el));
+    return;
+  }
+
+  const p = percentFor(el);
+  floatEl.innerHTML = `<span style="font-variant-numeric:tabular-nums">${p}%</span>`;
+  floatEl.style.background = colorForPercent(p);
+  floatEl.style.display = 'block';
+  requestAnimationFrame(()=>positionFloatAbove(el));
+}
+  function hideFloat(){ if (!pinnedEl){ document.querySelectorAll('.ml-float:not([data-sticky="1"])').forEach(el=>{ el.style.display='none'; el.style.top='-9999px'; el.style.left='-9999px'; }); } }
+  function pinTo(el){ pinnedEl = el; showFloatFor(el); }
+  function unpin(){ pinnedEl = null; hideFloat(); }
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') unpin(); });
+
+  function wireButton(el){
+    if (!el || el.dataset.mlFloatWired) return;
+    el.dataset.mlFloatWired = '1';
+    el.addEventListener('mouseenter', ()=>{ showFloatFor(el); });
+    el.addEventListener('mouseleave', hideFloat);
+    el.addEventListener('click', ()=>{ pinTo(el); });
+  }
+  function initFloat(){
+    document.querySelectorAll('.middleplus, .lowerplus, .middleminus, .lowerminus').forEach(wireButton);
+  }
+
+  // run now and after UI updates
+  initAll();
+  initFloat();
+  if (typeof updateScalpUI === 'function' && !updateScalpUI.__patchedFinal){
+    const orig = updateScalpUI;
+    updateScalpUI = function(){
+      const r = orig.apply(this, arguments);
+      try { initAll(); initFloat(); } catch(e){}
+      return r;
+    };
+    updateScalpUI.__patchedFinal = true;
+  }
+  const mo = new MutationObserver((ml)=>{
+    for (const m of ml){
+      if (m.addedNodes && m.addedNodes.length){
+        if ([...m.addedNodes].some(n => (n.nodeType===1 && (n.matches?.('.area-box') || n.querySelector?.('.area-box'))))){
+          initAll(); initFloat();
+          break;
+        }
+      }
+    }
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  // Hide anchored float when any plus/minus (top, middle, lower) is clicked or any area-box is clicked
+  function hideAllFloats(){
+    document.querySelectorAll('.ml-float:not([data-sticky="1"])').forEach(el=>{
+      el.style.display='none'; el.style.top='-9999px'; el.style.left='-9999px';
+    });
+    pinnedEl = null;
+  }
+  document.addEventListener('click', function(e){
+    const t = e.target;
+    if (!t) return;
+    if (t.classList.contains('plus') || t.classList.contains('minus') ||
+        t.classList.contains('middleplus') || t.classList.contains('middleminus') ||
+        t.classList.contains('lowerplus') || t.classList.contains('lowerminus') ||
+        t.classList.contains('area-box')){
+      hideAllFloats();
+    }
+  }, true);
+
+})();</script>
+<script id="deferred-suppressor">
+(function(){
+  function suppress(){
+    document.body.setAttribute('data-no-overlay','');
+    document.body.setAttribute('data-no-pattern','');
+  }
+  function unsuppress(){
+    document.body.removeAttribute('data-no-overlay');
+    document.body.removeAttribute('data-no-pattern');
+  }
+
+  // Hide on first paint
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', suppress, {once:true});
+  } else {
+    suppress();
+  }
+
+  // Suppress after code/state load
+  ['loadCode','applyState'].forEach(function(fn){
+    var orig = window[fn];
+    if (typeof orig === 'function'){
+      window[fn] = function(){
+        suppress();
+        return orig.apply(this, arguments);
+      };
+    }
+  });
+
+  function revealAndRefresh(){
+    unsuppress();
+    if (typeof window.updateScalpUI === 'function') { try { window.updateScalpUI(); } catch(e){} }
+    if (typeof window.renderPattern === 'function') { try { window.renderPattern(); } catch(e){} }
+    if (typeof window.updateFloatingPreview === 'function') { try { window.updateFloatingPreview(); } catch(e){} }
+  }
+
+  // Reveal after score-affecting calls
+  ['toggleScalpSelection','setDensity','setBoxScore','setSegmentScore'].forEach(function(fn){
+    var orig = window[fn];
+    if (typeof orig === 'function'){
+      window[fn] = function(){
+        var r = orig.apply(this, arguments);
+        revealAndRefresh();
+        return r;
+      };
+    }
+  });
+
+  // Also reveal on likely UI interactions
+  document.addEventListener('click', function(e){
+    if (
+      e.target.closest('[data-density]') ||
+      e.target.closest('.density-container button') ||
+      e.target.closest('[data-action="cycle"]') ||
+      e.target.closest('[data-score]') ||
+      e.target.closest('[data-select]') ||
+      e.target.closest('.scalp-box') ||
+      e.target.closest('.segment') ||
+      e.target.closest('.plus') || e.target.closest('.minus') ||
+      e.target.closest('.middleplus') || e.target.closest('.middleminus') ||
+      e.target.closest('.lowerplus') || e.target.closest('.lowerminus')
+    ){
+      revealAndRefresh();
+    }
+  }, true);
+})();
+</script>
+<script id="ml-float-override">
+(function(){
+  function _ensureFloatForBox(box){
+    if (!box) return null;
+    var el = box.querySelector('.ml-float');
+    if (!el){
+      el = document.createElement('div');
+      el.className = 'ml-float';
+      Object.assign(el.style, {
+        position:'absolute', top:'-9999px', left:'-9999px', padding:'8px 10px',
+        borderRadius:'8px', boxShadow:'0 6px 18px rgba(0,0,0,0.2)',
+        color:'#111', fontWeight:'600', fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif',
+        fontSize:'13px', zIndex:'99999', pointerEvents:'none', border:'1px solid rgba(0,0,0,0.15)',
+        whiteSpace:'nowrap', display:'none'
+      });
+      box.style.position = box.style.position || 'relative';
+      box.appendChild(el);
+    }
+    return el;
+  }
+  function _positionFloatAbove(btn, floatEl){
+    var box = btn.closest('.area-box');
+    var boxRect = box.getBoundingClientRect();
+    var btnRect = btn.getBoundingClientRect();
+    var x = (btnRect.left - boxRect.left) + btnRect.width/2;
+    var y = (btnRect.top  - boxRect.top)  - 10;
+    floatEl.style.left = Math.max(4, x - floatEl.offsetWidth/2) + 'px';
+    floatEl.style.top  = Math.max(4, y - floatEl.offsetHeight) + 'px';
+  }
+  function _percentFromLabel(label){
+    var m = /([0-9]+(?:\.[0-9]+)?)\s*%/.exec(String(label));
+    return m ? parseFloat(m[1]) : NaN;
+  }
+  function _colorForPercent(p){
+    try { if (typeof colorForPercent === 'function') return colorForPercent(p); } catch(e){}
+    // fallback
+    var hue = 120 - Math.max(0, Math.min(100, p||0)) * 1.2;
+    return 'hsl(' + hue + ', 80%, 70%)';
+  }
+  function _applyFloatBackground(el, colorOrGradient){
+    // Clear both properties first
+    el.style.removeProperty('background');
+    el.style.removeProperty('background-image');
+    el.style.removeProperty('background-color');
+    if (!colorOrGradient) return;
+    if (/gradient\(/i.test(colorOrGradient)){
+      el.style.setProperty('background-image', colorOrGradient, 'important');
+      el.style.setProperty('background-color', 'transparent', 'important');
+    } else {
+      el.style.setProperty('background-color', colorOrGradient, 'important');
+      el.style.setProperty('background-image', 'none', 'important');
+    }
+  }
+  function _valueByIndex(btn, labels){
+    var box = btn.closest('.area-box');
+    var areas = box && box.closest('[id$="-areas"]');
+    var sectionId = areas ? areas.id.replace(/-areas$/,'') : '';
+    var allBoxes = areas ? Array.from(areas.querySelectorAll('.area-box')) : [];
+    var indexBoxes = allBoxes.slice();
+    var isMinus = btn.classList.contains('middleminus') || btn.classList.contains('lowerminus') || btn.classList.contains('minus');
+    var scalpSections = new Set(['topside','backside','leftside','rightside']);
+    if (scalpSections.has(sectionId) && isMinus){
+      var hasMinus = function(b){ return !!b.querySelector('.middleminus, .lowerminus, .minus'); };
+      indexBoxes = allBoxes.filter(hasMinus);
+      if (indexBoxes.indexOf(box) === -1){
+        var count = 0;
+        for (var i=0;i<allBoxes.length;i++){
+          var b = allBoxes[i];
+          if (b === box) break;
+          if (hasMinus(b)) count++;
+        }
+        var idxF = Math.max(0, Math.min(count, labels.length - 1));
+        return labels[idxF] || labels[labels.length - 1];
+      }
+    }
+    var idx0 = indexBoxes.indexOf(box);
+    var idx = idx0 < 0 ? 0 : idx0;
+    return labels[idx] || labels[labels.length - 1];
+  }
+  function _chooseLabel(btn){
+    var box = btn.closest('.area-box');
+    var areas = box && box.closest('[id$="-areas"]');
+    var sectionId = areas ? areas.id.replace(/-areas$/,'') : '';
+    var isMinus = btn.classList.contains('middleminus') || btn.classList.contains('lowerminus') || btn.classList.contains('minus');
+    var isPlus  = btn.classList.contains('middleplus')  || btn.classList.contains('lowerplus')  || btn.classList.contains('plus');
+    if (sectionId === 'backside' && isMinus){
+      return _valueByIndex(btn, ["1%","3.5%","12.5%","25%","37.5%","50%","62.5%","75%","87.5%"]);
+    }
+    if (sectionId === 'topside'){
+      if (isMinus)   return _valueByIndex(btn, ["0.5%","2%","7.5%","15%","22.5%","30%","37.5%","45%","52.5%","60%","67.5%","75%","82.5%","90%","96%"]);
+      if (isPlus)    return _valueByIndex(btn, ["1.7%","5%","12.5%","20%","27.5%","35%","42.5%","50%","57.5%","65%","72.5%","80%","87.5%","95%","100%"]);
+    }
+    if (sectionId === 'leftside' || sectionId === 'rightside'){
+      if (isMinus)   return _valueByIndex(btn, ["1%","4.5%","9%","20%","40%","55%","70%","90%"]);
+      if (isPlus)    return _valueByIndex(btn, ["4%","7.5%","15%","30%","50%","65%","85%","100%"]);
+    }
+    return btn.getAttribute('title') || '';
+  }
+
+  window.showFloatFor = function(el){
+    try{
+      var box = el.closest('.area-box');
+      if (!box) return;
+      var floatEl = _ensureFloatForBox(box);
+      var label = _chooseLabel(el);
+      if (!label) return;
+      floatEl.innerHTML = '<span style="font-variant-numeric:tabular-nums">' + label + '</span>';
+      var p = _percentFromLabel(label);
+      var bg = _colorForPercent(p);
+      _applyFloatBackground(floatEl, bg);
+      floatEl.style.display = 'block';
+      requestAnimationFrame(function(){ _positionFloatAbove(el, floatEl); });
+    }catch(err){ /* swallow */ }
+  };
+
+  function _wire(){
+    document.querySelectorAll('.middleplus, .lowerplus, .middleminus, .lowerminus').forEach(function(el){
+      if (el.dataset.__mlFixWired) return;
+      el.dataset.__mlFixWired = '1';
+      el.addEventListener('mouseenter', function(){ window.showFloatFor(el); }, {capture:true});
+      el.addEventListener('mouseleave', function(){
+        var box = el.closest('.area-box');
+        var f = box && box.querySelector('.ml-float');
+        if (f && !(f.dataset && f.dataset.sticky==='1')){ f.style.display='none'; f.style.top='-9999px'; f.style.left='-9999px'; }
+      }, {capture:true});
+    });
+  }
+  _wire();
+  new MutationObserver(function(){ _wire(); }).observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+<script id="ml-float-config-v3">
+window.ML_FLOAT_LABELS = {
+  backside: {
+    plus:  { middle: [2.5, 10, 20, 35, 45, 60, 70, 85, 95],
+             lower:  [2.5, 10, 20, 35, 45, 60, 70, 85, 95] },
+    minus: { middle: [1, 3.5, 12.5, 25, 37.5, 50, 62.5, 75, 87.5],
+             lower:  [1, 3.5, 12.5, 25, 37.5, 50, 62.5, 75, 87.5] }
+  },
+  topside: {
+    plus:  { middle: [1.7, 5, 12.5, 20, 27.5, 35, 42.5, 50, 57.5, 65, 72.5, 80, 87.5, 95, 100],
+             lower:  [1.7, 5, 12.5, 20, 27.5, 35, 42.5, 50, 57.5, 65, 72.5, 80, 87.5, 95, 100] },
+    minus: { middle: [0.5, 2, 7.5, 15, 22.5, 30, 37.5, 45, 52.5, 60, 67.5, 75, 82.5, 90, 96],
+             lower:  [0.5, 2, 7.5, 15, 22.5, 30, 37.5, 45, 52.5, 60, 67.5, 75, 82.5, 90, 96] }
+  },
+  leftside: {
+    plus:  { middle: [4, 7.5, 15, 30, 50, 65, 85, 100],
+             lower:  [4, 7.5, 15, 30, 50, 65, 85, 100] },
+    minus: { middle: [1, 4.5, 9, 20, 40, 55, 70, 90],
+             lower:  [1, 4.5, 9, 20, 40, 55, 70, 90] }
+  },
+  rightside: {
+    plus:  { middle: [4, 7.5, 15, 30, 50, 65, 85, 100],
+             lower:  [4, 7.5, 15, 30, 50, 65, 85, 100] },
+    minus: { middle: [1, 4.5, 9, 20, 40, 55, 70, 90],
+             lower:  [1, 4.5, 9, 20, 40, 55, 70, 90] }
+  }
+};
+</script>
+<script id="ml-float-colors-v1">
+if (typeof window.colorForPercent !== 'function'){
+  // 0 -> green (120deg), 100 -> red (0deg)
+  window.colorForPercent = function(p){
+    if (p == null || isNaN(p)) return null;
+    var v = Math.max(0, Math.min(100, +p));
+    var h = 120 - v * 1.2; // invert hue scale
+    return 'hsl(' + h + ' 70% 50%)';
+  };
+}
+</script>
+<script id="ml-float-config-override-v3">
+(function(){
+  var origShow = window.showFloatFor;
+  var origHide = window.hideFloatFor;
+
+  // Only target middle/lower controls, never generic or upper ones
+  function isMinus(el){ return el && (el.classList.contains('middleminus') || el.classList.contains('lowerminus')); }
+  function isPlus(el){  return el && (el.classList.contains('middleplus')  || el.classList.contains('lowerplus')); }
+  function isTargetControl(el){ return isMinus(el) || isPlus(el); }
+
+  function whichRow(el){
+    if (!el) return null;
+    if (el.classList.contains('middleplus') || el.classList.contains('middleminus')) return 'middle';
+    if (el.classList.contains('lowerplus')  || el.classList.contains('lowerminus'))  return 'lower';
+    return null;
+  }
+  function sectionElFor(el){
+    return el && el.closest && el.closest('[id$="-areas"]');
+  }
+  function sectionOf(el){
+    var secEl = sectionElFor(el);
+    return secEl ? secEl.id.replace(/-areas$/, '') : '';
+  }
+  function boxesFor(el){
+    var secEl = sectionElFor(el);
+    return secEl ? Array.from(secEl.querySelectorAll('.area-box')) : [];
+  }
+  function hasMinusBox(b){ return !!(b && b.querySelector('.middleminus, .lowerminus')); }
+  function hasPlusBox(b){  return !!(b && b.querySelector('.middleplus, .lowerplus')); }
+
+  function normLabel(x){
+    if (x == null) return '';
+    if (typeof x === 'number') return String(x) + '%';
+    var s = String(x).trim();
+    return /%$/.test(s) ? s : (s + '%');
+  }
+
+  function pickLabelsFromConfig(el){
+    var sid = sectionOf(el);
+    var cfgRoot = (window.ML_FLOAT_LABELS && window.ML_FLOAT_LABELS[sid]) || null;
+    if (!cfgRoot){
+      cfgRoot = window.ML_FLOAT_LABELS && window.ML_FLOAT_LABELS['*'] || null;
+      if (!cfgRoot) return null;
+    }
+    var sign = isMinus(el) ? 'minus' : (isPlus(el) ? 'plus' : null);
+    if (!sign) return null;
+    var entry = cfgRoot[sign];
+    if (!entry || (Array.isArray(entry) && entry.length === 0)) return null;
+    var row = whichRow(el);
+    var list = Array.isArray(entry) ? entry : (entry && entry[row]);
+    if (!list || !list.length) return null;
+    return list.map(normLabel);
+  }
+
+  function valueByIndex(el, labels){
+    var all = boxesFor(el);
+    var indexList = all.slice();
+    if (isMinus(el)) indexList = all.filter(hasMinusBox);
+    if (isPlus(el))  indexList = all.filter(hasPlusBox);
+    var box = el.closest('.area-box');
+    var idx0 = indexList.indexOf(box);
+    if (idx0 === -1){
+      var count = 0;
+      for (var i=0;i<all.length;i++){
+        if (all[i] === box) break;
+        if (isMinus(el) && hasMinusBox(all[i])) count++;
+        if (isPlus(el)  && hasPlusBox(all[i]))  count++;
+      }
+      idx0 = count;
+    }
+    var idx = Math.max(0, Math.min(idx0 < 0 ? 0 : idx0, labels.length - 1));
+    return labels[idx] || labels[labels.length - 1];
+  }
+
+  // One fixed-position bubble in <body> per box
+  var BOX_SEQ = 1;
+  function floatForBox(box){
+    if (!box) return null;
+    if (!box.dataset.mlBoxId) box.dataset.mlBoxId = String(BOX_SEQ++);
+    var id = box.dataset.mlBoxId;
+    var f = document.body.querySelector('.ml-float[data-box="'+id+'"]');
+    if (!f){
+      f = document.createElement('div');
+      f.className = 'ml-float';
+      f.dataset.box = id;
+      Object.assign(f.style, {
+        position:'fixed', top:'-9999px', left:'-9999px', padding:'8px 10px',
+        borderRadius:'8px', boxShadow:'0 6px 18px rgba(0,0,0,0.2)',
+        color:'#000', fontWeight:'600', fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif',
+        fontSize:'13px', zIndex:'2147483647', pointerEvents:'none', border:'1px solid rgba(0,0,0,0.15)',
+        whiteSpace:'nowrap', display:'none', backgroundColor:'#fff'
+      });
+      document.body.appendChild(f);
+    }
+    return f;
+  }
+
+  function colorFor(p){
+    try{
+      if (typeof window.colorForPercent === 'function') return window.colorForPercent(p);
+    }catch(e){}
+    if (p == null || isNaN(p)) return null;
+    var v = Math.max(0, Math.min(100, +p));
+    var h = 120 - v * 1.2; // 0 -> green, 100 -> red
+    return 'hsl(' + h + ' 70% 50%)';
+  }
+  function parseNum(label){
+    var m = /([0-9]+(?:\.[0-9]+)?)\s*%/.exec(String(label));
+    return m ? parseFloat(m[1]) : NaN;
+  }
+  function positionNear(btn, floatEl){
+    var btnRect = btn.getBoundingClientRect();
+    // place above the button
+    var x = btnRect.left + btnRect.width/2;
+    var y = btnRect.top - 10;
+    floatEl.style.left = '-9999px';
+    floatEl.style.top  = '-9999px';
+    floatEl.style.display = 'block';
+    var fw = floatEl.offsetWidth, fh = floatEl.offsetHeight;
+    var left = Math.max(4, Math.min(window.innerWidth - fw - 4, x - fw/2));
+    var top  = Math.max(4, Math.min(window.innerHeight - fh - 4, y - fh));
+    floatEl.style.left = left + 'px';
+    floatEl.style.top  = top + 'px';
+  }
+
+  // Sticky per section
+  var stickyBySection = Object.create(null);
+  function makeSticky(el){
+    var secEl = sectionElFor(el);
+    if (!secEl) return;
+    var sid = secEl.id.replace(/-areas$/, '');
+    // clear previous in this section
+    if (stickyBySection[sid] && stickyBySection[sid].floatEl){
+      try{
+        stickyBySection[sid].floatEl.dataset.sticky = "";
+        stickyBySection[sid].floatEl.style.display = 'none';
+      }catch(e){}
+    }
+    var box = el.closest('.area-box');
+    var f = floatForBox(box);
+    stickyBySection[sid] = { floatEl: f, box: box };
+    f.dataset.sticky = "1";
+    f.style.display = 'block';
+  }
+
+  // Delegated hover show/hide for middle/lower controls
+  function isLeaving(el, evt){
+    var r = evt.relatedTarget;
+    return !(r && (r === el || (r instanceof Element && el.contains(r))));
+  }
+
+  (function attachDelegates(){
+    var sel = '.middleplus, .lowerplus, .middleminus, .lowerminus';
+    var sections = Array.from(document.querySelectorAll('[id$="-areas"]'));
+    sections.forEach(function(sec){
+      // click -> sticky
+      sec.addEventListener('click', function(e){
+        var btn = e.target && e.target.closest(sel);
+        if (!btn || !sec.contains(btn)) return;
+        try{ window.showFloatFor(btn); }catch(_){}
+        makeSticky(btn);
+      }, true);
+
+      // hover show
+      sec.addEventListener('mouseover', function(e){
+        var btn = e.target && e.target.closest(sel);
+        if (!btn || !sec.contains(btn)) return;
+        try{ window.showFloatFor(btn); }catch(_){}
+      }, true);
+
+      // hover hide when leaving the control, unless sticky
+      sec.addEventListener('mouseout', function(e){
+        var btn = e.target && e.target.closest(sel);
+        if (!btn || !sec.contains(btn)) return;
+        if (!isLeaving(btn, e)) return;
+        var box = btn.closest('.area-box');
+        var f = floatForBox(box);
+        // hide only if this box is not the sticky one for the section
+        var sid = sec.id.replace(/-areas$/, '');
+        var st = stickyBySection[sid];
+        if (!st || st.box !== box){
+          f.style.display = 'none';
+          f.dataset.sticky = "";
+        }
+      }, true);
+    });
+  })();
+
+  // Override show: ignore upper controls entirely; show for our targets
+  window.showFloatFor = function(el){
+    if (!isTargetControl(el)){
+      return;
+    }
+    try{
+      var labels = pickLabelsFromConfig(el);
+      if (!labels){
+        return;
+      }
+      var label = valueByIndex(el, labels);
+      var box = el.closest('.area-box');
+      var f = floatForBox(box);
+      f.innerHTML = '<span style="font-variant-numeric:tabular-nums">' + label + '</span>';
+      var p = parseNum(label);
+      var bg = colorFor(p);
+      if (bg){
+        f.style.background = '';
+        f.style.backgroundImage = 'none';
+        f.style.backgroundColor = bg;
+        f.style.color = '#000';
+      }
+      positionNear(el, f);
+      f.style.display = 'block';
+    } catch(err){
+      // swallow
+    }
+  };
+
+  // Override hide: never hide sticky bubbles
+  window.hideFloatFor = function(el){
+    try{
+      var secEl = sectionElFor(el);
+      var sid = secEl ? secEl.id.replace(/-areas$/, '') : null;
+      var box = el && el.closest && el.closest('.area-box');
+      var st = sid ? stickyBySection[sid] : null;
+      var f = box ? floatForBox(box) : null;
+      if (!f) return;
+      if (st && st.box === box){
+        return;
+      }
+      f.style.display = 'none';
+      f.dataset.sticky = "";
+    }catch(e){}
+  };
+})();
+
+</script>
+<script id="ml-float-anchor-after-10px">
+(function(){
+  var THRESH = 10;
+
+  function scrolledPast(){ 
+    var y = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0; 
+    return y > THRESH; 
+  }
+
+  function moveToBodyFixed(f){ 
+    if (!f) return;
+    if (f.parentNode !== document.body){ 
+      try { document.body.appendChild(f); } catch(e){} 
+    } 
+    f.style.position = "fixed"; 
+  }
+  function moveToBoxAbsolute(f, box){ 
+    if (!f || !box) return;
+    if (f.parentNode !== box){ 
+      try { box.appendChild(f); } catch(e){} 
+    } 
+    f.style.position = "absolute"; 
+  }
+
+  function posRelativeToViewport(btn, f){
+    if (!btn || !f) return;
+    var r = btn.getBoundingClientRect();
+    f.style.left = "-9999px";
+    f.style.top  = "-9999px";
+    f.style.display = "block";
+    var fw = f.offsetWidth, fh = f.offsetHeight;
+    var left = Math.max(4, Math.min(window.innerWidth - fw - 4, r.left + r.width/2 - fw/2));
+    var top  = Math.max(4, Math.min(window.innerHeight - fh - 4, r.top - fh - 10));
+    f.style.left = left + "px";
+    f.style.top  = top + "px";
+  }
+  function posInsideBox(btn, f){
+    if (!btn || !f) return;
+    var box = btn.closest && btn.closest(".area-box");
+    if (!box) return;
+    var br = box.getBoundingClientRect();
+    var r = btn.getBoundingClientRect();
+    f.style.left = "-9999px";
+    f.style.top  = "-9999px";
+    f.style.display = "block";
+    var fw = f.offsetWidth, fh = f.offsetHeight;
+    var left = Math.max(4, r.left - br.left + r.width/2 - fw/2);
+    var top  = Math.max(4, r.top - br.top - fh - 10);
+    f.style.left = left + "px";
+    f.style.top  = top + "px";
+  }
+
+  var origShow = window.showFloatFor;
+  var origHide = window.hideFloatFor || function(){};
+
+  window.showFloatFor = function(el){
+    try { if (origShow) origShow(el); } catch(e){}
+    try {
+      var box = el && el.closest && el.closest(".area-box");
+      if (!box) return;
+      var f = box.querySelector(".ml-float");
+      if (!f && box.dataset && box.dataset.mlBoxId){
+        f = document.body.querySelector('.ml-float[data-box="'+ box.dataset.mlBoxId +'"]');
+      }
+      if (!f) return;
+      f.__ml_src = el;
+      f.style.display = "block";
+      requestAnimationFrame(function(){
+        if (scrolledPast()){
+          // After threshold: ANCHORED TO PAGE inside the box, will scroll with content
+          moveToBoxAbsolute(f, box);
+          posInsideBox(el, f);
+        } else {
+          // Before threshold: allow it to float relative to viewport if desired
+          moveToBodyFixed(f);
+          posRelativeToViewport(el, f);
+        }
+      });
+    } catch(e){}
+  };
+
+  window.hideFloatFor = function(el){
+    try { origHide(el); } catch(e){}
+  };
+
+  function refreshAll(){
+    document.querySelectorAll(".ml-float").forEach(function(f){
+      if (!f || f.style.display === "none") return;
+      var el = f.__ml_src;
+      if (!el) return;
+      var box = el.closest && el.closest(".area-box");
+      if (scrolledPast()){
+        moveToBoxAbsolute(f, box);
+        posInsideBox(el, f);
+      } else {
+        moveToBodyFixed(f);
+        posRelativeToViewport(el, f);
+      }
+    });
+  }
+
+  window.addEventListener("scroll", refreshAll, {passive:true});
+  window.addEventListener("resize", refreshAll, {passive:true});
+})();
+</script>
+</body></html>
 <!-- removed legacy SAFE OVERRIDES -->
