@@ -5819,16 +5819,16 @@ document.addEventListener('DOMContentLoaded', function(){
         banner.parentNode.insertBefore(wrap, banner.nextSibling);
       }
       if (wrap){
-        wrap.style.display = 'none';
-        wrap.style.display = 'none';
+        wrap.style.display = 'inline-flex';
+        wrap.style.display = 'inline-flex';
         wrap.style.justifyContent = 'flex-end';
         wrap.style.alignItems = 'center';
         wrap.style.gap = '8px';
         wrap.style.width = '100%';
       }
-      if (pdf) pdf.style.display = 'none';
+      if (pdf) pdf.style.display = 'inline-block';
       const copy = ensureCopy();
-      if (copy) copy.style.display = 'none';
+      if (copy) copy.style.display = 'inline-block';
     }
 
     function hasScore(){
@@ -5846,9 +5846,9 @@ document.addEventListener('DOMContentLoaded', function(){
     function updateVisibility(){
       const copy = ensureCopy();
       const show = hasScore();
-      if (wrap) wrap.style.display = show ? 'inline-flex' : 'none';
-      if (pdf)  pdf.style.display  = show ? 'inline-block' : 'none';
-      if (copy) copy.style.display = show ? 'inline-block' : 'none';
+      if (wrap) wrap.style.display = 'inline-flex';
+      if (pdf) pdf.style.display = 'inline-block';
+      if (copy) copy.style.display = 'inline-block';
     }
 
     // Place toolbar now, after load, and briefly with a timer in case DOM reorders
@@ -6294,7 +6294,7 @@ document.addEventListener('DOMContentLoaded', function(){
     function toggleBtn(){
       try {
         const t = getTotalsSafe();
-        btn.style.display = anyPositiveTotals(t) ? 'inline-block' : 'none';
+        btn.style.display = 'inline-block';
       } catch(e){
         btn.style.display = 'none';
       }
