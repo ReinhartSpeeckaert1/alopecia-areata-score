@@ -399,25 +399,41 @@
 }
 
 
-  .help-box {
-    width: 220px;
-    height: 140px;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid #aaa;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
-    color: #000;
-    position: absolute;
-    top: 22px;
-    left: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    display: none;
-  }
+  
 
 
+.help-box {
+  border: 2px solid #aaa;
+  border-radius: 8px;
+  padding: 0;
+  font-size: 14px;
+  color: #000;
+  position: absolute;
+  top: 22px;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  background: white;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#help1-box.help-box { width: 900px; height: 437px; }
+#help2-box.help-box { width: 376px; height: 50px; }
+#androgenetic-help-box.help-box { width: 900px; height: 300px; }
+
+/* Strong, specific rules so images fill the fixed box */
+#help1-box.help-box img,
+#help2-box.help-box img,
+#androgenetic-help-box.help-box img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain;
+  image-rendering: auto;
+}
 #results-summary {
     display: flex;
     justify-content: center;
@@ -1385,7 +1401,7 @@
 <div id="aga-help-float" style="display:none; position: absolute; left: 26px; top: 0; 
                   background: white; border: 1px solid #999; 
                   box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
-<img alt="Androgenetic alopecia help" src="Androgenetichelp.jpg" style="max-width: 360px; height: auto;"/>
+<img alt="Androgenetic alopecia help" src="Images/Androgenetichelp.jpg" style="max-width: 100%; height: auto;"/>
 </div>
 </span>
 </h3>
@@ -2846,29 +2862,125 @@ window.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-<script>
-function showTooltip(el, text) {
-  let tip = document.createElement('div');
-  tip.className = 'help-box';
-  tip.innerText = text;
 
-  if (text.includes("window 1")) {
-    tip.style.backgroundImage = "url('Images/help1.jpg')";
-  } else if (text.includes("window 2")) {
-    tip.style.backgroundImage = "url('Images/help2.jpg')";
-  } else {
-    tip.style.background = "#fff";
+
+
+
+<script>
+(function(){
+  let ACTIVE_TIP = null;
+  let HIDE_TIMER = null;
+
+  function makeTip(){
+    const tip = document.createElement('div');
+    tip.className = 'help-box';
+    tip.style.display = 'block';
+    tip.style.backgroundRepeat = 'no-repeat';
+    tip.style.backgroundPosition = 'center';
+    tip.style.backgroundSize = 'contain';
+    tip.style.padding = '0';
+    tip.style.border = '1px solid #999';
+    tip.style.zIndex = '2147483647';
+    tip.style.position = 'fixed';
+    tip.style.width = '260px';
+    tip.style.height = '180px';
+    tip.style.background = 'transparent';
+    tip.setAttribute('data-tip','1');
+    return tip;
   }
 
-  el.appendChild(tip);
-  tip.style.display = 'block';
-}
+  function placeTip(tip, el, w, h){
+    const rect = el.getBoundingClientRect();
+    let left = rect.left;
+    let top  = rect.bottom + 8;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if (left + w > vw - 8) left = Math.max(8, vw - w - 8);
+    if (top + h > vh - 8)  top  = Math.max(8, rect.top - h - 8);
+    tip.style.left = left + 'px';
+    tip.style.top  = top  + 'px';
+  }
 
-function hideTooltip(el) {
-  const tip = el.querySelector('.help-box');
-  if (tip) tip.remove();
-}
+  window.showTooltip = function(el, text){
+    if (HIDE_TIMER){ clearTimeout(HIDE_TIMER); HIDE_TIMER = null; }
+
+    if (!ACTIVE_TIP){
+      ACTIVE_TIP = makeTip();
+      document.body.appendChild(ACTIVE_TIP);
+      ACTIVE_TIP.addEventListener('mouseenter', function(){
+        if (HIDE_TIMER){ clearTimeout(HIDE_TIMER); HIDE_TIMER = null; }
+      });
+      ACTIVE_TIP.addEventListener('mouseleave', function(){
+        window.hideTooltip(el);
+      });
+      function onRelayout(){
+        const w = parseInt(ACTIVE_TIP.style.width) || 260;
+        const h = parseInt(ACTIVE_TIP.style.height) || 180;
+        placeTip(ACTIVE_TIP, el, w, h);
+      }
+      ACTIVE_TIP._cleanup = () => {
+        window.removeEventListener('resize', onRelayout);
+        window.removeEventListener('scroll', onRelayout);
+      };
+      window.addEventListener('resize', onRelayout, {passive:true});
+      window.addEventListener('scroll', onRelayout, {passive:true});
+    }
+
+    // Simplified mapping
+    let candidate = null;
+    const nearestWithId = (el.closest('[id]') || {}).id || '';
+
+    if (el.closest('.title-banner')) {
+      candidate = 'Images/help1.jpg';            // banner
+    } else if (el.closest('#aga-ui-wrapper') || /androgenetic/i.test(nearestWithId)) {
+      candidate = 'Images/Androgenetichelp.jpg'; // AGA
+    } else {
+      candidate = 'Images/help2.jpg';            // all other density sections
+    }
+
+    const tip = ACTIVE_TIP;
+    placeTip(tip, el, 260, 180);
+
+    const img = new Image();
+    img.onload = function(){
+      const maxW = Math.min(this.naturalWidth, Math.floor(window.innerWidth * 0.9));
+      const ratio = this.naturalHeight / Math.max(1, this.naturalWidth);
+      const w = Math.max(180, maxW);
+      const h = Math.round(w * ratio);
+      tip.style.width  = w + 'px';
+      tip.style.height = h + 'px';
+      tip.style.backgroundImage = "url('" + candidate + "')";
+      tip.style.backgroundColor = 'transparent';
+      placeTip(tip, el, w, h);
+    };
+    img.onerror = function(){
+      tip.style.width = '280px';
+      tip.style.height = 'auto';
+      tip.style.padding = '8px 10px';
+      tip.style.background = '#fff';
+      tip.textContent = text || 'Help';
+      placeTip(tip, el, 280, 140);
+    };
+    img.src = candidate;
+  };
+
+  window.hideTooltip = function(el){
+    if (HIDE_TIMER){ clearTimeout(HIDE_TIMER); }
+    HIDE_TIMER = setTimeout(function(){
+      if (ACTIVE_TIP){
+        if (ACTIVE_TIP._cleanup) ACTIVE_TIP._cleanup();
+        ACTIVE_TIP.remove();
+        ACTIVE_TIP = null;
+      }
+      HIDE_TIMER = null;
+    }, 160);
+  };
+})();
 </script>
+
+
+
+
 <script>document.getElementById("reset-button").onclick = () => location.reload();</script>
 <script>
 function calculateSectionTotals() {
@@ -7430,5 +7542,24 @@ if (typeof window.colorForPercent !== 'function'){
   window.addEventListener("resize", refreshAll, {passive:true});
 })();
 </script>
+
+<script>
+(function(){
+  const float = document.getElementById('aga-help-float');
+  const img   = float && float.querySelector('img');
+  if (!float || !img) return;
+  function sizeToImage(){
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    const maxW = Math.min(Math.max(320, img.naturalWidth), Math.floor(window.innerWidth * 0.9));
+    float.style.width  = maxW + 'px';
+    const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
+    float.style.height = Math.round(maxW * ratio) + 'px';
+  }
+  img.addEventListener('load', sizeToImage);
+  if (img.complete) sizeToImage();
+  window.addEventListener('resize', sizeToImage, {passive:true});
+})();
+</script>
+
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
