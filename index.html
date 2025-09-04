@@ -5,6 +5,32 @@
 <meta charset="utf-8"/>
 <title>Alopecia Areata Calculator</title>
 <style>
+
+/* injected v3: spacing for moved density help icon */
+.density-container > .help-icon { margin-left: 8px; }
+
+
+
+/* injected v3: make header title ignore pointer events so it doesn't block Info hover */
+.title-banner h1, .title-banner h2, .title-banner h3 { pointer-events: none; }
+.title-banner .help-info-btn { position: relative; z-index: 25; }
+
+
+
+/* injected: Info buttons styled to match selected Age button and stacking fix */
+.help-info-btn {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 9999px;
+  padding: 4px 10px;
+}
+.title-banner { position: relative; }
+.title-banner .help-info-btn { position: relative; z-index: 21; }
+
+
     body {
       font-family: "Segoe UI", "Helvetica Neue", sans-serif;
       padding: 20px;
@@ -1350,14 +1376,59 @@
     display: none !important;
   }
 </style>
+
+<style id="help-box-viewport-guard">
+  :root { --help-pad: 12px; }
+  /* Never let help pop-ups exceed the viewport */
+  .help-box {
+    max-width: calc(100vw - var(--help-pad) * 2) !important;
+    max-height: calc(100vh - var(--help-pad) * 2) !important;
+    overflow: auto !important;
+    box-sizing: border-box !important;
+  }
+  /* Override earlier fixed sizes */
+  #help1-box.help-box,
+  #help2-box.help-box,
+  #androgenetic-help-box.help-box {
+    width: auto !important;
+    height: auto !important;
+  }
+  /* Include the floating AGA help as well */
+  #aga-help-float {
+    max-width: calc(100vw - var(--help-pad) * 2) !important;
+    max-height: calc(100vh - var(--help-pad) * 2) !important;
+    overflow: auto !important;
+    box-sizing: border-box !important;
+  }
+</style>
+
+<style id="banner-small-screen-fix">
+  /* Center the banner and avoid right-edge overflow on small screens */
+  .title-banner {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+  @media (max-width: 640px) {
+    .title-banner {
+      width: 100% !important;
+      overflow: hidden !important; /* clip pseudo-element glow */
+    }
+    .title-banner::after {
+      /* clamp decorative background so it doesn't push the right edge */
+      inset: -30% -8% !important;
+    }
+  }
+  html, body { overflow-x: hidden; } /* prevent any residual horizontal scroll */
+</style>
 </head>
 <body>
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<div class="title-banner has-hero" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;">
-<span class="help-icon" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">?</span>
+<div class="title-banner has-hero" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;" z-index: 20;"><button type="button" class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">Info</button>
 </div>
 <div style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: white; opacity: 0.8;">
     © Reinhart Speeckaert, Nanja van Geel
@@ -1395,9 +1466,7 @@
 <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
 <span>Androgenetic alopecia</span>
 <span class="aga-help-wrap" style="position: relative; display: inline-block;">
-<span id="aga-help" style="cursor: pointer; font-weight: bold; border: 1px solid #ccc; border-radius: 50%; 
-                   width: 18px; height: 18px; display: inline-flex; align-items: center; 
-                   justify-content: center; background-color: white;" title="Help">?</span>
+<button id="aga-help" type="button" class="age-btn help-info-btn" title="Help">Info</button>
 <div id="aga-help-float" style="display:none; position: absolute; left: 26px; top: 0; 
                   background: white; border: 1px solid #999; 
                   box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
@@ -1407,7 +1476,7 @@
 </h3>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
-<div class="density-container" id="androgenetic-density"><label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button></div>
+<div class="density-container" id="androgenetic-density"><label>Hair Density:</label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></div>
 </div>
 <div class="area-container" id="androgenetic-areas" style="margin-top: 6px;"></div>
 <div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
@@ -1539,13 +1608,13 @@ function renderScalpSection(section) {
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div></div>
       <div class="density-container" id="${section.id}-density">
-        <label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the alopecia areata patches')" onmouseleave="hideTooltip(this)">?</span></label>
+        <label>Hair Density:</label>
         <button data-density="0" class="selected"></button>
         <button data-density="10"></button>
         <button data-density="25"></button>
         <button data-density="50"></button>
         <button data-density="75"></button>
-        <button data-density="90"></button>
+        <button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the alopecia areata patches')" onmouseleave="hideTooltip(this)">?</span>
       </div>
     </div>
     <div class="area-container" id="${section.id}-areas"></div>
@@ -2554,13 +2623,13 @@ window.addEventListener("DOMContentLoaded", function() {
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="right-beard-density">
-<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 22')" onmouseleave="hideTooltip(this)">?</span></label>
+<label>Hair Density:</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
 <button data-density="50"></button>
 <button data-density="75"></button>
-<button data-density="90"></button>
+<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 22')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="right-beard-areas"></div>
@@ -2571,13 +2640,13 @@ window.addEventListener("DOMContentLoaded", function() {
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="left-beard-density">
-<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span></label>
+<label>Hair Density:</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
 <button data-density="50"></button>
 <button data-density="75"></button>
-<button data-density="90"></button>
+<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="left-beard-areas"></div>
@@ -2588,13 +2657,13 @@ window.addEventListener("DOMContentLoaded", function() {
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="central-beard-density">
-<label>Hair Density:<span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span></label>
+<label>Hair Density:</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
 <button data-density="50"></button>
 <button data-density="75"></button>
-<button data-density="90"></button>
+<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="central-beard-areas"></div>
@@ -7561,5 +7630,48 @@ if (typeof window.colorForPercent !== 'function'){
 })();
 </script>
 
+
+<script id="help-box-placement-guard">
+(function(){
+  const PAD = 12;
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+  function placeWithinViewport(box, trigger){
+    box.style.position = 'fixed';
+    box.style.maxWidth  = `calc(100vw - ${PAD*2}px)`;
+    box.style.maxHeight = `calc(100vh - ${PAD*2}px)`;
+    // force reflow to measure after styling
+    const bw = box.offsetWidth, bh = box.offsetHeight;
+    const r  = trigger.getBoundingClientRect();
+    const left = clamp(Math.round(r.left), PAD, window.innerWidth  - bw - PAD);
+    const top  = clamp(Math.round(r.bottom + 8), PAD, window.innerHeight - bh - PAD);
+    box.style.left = left + 'px';
+    box.style.top  = top  + 'px';
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.help-icon, .help-info-btn');
+    if (!btn) return;
+    // Prefer a nearby .help-box; fall back to global androgenetic box
+    let box = btn.closest('.aga-help-wrap, .title-banner, body')?.querySelector('.help-box');
+    if (!box) box = document.querySelector('#androgenetic-help-box, #help1-box, #help2-box, #aga-help-float');
+    if (!box) return;
+    const isHidden = getComputedStyle(box).display === 'none' || box.hidden;
+    box.style.display = isHidden ? 'block' : 'none';
+    box.hidden = false;
+    if (isHidden) requestAnimationFrame(() => placeWithinViewport(box, btn));
+  });
+
+  // Re-clamp visible boxes on resize
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.help-box, #aga-help-float').forEach(box => {
+      if (getComputedStyle(box).display !== 'none') {
+        const trigger = document.querySelector('.help-icon:hover, .help-info-btn:hover') || document.querySelector('.help-info-btn') || document.querySelector('.help-icon');
+        if (trigger) placeWithinViewport(box, trigger);
+      }
+    });
+  }, { passive: true });
+})();
+</script>
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
