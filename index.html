@@ -1436,6 +1436,10 @@
 </style><style id="tooltip-suppression-css">
 /* Hide tooltips within a box while user is interacting with middle/lower controls */
 .area-box.suppress-tooltips .tooltip { display: none !important; }
+
+/* Tooltip suppression applies only when .suppress-tooltips is present. If data-tooltip-sticky='1' on a box, pointerleave will not hide its tooltip. */</style><style id="ml-sticky-css-guard">
+/* When a sticky (pinned) middle/lower percentage is active, hide any non-sticky hover float */
+body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !important; }
 </style></head>
 <body>
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
@@ -7676,9 +7680,17 @@ if (typeof window.colorForPercent !== 'function'){
   }, { passive: true });
 })();
 </script>
-<script id="fix-hide-tooltips-and-mlfloats-v10">
+<script id="fix-hide-tooltips-and-mlfloats-v12">
 (function(){
-  // Helper utilities
+  // Utilities
+  function inBox(el){ return el && el.closest ? el.closest('.area-box') : null; }
+  function isMidLower(el){ return !!(el && el.closest && el.closest('.middleplus, .middleminus, .lowerplus, .lowerminus')); }
+  function isUpper(el){ return !!(el && el.closest && el.closest('.plus, .minus')); }
+  function shouldHandle(el){
+    return !!(el && el.closest && el.closest(
+      '.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus, .area-box, .area-box input, .area-box label'
+    ));
+  }
   function sendEscape(){
     try{
       var evt = new KeyboardEvent('keydown', {key:'Escape', bubbles:true, cancelable:true});
@@ -7687,96 +7699,85 @@ if (typeof window.colorForPercent !== 'function'){
   }
   function hideAllFloats(){
     try{
-      sendEscape(); // clear internal pin state
+      sendEscape(); // clear any internal pin
       document.querySelectorAll('.ml-float').forEach(function(f){
         if (!f) return;
         f.style.display = 'none';
         f.style.top = '-9999px';
         f.style.left = '-9999px';
+        f.removeAttribute('data-sticky-temp');
       });
+      document.body.classList.remove('ml-sticky-active');
     }catch(_){}
   }
-  function hideTooltipsInBox(box){
-    if (!box) return;
-    box.querySelectorAll('.tooltip').forEach(function(t){
-      t.style.display = 'none';
-    });
-  }
-  function markSuppress(box){
+  function startSuppression(box){
     if (!box) return;
     box.classList.add('suppress-tooltips');
+    box.querySelectorAll('.tooltip').forEach(function(t){ t.style.display = 'none'; });
   }
-  function clearSuppress(box){
+  function stopSuppression(box){
     if (!box) return;
     box.classList.remove('suppress-tooltips');
   }
-  function isMidLower(el){
-    return !!(el && el.closest && el.closest('.middleplus, .middleminus, .lowerplus, .lowerminus'));
-  }
-  function isUpper(el){
-    return !!(el && el.closest && el.closest('.plus, .minus'));
-  }
-  function inAreaBox(el){
-    return el && el.closest ? el.closest('.area-box') : null;
-  }
-  function shouldHandle(el){
-    return !!(el && el.closest && el.closest(
-      '.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus, .area-box, .area-box input, .area-box label'
-    ));
-  }
 
-  // 1) Any click on any control or box hides floating % bubbles.
+  // Track sticky mode explicitly when user clicks a middle/lower control
   document.addEventListener('click', function(e){
     var t = e.target;
     if (!shouldHandle(t)) return;
+    var box = inBox(t);
+    var midlower = isMidLower(t);
+    var upper = isUpper(t);
+
+    if (midlower){
+      // Do NOT call hideAllFloats here; let the site's handler show & pin the chosen float
+      document.body.classList.add('ml-sticky-active');
+      if (box) startSuppression(box);
+      return;
+    }
+
+    // For any other click path, clear sticky and hide all floats
     hideAllFloats();
 
-    var btnMidLower = t.closest('.middleplus, .middleminus, .lowerplus, .lowerminus');
-    var box = inAreaBox(t);
-
-    // Start suppression when using middle/lower controls; also hide any currently visible tooltips
-    if (btnMidLower && box){
-      markSuppress(box);
-      hideTooltipsInBox(box);
-      return; // keep suppressed until explicit unsuppress below
-    }
-
-    // If user clicks inside a box on anything that is NOT middle/lower controls, lift suppression immediately
-    if (box && !btnMidLower){
-      clearSuppress(box);
-    }
+    // If clicked inside a box (but not mid/lower), lift tooltip suppression for that box
+    if (box && !midlower){ stopSuppression(box); }
   }, true);
 
-  // 2) Pointerover: do NOT lift suppression just by hovering; this prevents the tooltip from reappearing while moving within the box after a middle/lower click.
-  //    But if hovering over a different box (without suppression), normal tooltip behavior continues.
-  document.addEventListener('pointerover', function(e){
+  // If pointer leaves a control and no sticky is active, hide non-sticky floats
+  document.addEventListener('pointerout', function(e){
     var t = e.target;
     if (!t) return;
-    var box = inAreaBox(t);
-    if (!box) return;
-
-    // When suppressed, ensure tip stays hidden while moving around inside the box
-    if (box.classList.contains('suppress-tooltips')){
-      hideTooltipsInBox(box);
+    if (!t.matches) return;
+    // If leaving any middle/lower button
+    if (t.matches('.middleplus, .middleminus, .lowerplus, .lowerminus')){
+      // If a sticky is active, we keep it. Otherwise, hide hover floats.
+      if (!document.body.classList.contains('ml-sticky-active')){
+        document.querySelectorAll('.ml-float:not([data-sticky="1"])').forEach(function(f){
+          f.style.display = 'none';
+        });
+      }
     }
   }, true);
 
-  // 3) Pointerleave from a box: always hide its tooltips and clear suppression, so stale tips do not stick around.
+  // When Escape is pressed by the user (or via our hideAllFloats), clear sticky mode
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){
+      document.body.classList.remove('ml-sticky-active');
+    }
+  }, true);
+
+  // Leaving a box always clears tooltip suppression; sticky state is unaffected
   document.addEventListener('pointerleave', function(e){
     var box = e.target && e.target.classList && e.target.classList.contains('area-box') ? e.target : null;
     if (!box) return;
-    hideTooltipsInBox(box);
-    clearSuppress(box);
+    stopSuppression(box);
   }, true);
 
-  // 4) Input changes inside boxes still hide floats
+  // Any input change that is not from mid/lower clears non-sticky floats and sticky mode
   document.addEventListener('change', function(e){
     if (!shouldHandle(e.target)) return;
-    hideAllFloats();
-    // If change occurs in a box and it's not from middle/lower controls, lift suppression
-    var box = inAreaBox(e.target);
-    if (box && !isMidLower(e.target)){
-      clearSuppress(box);
+    var midlower = isMidLower(e.target);
+    if (!midlower){
+      hideAllFloats();
     }
   }, true);
 })();
