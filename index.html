@@ -1360,7 +1360,6 @@
     }
   }
 </style>
-
 <style id="aga-no-yellow">
   #androgenetic-areas .area-box.selected {
     background-color: transparent !important;
@@ -1376,7 +1375,6 @@
     display: none !important;
   }
 </style>
-
 <style id="help-box-viewport-guard">
   :root { --help-pad: 12px; }
   /* Never let help pop-ups exceed the viewport */
@@ -1401,7 +1399,6 @@
     box-sizing: border-box !important;
   }
 </style>
-
 <style id="banner-small-screen-fix">
   /* Center the banner and avoid right-edge overflow on small screens */
   .title-banner {
@@ -1422,13 +1419,30 @@
   }
   html, body { overflow-x: hidden; } /* prevent any residual horizontal scroll */
 </style>
-</head>
+<style id="plus-minus-hover-enlarge-v2">
+/* Ensure plus/minus controls visibly scale on hover even if parent boxes scale */
+.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  transition: transform 0.15s ease-in-out !important;
+  transform-origin: center center;
+}
+.plus:hover, .minus:hover, .middleplus:hover, .middleminus:hover, .lowerplus:hover, .lowerminus:hover {
+  transform: scale(1.35) !important;
+  cursor: pointer;
+}
+</style><style id="tooltip-suppression-css">
+/* Hide tooltips within a box while user is interacting with middle/lower controls */
+.area-box.suppress-tooltips .tooltip { display: none !important; }
+</style></head>
 <body>
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<div class="title-banner has-hero" style="position: relative;"><div style="position: absolute; top: 5px; left: 10px;" z-index: 20;"><button type="button" class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)">Info</button>
+<div class="title-banner has-hero" style="position: relative;"><div 20;"="" style="position: absolute; top: 5px; left: 10px;" z-index:=""><button class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)" type="button">Info</button>
 </div>
 <div style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: white; opacity: 0.8;">
     © Reinhart Speeckaert, Nanja van Geel
@@ -1466,7 +1480,7 @@
 <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
 <span>Androgenetic alopecia</span>
 <span class="aga-help-wrap" style="position: relative; display: inline-block;">
-<button id="aga-help" type="button" class="age-btn help-info-btn" title="Help">Info</button>
+<button class="age-btn help-info-btn" id="aga-help" title="Help" type="button">Info</button>
 <div id="aga-help-float" style="display:none; position: absolute; left: 26px; top: 0; 
                   background: white; border: 1px solid #999; 
                   box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
@@ -2931,10 +2945,6 @@ window.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-
-
-
-
 <script>
 (function(){
   let ACTIVE_TIP = null;
@@ -3046,10 +3056,6 @@ window.addEventListener("DOMContentLoaded", function () {
   };
 })();
 </script>
-
-
-
-
 <script>document.getElementById("reset-button").onclick = () => location.reload();</script>
 <script>
 function calculateSectionTotals() {
@@ -7611,7 +7617,6 @@ if (typeof window.colorForPercent !== 'function'){
   window.addEventListener("resize", refreshAll, {passive:true});
 })();
 </script>
-
 <script>
 (function(){
   const float = document.getElementById('aga-help-float');
@@ -7629,8 +7634,6 @@ if (typeof window.colorForPercent !== 'function'){
   window.addEventListener('resize', sizeToImage, {passive:true});
 })();
 </script>
-
-
 <script id="help-box-placement-guard">
 (function(){
   const PAD = 12;
@@ -7673,5 +7676,109 @@ if (typeof window.colorForPercent !== 'function'){
   }, { passive: true });
 })();
 </script>
-</body></html>
+<script id="fix-hide-tooltips-and-mlfloats-v10">
+(function(){
+  // Helper utilities
+  function sendEscape(){
+    try{
+      var evt = new KeyboardEvent('keydown', {key:'Escape', bubbles:true, cancelable:true});
+      document.dispatchEvent(evt);
+    }catch(_){}
+  }
+  function hideAllFloats(){
+    try{
+      sendEscape(); // clear internal pin state
+      document.querySelectorAll('.ml-float').forEach(function(f){
+        if (!f) return;
+        f.style.display = 'none';
+        f.style.top = '-9999px';
+        f.style.left = '-9999px';
+      });
+    }catch(_){}
+  }
+  function hideTooltipsInBox(box){
+    if (!box) return;
+    box.querySelectorAll('.tooltip').forEach(function(t){
+      t.style.display = 'none';
+    });
+  }
+  function markSuppress(box){
+    if (!box) return;
+    box.classList.add('suppress-tooltips');
+  }
+  function clearSuppress(box){
+    if (!box) return;
+    box.classList.remove('suppress-tooltips');
+  }
+  function isMidLower(el){
+    return !!(el && el.closest && el.closest('.middleplus, .middleminus, .lowerplus, .lowerminus'));
+  }
+  function isUpper(el){
+    return !!(el && el.closest && el.closest('.plus, .minus'));
+  }
+  function inAreaBox(el){
+    return el && el.closest ? el.closest('.area-box') : null;
+  }
+  function shouldHandle(el){
+    return !!(el && el.closest && el.closest(
+      '.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus, .area-box, .area-box input, .area-box label'
+    ));
+  }
+
+  // 1) Any click on any control or box hides floating % bubbles.
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if (!shouldHandle(t)) return;
+    hideAllFloats();
+
+    var btnMidLower = t.closest('.middleplus, .middleminus, .lowerplus, .lowerminus');
+    var box = inAreaBox(t);
+
+    // Start suppression when using middle/lower controls; also hide any currently visible tooltips
+    if (btnMidLower && box){
+      markSuppress(box);
+      hideTooltipsInBox(box);
+      return; // keep suppressed until explicit unsuppress below
+    }
+
+    // If user clicks inside a box on anything that is NOT middle/lower controls, lift suppression immediately
+    if (box && !btnMidLower){
+      clearSuppress(box);
+    }
+  }, true);
+
+  // 2) Pointerover: do NOT lift suppression just by hovering; this prevents the tooltip from reappearing while moving within the box after a middle/lower click.
+  //    But if hovering over a different box (without suppression), normal tooltip behavior continues.
+  document.addEventListener('pointerover', function(e){
+    var t = e.target;
+    if (!t) return;
+    var box = inAreaBox(t);
+    if (!box) return;
+
+    // When suppressed, ensure tip stays hidden while moving around inside the box
+    if (box.classList.contains('suppress-tooltips')){
+      hideTooltipsInBox(box);
+    }
+  }, true);
+
+  // 3) Pointerleave from a box: always hide its tooltips and clear suppression, so stale tips do not stick around.
+  document.addEventListener('pointerleave', function(e){
+    var box = e.target && e.target.classList && e.target.classList.contains('area-box') ? e.target : null;
+    if (!box) return;
+    hideTooltipsInBox(box);
+    clearSuppress(box);
+  }, true);
+
+  // 4) Input changes inside boxes still hide floats
+  document.addEventListener('change', function(e){
+    if (!shouldHandle(e.target)) return;
+    hideAllFloats();
+    // If change occurs in a box and it's not from middle/lower controls, lift suppression
+    var box = inAreaBox(e.target);
+    if (box && !isMidLower(e.target)){
+      clearSuppress(box);
+    }
+  }, true);
+})();
+</script></body></html>
 <!-- removed legacy SAFE OVERRIDES -->
