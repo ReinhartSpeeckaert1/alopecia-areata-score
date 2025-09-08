@@ -7781,5 +7781,102 @@ if (typeof window.colorForPercent !== 'function'){
     }
   }, true);
 })();
-</script></body></html>
+</script>
+
+
+
+<script id="aga-fix-v10">
+(function(){
+  function clearAga(){
+    try { if (typeof window.setAndrogeneticScore === 'function') window.setAndrogeneticScore(0); } catch(e){}
+    try { if (typeof window.updateScalpUI === 'function') window.updateScalpUI(); } catch(e){}
+    try { if (typeof window.updateScoreRings === 'function') window.updateScoreRings(); } catch(e){}
+  }
+
+  // Second-click toggle off
+  document.addEventListener('click', function(ev){
+    var within = ev.target && ev.target.closest && ev.target.closest('#androgenetic-areas');
+    if (!within) return;
+    var pm = ev.target.closest && ev.target.closest('.plus, .minus');
+    if (pm && pm.classList.contains('glow')){
+      ev.preventDefault(); ev.stopPropagation();
+      clearAga();
+      return;
+    }
+    var box = ev.target.closest && ev.target.closest('.area-box');
+    if (box && box.classList.contains('selected')){
+      var clickedPM = ev.target.closest && ev.target.closest('.plus, .minus');
+      if (!clickedPM){
+        ev.preventDefault(); ev.stopPropagation();
+        clearAga();
+        return;
+      }
+    }
+  }, true);
+
+  // Refresh ring on checkbox toggle
+  document.addEventListener('change', function(e){
+    var t = e.target;
+    if (t && t.id === 'aga-checkbox'){
+      try { if (typeof window.updateScalpUI === 'function') window.updateScalpUI(); } catch(e){}
+      try { if (typeof window.updateScoreRings === 'function') window.updateScoreRings(); } catch(e){}
+      setTimeout(colorizeAgaTooltips, 0);
+    }
+  }, true);
+
+  // Color function
+  function colorFn(p){
+    if (typeof window.getColorForPercentage === 'function') return window.getColorForPercentage(p);
+    var v = Math.max(0, Math.min(100, Number(p))) / 100;
+    var hue = (1 - v) * 120;
+    return 'hsl(' + hue + ', 80%, 45%)';
+  }
+  function colorizeAgaTooltips(){
+    var root = document.getElementById('androgenetic-areas');
+    if (!root) return;
+    root.querySelectorAll('.tooltip').forEach(function(tt){
+      var txt = tt.textContent || '';
+      var m = txt.match(/(\d+(?:\.\d+)?)%/);
+      if (!m) return;
+      var pct = parseFloat(m[1]);
+      var bg = colorFn(pct);
+      try { tt.style.setProperty('background-color', bg, 'important'); } catch(e){ tt.style.backgroundColor = bg; }
+    });
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', colorizeAgaTooltips);
+  } else {
+    colorizeAgaTooltips();
+  }
+
+  document.addEventListener('click', function(ev){
+    if (ev.target && ev.target.closest && ev.target.closest('#androgenetic-areas')){
+      setTimeout(colorizeAgaTooltips, 0);
+    }
+  }, true);
+
+  var mo = new MutationObserver(function(muts){
+    for (var i=0;i<muts.length;i++){
+      var m = muts[i];
+      if (m.type === 'childList'){
+        m.addedNodes && m.addedNodes.forEach(function(n){
+          if (n.nodeType === 1 && (n.matches && n.matches('#androgenetic-areas .tooltip'))){
+            colorizeAgaTooltips();
+          } else if (n.querySelectorAll){
+            var any = n.querySelectorAll('#androgenetic-areas .tooltip');
+            if (any.length) colorizeAgaTooltips();
+          }
+        });
+      } else if (m.type === 'characterData'){
+        var p = m.target && m.target.parentElement;
+        if (p && p.matches && p.matches('#androgenetic-areas .tooltip')) colorizeAgaTooltips();
+      }
+    }
+  });
+  try { mo.observe(document.body, {subtree:true, childList:true, characterData:true}); } catch(e){}
+})();
+</script>
+
+</body></html>
 <!-- removed legacy SAFE OVERRIDES -->
