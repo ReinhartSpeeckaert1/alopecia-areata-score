@@ -1686,8 +1686,7 @@ function renderScalpSection(section) {
       if (y >= h * 2/3) segment = 'bottom';
       else if (y >= h / 3) segment = 'middle';
       // ensure only one scalp box has a segment at a time
-      document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box')
-        .forEach(b => b.removeAttribute('data-selected-segment'));
+      /* keep per-box segments: global clear removed */
       box.setAttribute('data-selected-segment', segment);
       toggleScalpSelection(section.id, area.value);
     };
@@ -1950,7 +1949,7 @@ const androgeneticSection = {
       minus.addEventListener('click', () => {
         container.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
         // highlight minus and the box
-        container.querySelectorAll('.plus, .minus').forEach(el => el.classList.remove('glow'));
+        box.querySelectorAll('.plus, .minus').forEach(el=>el.classList.remove('glow'));
         minus.classList.add('glow');
         box.classList.add('selected');
         mtip.style.display = 'block';
@@ -1969,7 +1968,7 @@ const androgeneticSection = {
       plus.addEventListener('click', () => {
         container.querySelectorAll('.tooltip').forEach(t => t.style.display = 'none');
         // highlight plus and the box
-        container.querySelectorAll('.plus, .minus').forEach(el => el.classList.remove('glow'));
+        box.querySelectorAll('.plus, .minus').forEach(el=>el.classList.remove('glow'));
         plus.classList.add('glow');
         box.classList.add('selected');
         ptip.style.display = 'block';
@@ -6641,8 +6640,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (!box || !isScalpBox(box)) return;
     const seg = inferSegmentFromClick(box, e.clientY);
     // Ensure only one segment overlay across scalp boxes at a time
-    document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box')
-      .forEach(b => b.removeAttribute('data-selected-segment'));
+    /* keep per-box segments: global clear removed */
     box.setAttribute('data-selected-segment', seg);
     // No need to call updateScalpUI(); the existing onclick on +/- triggers selection and UI update.
   }, true); // capture so it runs before per-element handlers that stopPropagation
@@ -6768,7 +6766,7 @@ window.ML_PERCENT_CONFIG = {
 
     function setUniformGlow(type){
       const container = box.closest('[id$="-areas"]') || document;
-      container.querySelectorAll('.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus')
+      box.querySelectorAll('.plus, .minus, .middleplus, .middleminus, .lowerplus, .lowerminus')
         .forEach(el=>el.classList.remove('glow'));
       const topPlus = box.querySelector('.plus');
       const topMinus = box.querySelector('.minus');
@@ -6782,8 +6780,7 @@ window.ML_PERCENT_CONFIG = {
     function select(segment, value, ev){
       if (ev) ev.stopPropagation();
       // clear segment on all boxes to match native behavior
-      document.querySelectorAll('#backside-areas .area-box, #topside-areas .area-box, #leftside-areas .area-box, #rightside-areas .area-box, #androgenetic-areas .area-box')
-        .forEach(b => b.removeAttribute('data-selected-segment'));
+      /* keep per-box segments: global clear removed */
       box.setAttribute('data-selected-segment', segment);
       if (typeof toggleScalpSelection === 'function') toggleScalpSelection(sectionId, value, true);
     }
