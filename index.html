@@ -6684,6 +6684,12 @@ document.addEventListener('DOMContentLoaded', function() {
           box.querySelectorAll('.segment-overlay').forEach(function(n) { n.remove(); });
           if (isSelected) {
             const seg = box.getAttribute('data-selected-segment') || 'middle';
+            const thirds = ['top','middle','bottom'];
+            thirds.filter(function(t){ return t !== seg; }).forEach(function(t){
+              const g = document.createElement('div');
+              g.className = 'segment-overlay grey ' + t;
+              box.appendChild(g);
+            });
             const ov = document.createElement('div');
             ov.className = 'segment-overlay ' + seg;
             box.appendChild(ov);
@@ -7877,6 +7883,55 @@ if (typeof window.colorForPercent !== 'function'){
   try { mo.observe(document.body, {subtree:true, childList:true, characterData:true}); } catch(e){}
 })();
 </script>
+
+
+<style>
+  /* Grey out the non-selected thirds inside a scalp box */
+  .area-box .segment-overlay.grey {
+    background-color: rgba(128,128,128,0.25);
+    border: 1px solid rgba(128,128,128,0.35);
+    box-shadow: none;
+    z-index: 1;
+  }
+  /* Keep the selected third clearly on top */
+  .area-box .segment-overlay:not(.grey) {
+    z-index: 2;
+  }
+</style>
+
+
+<style id="overlay-opacity-override-final">
+/* Ensure overlays are positioned and sit above controls */
+.area-box { position: relative !important; }
+.area-box .segment-overlay {
+  position: absolute !important;
+  left: 0; right: 0;
+  pointer-events: none !important;
+}
+
+/* Make grey overlays less transparent (darker) and on top of +/- */
+.area-box .segment-overlay.grey {
+  background-color: rgba(128,128,128,0.7) !important; /* was ~0.25–0.5; now darker */
+  border: 1px solid rgba(128,128,128,0.8) !important;
+  box-shadow: none !important;
+  z-index: 10000 !important;
+}
+
+/* Keep the selected third fully transparent with a clear yellow outline */
+.area-box .segment-overlay:not(.grey) {
+  background-color: rgba(255,193,7,0) !important;
+  border: 0 !important;
+  outline: 3px solid rgba(255,193,7,1) !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+  z-index: 10001 !important;
+}
+
+/* Safety: define third positions if needed */
+.area-box .segment-overlay.top { top: 0; height: 33.3333% !important; }
+.area-box .segment-overlay.middle { top: 33.3333%; height: 33.3333% !important; }
+.area-box .segment-overlay.bottom { top: 66.6667%; height: 33.3333% !important; }
+</style>
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
