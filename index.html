@@ -4801,10 +4801,7 @@ function showImmediatePeekFor(region) {
       const now = new Date();
       const dt = now.toLocaleString();
       const lines = [];
-      lines.push('Alopecia Areata Calculator');
-      lines.push(dt);
-      lines.push('');
-      lines.push('Summary of Alopecia Areata Involvement');
+      const __d = new Date(); const __ds = (__d.getDate()) + '/' + (__d.getMonth()+1) + '/' + __d.getFullYear(); lines.push('Summary of Alopecia Areata Involvement (' + __ds + '):');
       lines.push(`- Total Scalp: ${Number(totals.Scalp).toFixed(0)}%`);
 
     // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
@@ -5035,10 +5032,7 @@ if (typeof window.__baselineScalpPct === 'number') {
     const totals = (typeof calculateSectionTotals==='function') ? calculateSectionTotals() : {Scalp:0, Eyebrows:0, Eyelashes:0, Beard:0};
     const dt = new Date().toLocaleString();
     const lines = [];
-    lines.push('Alopecia Areata Calculator');
-    lines.push(dt);
-    lines.push('');
-    lines.push('Summary of Alopecia Areata Involvement');
+    const __d = new Date(); const __ds = (__d.getDate()) + '/' + (__d.getMonth()+1) + '/' + __d.getFullYear(); lines.push('Summary of Alopecia Areata Involvement (' + __ds + '):');
     lines.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||0)}%`);
     
     // Append scalp change if baseline exists and non-zero (works with totals.Scalp or totals.scalp)
@@ -5073,12 +5067,18 @@ lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||0)}%`);
         }
       } catch(_){ code = ''; }
     }
-    if (code) {
-      lines.push('');
-      lines.push(`Code: ${code}`);
-    }
     lines.push('');
-    return lines.join('\n'); // real newlines
+    // Ensure order: Dominant pattern before Code
+let __hasDom = lines.some(l=>/^\s*Dominant pattern:/i.test(l));
+if (!__hasDom) {
+  try {
+    var __patNode = document.getElementById('pattern-dominant');
+    var __patText = __patNode && __patNode.textContent ? __patNode.textContent.trim() : '';
+    if (__patText) lines.push('Dominant pattern: ' + __patText);
+  } catch(__e){}
+}
+if (code) { lines.push('Code: ' + code); }
+return lines.join('\n'); // real newlines
   }
   async function initCopySummary(){
     // Wait for required functions
@@ -6352,15 +6352,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const now = new Date().toLocaleString();
     const lines = [];
-    lines.push('Alopecia Areata Calculator');
-    lines.push(now);
-    lines.push('');
-    lines.push('Summary of Alopecia Areata Involvement');
+    const __d = new Date(); const __ds = (__d.getDate()) + '/' + (__d.getMonth()+1) + '/' + __d.getFullYear(); lines.push('Summary of Alopecia Areata Involvement (' + __ds + '):');
     if (includeScalp)    lines.push(`- Total Scalp: ${Math.round(Number(totals.Scalp)||Number(totals.scalp)||0)}%`);
     if (includeEyebrows) lines.push(`- Total Eyebrows: ${Math.round(Number(totals.Eyebrows)||Number(totals.eyebrows)||0)}%`);
     if (includeEyelashes)lines.push(`- Total Eyelashes: ${Math.round(Number(totals.Eyelashes)||Number(totals.eyelashes)||0)}%`);
     if (includeBeard)    lines.push(`- Total Beard: ${Math.round(Number(totals.Beard)||Number(totals.beard)||0)}%`);
-    if (code) { lines.push(''); lines.push(`Code: ${code}`); }
     lines.push('');
     lines.push('Detailed Area Breakdown');
     if (includeScalp){
