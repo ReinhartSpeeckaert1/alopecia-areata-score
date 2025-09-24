@@ -6439,9 +6439,13 @@ document.addEventListener('DOMContentLoaded', function(){
       .replace(/[^\x20-\x7E\r\n\t]/g, '?');
   }
   function escapePdfText(s){
-    return asciiSafe(s).replace(/([()\\])/g, '\\\\$1').replace(/\r?\n/g, '\\n');
+    s = asciiSafe(s);
+    s = s.replace(/\\/g, '\\\\'); // escape backslashes
+    s = s.replace(/\r?\n/g, '\\n'); // normalize newlines
+    return s;
   }
-  function byteLen(s){
+
+function byteLen(s){
     return new TextEncoder().encode(s).length;
   }
 
