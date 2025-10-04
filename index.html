@@ -749,6 +749,97 @@ body { margin: 0 !important; padding-top: 0 !important; }
 /* Tighten spacing below the result line now that the bar is gone */
 #result { margin: 6px 0 2px 0 !important; }
 
+
+/* === Robust density image mapping by attribute (overrides nth-child shifts) === */
+.density-container button[data-density="0"]  { background-image: url('Images/density-0.jpg') !important; }
+.density-container button[data-density="10"] { background-image: url('Images/density-10.jpg') !important; }
+.density-container button[data-density="25"] { background-image: url('Images/density-25.jpg') !important; }
+.density-container button[data-density="50"] { background-image: url('Images/density-50.jpg') !important; }
+.density-container button[data-density="75"] { background-image: url('Images/density-75.jpg') !important; }
+.density-container button[data-density="90"] { background-image: url('Images/density-90.jpg') !important; }
+
+/* === Instruction video button: YouTube red === */
+#instruction-video-btn {
+  background: #FF0000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#instruction-video-btn:hover, #instruction-video-btn:focus {
+  background: #CC0000 !important;
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+
+/* === UI tweaks: darker red video button, bigger rings+labels, extra spacing === */
+
+/* 1) Darker red for the information video button */
+#instruction-video-btn {
+  background: #B00000 !important; /* darker YouTube red */
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#instruction-video-btn:hover,
+#instruction-video-btn:focus {
+  background: #8B0000 !important; /* even darker on hover/focus */
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+/* 2) Enlarge the rings and the labels below them */
+#score-rings { gap: 16px !important; margin-bottom: 30px !important; }
+.ring {
+  width: 120px !important;
+  height: 120px !important;
+  position: relative !important; /* ensure label can sit below */
+}
+/* Put label below the ring and enlarge it */
+.ring .ring-label {
+  position: absolute !important;
+  bottom: -22px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  pointer-events: none !important;
+}
+
+/* 3) Increase space between hair density buttons and scoring boxes */
+.density-container { margin: 10px 0 20px 0 !important; } /* more bottom space */
+.area-container { margin-top: 8px !important; } /* extra breathing room */
+/* Keep density help icon only on hover/selected (from earlier changes) */
+.density-container .help-icon { transition: opacity 120ms ease-in-out; }
+
+
+/* === Larger ring numbers and labels; larger top summary ("pattern / improvement / worsening") === */
+.ring .ring-val { font-size: 28px !important; font-weight: 700 !important; }
+.ring .ring-label { font-size: 18px !important; font-weight: 600 !important; }
+#results-summary .result-box { font-size: 16px !important; padding: 8px 12px !important; }
+
+/* === Extra spacing below each hair density row to prevent tooltip overlap with scoring boxes === */
+.density-container { margin: 10px 0 36px 0 !important; }  /* big bottom margin */
+.area-container { margin-top: 12px !important; }
+
+
+/* Exact sizes requested */
+.ring .ring-val { font-size: 20px !important; }
+#results-summary .result-box { font-size: 20px !important; }
+
+
+/* Force the heading above the rings ("pattern") to 20px despite inline font */
+#pattern-dominant {
+  font-size: 20px !important;
+  line-height: 1.25 !important;
+  font-weight: 600 !important;
+}
+
+/* Add more space so density tooltips never overlap scoring boxes */
+.density-container { margin: 12px 0 44px 0 !important; }
+.area-container { margin-top: 14px !important; }
+
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
