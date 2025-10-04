@@ -2,6 +2,7 @@
 
 <html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
 // Age helpers - minimal, non-invasive
 (function(){
@@ -696,6 +697,135 @@ html, body { margin-top: 0 !important; }
 body { margin: 0 !important; padding-top: 0 !important; }
 .top-info-icons { margin: 0 !important; }
 .title-banner { margin-top: 0 !important; }
+
+
+/* Mobile/touch accessibility for beard toggle */
+#beard-title { display: flex; align-items: center; gap: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+#beard-title input#beard-toggle { width: 22px; height: 22px; flex: 0 0 auto; }
+#beard-title .beard-label { display: block; padding: 12px 8px; line-height: 1.3; user-select: none; }
+@media (pointer:coarse), (max-width: 640px) {
+  #beard-title .beard-label { padding: 14px 10px; }
+  #beard-title input#beard-toggle { width: 26px; height: 26px; }
+}
+
+
+/* Top info icons: dark blue background with white glyphs */
+.top-info-icons .help-info-btn {
+  background: #1e40af !important; /* dark blue */
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 6px 12px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+.top-info-icons .help-info-btn:hover,
+.top-info-icons .help-info-btn:focus {
+  background: #1d4ed8 !important; /* slightly lighter on hover */
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+/* Hide density-area question-mark icons until hover or when user has it open/selected */
+.density-container .help-icon {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-in-out;
+}
+.density-container:hover .help-icon,
+.density-container.show .help-icon,
+.density-container[data-user-selected="true"] .help-icon {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* Hide the scalp scale under 'Total Scalp Alopecia Areata' */
+#scalp-scale { display: none !important; }
+
+
+/* Remove the progress bar under 'Total Scalp Alopecia Areata' */
+#scalp-progress { display: none !important; }
+/* Tighten spacing below the result line now that the bar is gone */
+#result { margin: 6px 0 2px 0 !important; }
+
+
+/* ===== Compact vertical layout (no changes to font sizes or figure sizes) ===== */
+.top-info-icons { margin-bottom: 4px !important; }
+.title-banner { margin-bottom: 6px !important; }
+.title-sub { margin-top: 2px !important; margin-bottom: 4px !important; }
+
+/* Space around the PDF icon row and preview strip */
+#pdf-icon-container { margin-bottom: 4px !important; }
+#selected-preview { margin: 4px 0 8px 0 !important; }
+
+/* Summary box and rings spacing */
+#results-summary { margin: 6px 0 !important; padding: 6px 10px !important; }
+#score-rings { margin: 6px 0 6px 0 !important; gap: 12px !important; }
+/* Keep ring sizes; do not alter .ring width/height */
+
+/* Section titles and blocks */
+#main-title { margin: 6px 0 4px 0 !important; }
+h3 { margin: 10px 0 6px 0 !important; } /* compact but readable for all section headers */
+
+/* Density row spacing and area containers */
+.density-container { margin: 6px 0 10px 0 !important; }
+.area-container { margin-top: 4px !important; }
+
+/* Androgenetic block tweaks */
+#androgenetic-score { margin-top: 2px !important; }
+#androgenetic-areas { margin-top: 4px !important; }
+
+/* Eyebrow/beard/eyelash blocks */
+#eyebrow-title, #beard-title, #eyelash-title { margin: 8px 0 4px 0 !important; }
+#eyebrows-wrapper, #beard-wrapper, #eyelashes-wrapper { margin-top: 4px !important; }
+
+/* General tighten for common containers */
+.banner-actions { margin-bottom: 4px !important; }
+#result { margin: 6px 0 2px 0 !important; } /* already reduced when we hid the bar; keep tight */
+
+
+/* ===== Ultra-compact vertical layout (no change to font or figure sizes) ===== */
+.top-info-icons { margin-bottom: 2px !important; }
+.title-banner { margin-bottom: 4px !important; }
+.title-sub { margin-top: 1px !important; margin-bottom: 2px !important; }
+
+/* PDF icon row and preview strip */
+#pdf-icon-container { margin-bottom: 2px !important; }
+#selected-preview { margin: 2px 0 6px 0 !important; }
+
+/* Summary box and rings */
+#results-summary { margin: 4px 0 !important; padding: 4px 8px !important; }
+#score-rings { margin: 4px 0 4px 0 !important; gap: 8px !important; }
+
+/* Section headers */
+#main-title { margin: 4px 0 2px 0 !important; }
+h2 { margin: 6px 0 4px 0 !important; }
+h3 { margin: 6px 0 4px 0 !important; }
+h4 { margin: 4px 0 2px 0 !important; }
+
+/* Immediately-following blocks under headers */
+h2 + div, h3 + div, h4 + div { margin-top: 2px !important; }
+
+/* Density rows and area containers */
+.density-container { margin: 4px 0 6px 0 !important; }
+.area-container { margin-top: 2px !important; }
+
+/* Androgenetic block */
+#androgenetic-score { margin-top: 2px !important; }
+#androgenetic-areas { margin-top: 2px !important; }
+
+/* Eyebrow/beard/eyelash blocks */
+#eyebrow-title, #beard-title, #eyelash-title { margin: 6px 0 3px 0 !important; }
+#eyebrows-wrapper, #beard-wrapper, #eyelashes-wrapper { margin-top: 2px !important; }
+
+/* Banner actions */
+.banner-actions { margin-bottom: 2px !important; }
+
+/* Reduce excess spacing around any helper boxes or info bands */
+#androgenetic-help-box, #help1-box, #help2-box, #aga-help-float {
+  margin-top: 2px !important;
+}
 
 </style>
 <!-- Preload all beard Images -->
@@ -1538,17 +1668,6 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
   .help-info-btn:hover {
     background-color: #60a5fa !important; /* even lighter on hover */
   }
-</style>
-
-
-<style id="fix-density-images-by-attr">
-/* Attribute-based mapping so added nodes do not break order */
-.density-container button[data-density="0"]  { background-image: url('Images/density-0.jpg') !important; }
-.density-container button[data-density="10"] { background-image: url('Images/density-10.jpg') !important; }
-.density-container button[data-density="25"] { background-image: url('Images/density-25.jpg') !important; }
-.density-container button[data-density="50"] { background-image: url('Images/density-50.jpg') !important; }
-.density-container button[data-density="75"] { background-image: url('Images/density-75.jpg') !important; }
-.density-container button[data-density="90"] { background-image: url('Images/density-90.jpg') !important; }
 </style>
 
 </head>
@@ -3128,12 +3247,7 @@ window.addEventListener("DOMContentLoaded", function () {
     let candidate = null;
     const nearestWithId = (el.closest('[id]') || {}).id || '';
 
-    if (el.closest('.top-info-icons')) {
-      var btnEl = el.closest('.help-info-btn');
-      var list = Array.prototype.slice.call(el.closest('.top-info-icons').querySelectorAll('.help-info-btn'));
-      var idx = list.indexOf(btnEl);
-      if (idx === 0) candidate = 'Images/help1.jpg';
-    } else if (el.closest('.title-banner')) {
+    if (el.closest('.title-banner')) {
       candidate = 'Images/help1.jpg';            // banner
     } else if (el.closest('#aga-ui-wrapper') || /androgenetic/i.test(nearestWithId)) {
       candidate = 'Images/Androgenetichelp.jpg'; // AGA
@@ -8549,6 +8663,35 @@ if (typeof window.colorForPercent !== 'function'){
     }
     labelSpan.addEventListener('mouseenter', onEnter);
     cb.addEventListener('mouseenter', onEnter);
+
+    
+    function toggleByTap(e){
+      if (e) e.preventDefault();
+      try { cb.checked = !cb.checked; } catch(e) {}
+      if (cb.checked) openBeard(); else closeBeard();
+    }
+    // Tap/click anywhere on the title or label toggles the section
+    labelSpan.addEventListener('click', toggleByTap);
+    title.addEventListener('click', function(e){
+      // ignore native click on the checkbox itself (it has its own change handler)
+      if (e && e.target && e.target === cb) return;
+      toggleByTap(e);
+    });
+    // Touch support
+    labelSpan.addEventListener('touchstart', toggleByTap, {passive:true});
+    title.addEventListener('touchstart', function(e){
+      if (e && e.target && e.target === cb) return;
+      toggleByTap(e);
+    }, {passive:true});
+    // Keyboard support
+    title.setAttribute('role','button');
+    title.setAttribute('tabindex','0');
+    title.addEventListener('keydown', function(e){
+      if (e && (e.key === 'Enter' || e.key === ' ')){
+        e.preventDefault();
+        toggleByTap(e);
+      }
+    });
 
     cb.addEventListener('change', function(){
       if (cb.checked) openBeard(); else closeBeard();
