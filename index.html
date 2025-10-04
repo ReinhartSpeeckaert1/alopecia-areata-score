@@ -844,6 +844,19 @@ body { margin: 0 !important; padding-top: 0 !important; }
 /* Prevent inconsistent mobile font inflation (keeps desktop sizes on phones) */
 html { -webkit-text-size-adjust: none !important; text-size-adjust: none !important; }
 
+
+
+.zoom-ctrl button {
+  border: 1px solid rgba(0,0,0,0.2);
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+.zoom-ctrl button:active { transform: translateY(1px); }
+
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
@@ -1689,6 +1702,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 
 </head>
 <body>
+
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
@@ -3264,7 +3278,16 @@ window.addEventListener("DOMContentLoaded", function () {
     let candidate = null;
     const nearestWithId = (el.closest('[id]') || {}).id || '';
 
-    if (el.closest('.title-banner')) {
+    if (el.closest('.top-info-icons')) {
+      const list = Array.prototype.slice.call(el.closest('.top-info-icons').querySelectorAll('.help-info-btn'));
+      const btn = el.closest('.help-info-btn');
+      const idx = list.indexOf(btn);
+      if (idx === 0) {
+        candidate = 'Images/help1.jpg';
+      } else {
+        candidate = 'Images/help2.jpg';
+      }
+    } else if (el.closest('.title-banner')) {
       candidate = 'Images/help1.jpg';            // banner
     } else if (el.closest('#aga-ui-wrapper') || /androgenetic/i.test(nearestWithId)) {
       candidate = 'Images/Androgenetichelp.jpg'; // AGA
@@ -7902,7 +7925,73 @@ if (typeof window.colorForPercent !== 'function'){
   document.addEventListener('click', function(e){
     const btn = e.target.closest('.help-icon, .help-info-btn');
     if (!btn) return;
-    // Prefer a nearby .help-box; fall back to global androgenetic box
+    
+
+    
+    if (btn.matches('.help-info-btn[data-help="help1"]')) {
+      let box = document.querySelector('#help1-box') || document.querySelector('.help-box');
+      if (!box) {
+        box = document.createElement('div');
+        box.className = 'help-box';
+        document.body.appendChild(box);
+      }
+      box.style.display = 'block';
+      box.hidden = false;
+      box.style.backgroundImage = "url('Images/help1.jpg')";
+      box.style.backgroundRepeat = 'no-repeat';
+      box.style.backgroundSize = 'contain';
+      box.style.backgroundPosition = 'center';
+      // Position near the button
+      try {
+        const r = btn.getBoundingClientRect();
+        box.style.position = 'fixed';
+        box.style.left = Math.min(window.innerWidth - 400, Math.max(8, r.left)) + 'px';
+        box.style.top  = Math.min(window.innerHeight - 320, Math.max(8, r.bottom + 8)) + 'px';
+        box.style.width = '360px';
+        box.style.height = '220px';
+        box.style.backgroundColor = 'white';
+        box.style.border = '1px solid rgba(0,0,0,0.2)';
+        box.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)';
+        box.style.zIndex = 10000;
+      } catch(e){}
+      return;
+    }
+// If this is the first top info button, force help1.jpg
+    const topBar = btn.closest('.top-info-icons');
+    if (topBar) {
+      const list = Array.prototype.slice.call(topBar.querySelectorAll('.help-info-btn'));
+      const idx = list.indexOf(btn);
+      if (idx === 0) {
+        let box = document.querySelector('#help1-box') || document.querySelector('.help-box') || null;
+        if (!box) {
+          // create a generic help box if none exists
+          box = document.createElement('div');
+          box.className = 'help-box';
+          document.body.appendChild(box);
+        }
+        box.style.display = 'block';
+        box.hidden = false;
+        box.style.backgroundImage = "url('Images/help1.jpg')";
+        box.style.backgroundRepeat = 'no-repeat';
+        box.style.backgroundSize = 'contain';
+        box.style.backgroundPosition = 'center';
+        // Place it near the button
+        try {
+          const r = btn.getBoundingClientRect();
+          box.style.position = 'fixed';
+          box.style.left = Math.min(window.innerWidth - 400, Math.max(8, r.left)) + 'px';
+          box.style.top  = Math.min(window.innerHeight - 320, Math.max(8, r.bottom + 8)) + 'px';
+          box.style.width = '360px';
+          box.style.height = '220px';
+          box.style.backgroundColor = 'white';
+          box.style.border = '1px solid rgba(0,0,0,0.2)';
+          box.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)';
+          box.style.zIndex = 10000;
+        } catch(e){}
+        return;
+      }
+    }
+// Prefer a nearby .help-box; fall back to global androgenetic box
     let box = btn.closest('.aga-help-wrap, .title-banner, body')?.querySelector('.help-box');
     if (!box) box = document.querySelector('#androgenetic-help-box, #help1-box, #help2-box, #aga-help-float');
     if (!box) return;
@@ -8898,6 +8987,7 @@ if (typeof window.colorForPercent !== 'function'){
   }
 })();
 </script>
+
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
