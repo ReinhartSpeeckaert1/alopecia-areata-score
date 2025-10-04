@@ -840,6 +840,10 @@ body { margin: 0 !important; padding-top: 0 !important; }
 .density-container { margin: 12px 0 44px 0 !important; }
 .area-container { margin-top: 14px !important; }
 
+
+/* Prevent inconsistent mobile font inflation (keeps desktop sizes on phones) */
+html { -webkit-text-size-adjust: none !important; text-size-adjust: none !important; }
+
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
