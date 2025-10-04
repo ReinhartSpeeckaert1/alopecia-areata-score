@@ -2,6 +2,30 @@
 
 <html lang="en">
 <head>
+<script>
+// Age helpers - minimal, non-invasive
+(function(){
+  function _normAge(g){
+    if (!g) return 'over12';
+    g = String(g).trim();
+    if (g === '2-5') return '2-5';
+    return g;
+  }
+  function _getAgeGroup(){ try { return _normAge(globalThis.__ageGroup); } catch(e){ return 'over12'; } }
+  function _getAgeAdjustedMAX(){
+    // Default adult denominators used app-wide
+    const base = { leftScalp:17, rightScalp:17, topScalp:40, backScalp:24,
+                   leftEyebrow:50, rightEyebrow:50, leftEyelash:50, rightEyelash:50,
+                   leftBeard:40, rightBeard:40, centralBeard:20 };
+    const g = _getAgeGroup();
+    if (g === '6-11') return {  ...base, leftScalp:19, rightScalp:19, backScalp:23, topScalp:39 }; if (g === '2-5') return { ...base, leftScalp: 19, rightScalp: 19, backScalp: 24, topScalp: 38 };
+    return base;
+  }
+  if (typeof globalThis.getAgeAdjustedMAX !== 'function') globalThis.getAgeAdjustedMAX = _getAgeAdjustedMAX;
+  if (typeof globalThis.getAgeGroup !== 'function') globalThis.getAgeGroup = _getAgeGroup;
+})();
+</script>
+
 <meta charset="utf-8"/>
 <title>Alopecia Areata Calculator</title>
 <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iOTE0LjAwMDAwMHB0IiBoZWlnaHQ9IjE1MzguMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCA5MTQuMDAwMDAwIDE1MzguMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCI+Cgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwxNTM4LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzg0OWVmNSIgc3Ryb2tlPSIjODQ5ZWY1Ij4KPHBhdGggZD0iTTg5NzYgMTUzMzYgYy0zMzIgLTE3MSAtMTMxMiAtMTAzMiAtMjAxOCAtMTc3NCAtMjg3IC0zMDIgLTMyMSAtMzQwCi01MTQgLTU3MCAtMTExOSAtMTM0MCAtMjE5NyAtMzIzMiAtMjc5OCAtNDkwOSAtMjE4IC02MTEgLTQ4NCAtMTY0NSAtNTI1Ci0yMDQyIC04IC03NyAtMTQgLTk5IC0zNCAtMTIwIC0zNiAtMzggLTQ1IC03NSAtNzIgLTI5MCAtMTQgLTEwOCAtNDUgLTMyNgotNzAgLTQ4NiAtNjUgLTQyNiAtNjkgLTQ3OCAtNjkgLTgwMCAwIC01MDUgNDAgLTcyNiAxODYgLTEwMjAgMTEzIC0yMjcgMzA5Ci00NjkgNTA0IC02MjEgMzI2IC0yNTQgNzM2IC0zOTYgMTE0OSAtMzk3IDE4NCAwIDI4MCAxMSA0NTMgNTQgNjUxIDE2MCAxMTU1CjY0OSAxMzEyIDEyNzQgNDMgMTY5IDU0IDI4MiA0NyA0OTQgLTExIDMzMyAtNzAgNTM4IC0zMjIgMTExMSAtMTk0IDQ0MSAtMjcxCjY5NSAtMzA3IDEwMTYgLTE3IDE1NSAtMTcgODQ2IDAgMTA4NCA4MiAxMTE3IDM0MSAyMzQwIDc1MSAzNTUwIDIwNCA2MDQgNDE1CjExMTQgNjgyIDE2NTAgMjk0IDU5MCA1MDEgOTE5IDExMzQgMTgwNSA0MTggNTg2IDU3NCA4MTIgNjQ1IDkzOSBsMzQgNTkgLTIzCjE4IGMtMzMgMjcgLTUwIDI0IC0xNDUgLTI1eiBtLTI4MTMgLTM4NTggYy0xNCAtNDYgLTcwIC0yMjAgLTEyNSAtMzg4IC02NjQKLTIwMzYgLTkyNSAtMzk2MCAtNzAzIC01MTc1IDczIC00MDIgMTc2IC03MTAgMzc1IC0xMTI1IDE2OCAtMzUxIDE5MiAtNDQ3CjE5NCAtNzc1IDEgLTIzMCAtMSAtMjQxIC05MCAtNDE1IC02MiAtMTIwIC0xMTYgLTE5NiAtMjEyIC0yOTQgLTM2NyAtMzc4Ci05NzAgLTQ3NyAtMTQ0NiAtMjM3IC0xMzkgNzAgLTIwMSAxMTYgLTMyMiAyMzYgLTI2NyAyNjQgLTM2NSA1MjggLTM2NiA5ODUKLTEgMjgxIDI5IDU2NiAxMTMgMTA2NSAyMTIgMTI2OCA1ODkgMjUzOSAxMDY5IDM2MDAgOTEgMjAxIDI3MiA1NjMgMzYwIDcyMAoxNzkgMzIxIDExNTQgMTg4NSAxMTc0IDE4ODUgMiAwIC03IC0zNyAtMjEgLTgyeiIvPgo8cGF0aCBkPSJNMjI3NSA2MDY5IGMtMTczIC0xOSAtMzc1IC01MSAtNDgwIC03NiAtODEyIC0xOTAgLTE0NjMgLTc5NSAtMTcwMAotMTU3NyAtNzAgLTIzNCAtODcgLTM4NyAtODcgLTc3MSAwIC01MzUgNDcgLTg2OCAxNjkgLTExOTAgMjE5IC01NzggNjE1Ci0xMTIxIDEwNjMgLTE0NTcgODExIC02MTAgMTY4OCAtOTA5IDI4NjQgLTk3OSAyNTggLTE1IDg3NCAtNiAxMDg2IDE1IDc4MCA4MQoxNDE4IDI4MiAyMDU5IDY1MSA3OTMgNDU1IDEyNTIgMTAwNyAxNTQyIDE4NTQgMTA1IDMwOCAxMzEgNDQxIDE1MCA3ODEgMTQKMjQyIDYgNjM5IC0xNSA3OTAgLTcxIDUwNSAtMjY3IDg3NSAtNjcwIDEyNjggLTM4MCAzNjkgLTg2NiA2MTAgLTEzNDYgNjY3Ci0xNDkgMTggLTIyMSAxOSAtMjkyIDQgLTQ2IC0xMCAtNjIgLTIwIC0xMTkgLTc4IC0xNzggLTE4MSAtMTU1IC0zNjIgNTkgLTQ3MAo3MyAtMzcgMTMyIC01NCAzMDIgLTg3IDYwNyAtMTE3IDEwOTUgLTUwMyAxMzU0IC0xMDcwIDc5IC0xNzQgODcgLTIxOSA5MwotNTM0IDEyIC02MzUgLTQxIC05MTggLTI1NiAtMTM2NSAtMTUyIC0zMTQgLTMwNSAtNTMxIC01NDUgLTc3MCAtMjMzIC0yMzMKLTQ0NSAtMzg2IC03NDcgLTU0MCAtNDgxIC0yNDUgLTk5NyAtMzgwIC0xNjk5IC00NDcgLTE4NSAtMTcgLTk2NyAtMTcgLTExNjAKMCAtNjY1IDYwIC0xMTYzIDE5NyAtMTY4OSA0NjQgLTQ5OCAyNTIgLTk5MyA3MDkgLTEyNjAgMTE2NCAtMTIzIDIwOSAtMjM5CjU1MyAtMjkwIDg1OSAtOTkgNTkxIC0xOCAxMDY0IDI0OSAxNDYwIDI1NSAzNzcgNjY4IDY1NyAxMTAwIDc0NSA3OCAxNiA0MjcKNTAgNTEzIDUwIDE2IDAgMTcgMjIgMTcgMzI1IGwwIDMyNSAtOTIgLTEgYy01MSAtMSAtMTI5IC02IC0xNzMgLTEweiIvPgo8L2c+Cjwvc3ZnPgo=" type="image/svg+xml"/>
@@ -1450,19 +1474,75 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 })();
 </script>
 
+
+<style id="beard-hover-css">
+  /* Hide beard subsections until first hover reveal */
+  #beard-wrapper.beard-collapsed { display: none !important; }
+  /* Optional: show pointer cursor on the beard title to suggest interactivity */
+  #beard-title { cursor: help; position: relative; }
+  /* Lightweight tooltip styling if needed in the future */
+  #beard-title[data-revealed="0"]::after {
+    content: attr(data-hovertext);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1000;
+  }
+  #beard-title[data-revealed="0"].hovering::after { display: block; }
+</style>
+
+
+<style>
+  #aga-help-float img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+</style>
+
+
+<style id="diffuse-lock-css">
+  /* When locked: hide the label, show the buttons and any helper inline elements */
+  #androgenetic-density.locked label { display: none !important; }
+  #androgenetic-density.locked button { display: inline-block !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+  #androgenetic-density.locked .hint, 
+  #androgenetic-density.locked .tooltip, 
+  #androgenetic-density.locked [data-role="helper"] { display: inline-block !important; }
+</style>
+<style>
+  .help-info-btn {
+    background-color: #3b82f6 !important; /* lighter blue */
+    color: white !important;
+    font-size: 1.2em !important; /* slightly larger text including ⓘ */
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .help-info-btn:hover {
+    background-color: #60a5fa !important; /* even lighter on hover */
+  }
+</style>
+
 </head>
 <body>
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<div class="title-banner has-hero" style="position: relative;"><div 20;"="" style="position: absolute; top: 5px; left: 10px;" z-index:=""><button class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)" type="button">Info</button>
+<div class="title-banner has-hero" style="position: relative;"><div 20;"="" style="position: absolute; top: 5px; left: 10px;" z-index:=""><button class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)" type="button">ⓘ</button>
+  <button id="instruction-video-btn" class="help-info-btn" type="button" title="Tutorial">ⓘ ▶</button>
 </div>
 <div style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: white; opacity: 0.8;">
     © Reinhart Speeckaert, Nanja van Geel
   </div>
 <h2 id="main-title">Alopecia areata calculator</h2>
-<div class="title-sub">Select the options that best fit with the extent of alopecia areata</div>
+<div class="title-sub">For each section, choose the row that matches the alopecia extent. In that row, click the image that resembles the hair loss pattern. Check the percentage and adjust with ⊕︀ or ⊖ if needed.</div>
+<div class="title-sub"> </div>
 </div>
 <div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;">
 </div><div id="selected-preview" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;"></div>
@@ -1492,19 +1572,17 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 <div id="aga-toggle-container" style="display: none;"></div>
 <div id="aga-ui-wrapper" style="display: none; flex-direction: column; gap: 6px;">
 <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
-<span>Androgenetic alopecia</span>
+<span><strong>Androgenetic alopecia</strong> <span style="font-weight: normal;">(Score in 'Top of the scalp' (↑) ONLY the alopecia areata patches and score the androgenetic alopecia below (↓)</span></span>
 <span class="aga-help-wrap" style="position: relative; display: inline-block;">
 <button class="age-btn help-info-btn" id="aga-help" title="Help" type="button">Info</button>
-<div id="aga-help-float" style="display:none; position: absolute; left: 26px; top: 0; 
-                  background: white; border: 1px solid #999; 
-                  box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 8px; z-index: 100;">
+<div id="aga-help-float" style="display:none; position: fixed; left: 50%; transform: translateX(-50%); top: 0; background: white; border: 1px solid #999; box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 12px; z-index: 1000; max-width: min(720px, 90vw); max-height: 80vh; overflow: auto; text-align: center;">
 <img alt="Androgenetic alopecia help" src="Images/Androgenetichelp.jpg" style="max-width: 100%; height: auto;"/>
 </div>
 </span>
 </h3>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
-<div class="density-container" id="androgenetic-density"><label>Hair Density:</label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></div>
+<div class="density-container" id="androgenetic-density"><label>Diffuse/regrowing hair?</label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></div>
 </div>
 <div class="area-container" id="androgenetic-areas" style="margin-top: 6px;"></div>
 <div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
@@ -1636,7 +1714,7 @@ function renderScalpSection(section) {
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div></div>
       <div class="density-container" id="${section.id}-density">
-        <label>Hair Density:</label>
+        <label>Diffuse/regrowing hair?</label>
         <button data-density="0" class="selected"></button>
         <button data-density="10"></button>
         <button data-density="25"></button>
@@ -1795,7 +1873,7 @@ function updateScalpUI() {
   const titleElement = document.getElementById("main-title");
   const totalResultDiv = document.getElementById("result");
   if (totalResultDiv) totalResultDiv.innerText = `Total Scalp Alopecia Areata: ${scalpPct.toFixed(1)}%`;
-  if (titleElement) titleElement.textContent = `Alopecia areata calculator: Scalp (=${scalpPct.toFixed(1)}%)`;
+  if (titleElement) titleElement.textContent = `Alopecia areata calculator: scalp (=${scalpPct.toFixed(1)}%)`;
 
   // 3) Maintain AGA tooltip persistence after UI refresh
   try { if (typeof refreshAgaTooltip === 'function') refreshAgaTooltip(); } catch(e){}
@@ -2642,15 +2720,15 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <!-- Beard Area Section -->
-<h3 id="beard-title" style="margin-bottom: 0px;">Beard Area (0.00%)</h3>
-<div style="display: flex; flex-direction: column; gap: 0px;">
+<h3 id="beard-title" style="margin-bottom: 0px;">Alopecia in the beard?</h3>
+<div id="beard-wrapper" style="display: flex; flex-direction: column; gap: 0px;">
 <!-- Right Beard -->
 <div>
 <h4 style="text-align: center; margin-bottom: 0px;">Right Beard Area</h4>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="right-beard-density">
-<label>Hair Density:</label>
+<label>Diffuse/regrowing hair?</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
@@ -2667,7 +2745,7 @@ window.addEventListener("DOMContentLoaded", function() {
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="left-beard-density">
-<label>Hair Density:</label>
+<label>Diffuse/regrowing hair?</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
@@ -2684,7 +2762,7 @@ window.addEventListener("DOMContentLoaded", function() {
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
 <div class="density-container" id="central-beard-density">
-<label>Hair Density:</label>
+<label>Diffuse/regrowing hair?</label>
 <button class="selected" data-density="0"></button>
 <button data-density="10"></button>
 <button data-density="25"></button>
@@ -2846,7 +2924,12 @@ function updateBeardUI() {
     total += subtotal * (1 - data.density / 100);
   }
 
-  document.getElementById("beard-title").innerText = `Beard Area (${total.toFixed(2)}%)`;
+  const __bt = document.getElementById("beard-title");
+__bt.dataset.total = total.toFixed(2);
+if (__bt.dataset.revealed === "1") {
+  __bt.innerText = `Beard Area (${Number(__bt.dataset.total).toFixed(2)}%)`;
+}
+
 }
 
 window.addEventListener("DOMContentLoaded", function() {
@@ -3663,12 +3746,7 @@ function getTotalsAndDetails(){
     const rightBeard = getSubtotal(beardSelections["right-beard"].selected, beardSelections["right-beard"].density);
     const centralBeard = getSubtotal(beardSelections["central-beard"].selected, beardSelections["central-beard"].density);
 
-    const MAX = {
-      leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-      leftEyebrow: 50, rightEyebrow: 50,
-      leftEyelash: 50, rightEyelash: 50,
-      leftBeard: 40, rightBeard: 40, centralBeard: 20
-    };
+    const MAX = (typeof getAgeAdjustedMAX === 'function') ? getAgeAdjustedMAX() : { leftScalp:17, rightScalp:17, topScalp:40, backScalp:24, leftEyebrow:50, rightEyebrow:50, leftEyelash:50, rightEyelash:50, leftBeard:40, rightBeard:40, centralBeard:20 };
 
     function rel(val, max) {
       if (!max) return "0.00";
@@ -3912,12 +3990,7 @@ copyBtn.style.marginLeft = "8px";
       const rightBeard = getSubtotal(beardSelections["right-beard"].selected, beardSelections["right-beard"].density);
       const centralBeard = getSubtotal(beardSelections["central-beard"].selected, beardSelections["central-beard"].density);
 
-      const MAX = {
-        leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-        leftEyebrow: 50, rightEyebrow: 50,
-        leftEyelash: 50, rightEyelash: 50,
-        leftBeard: 40, rightBeard: 40, centralBeard: 20
-      };
+      const MAX = (typeof getAgeAdjustedMAX === 'function') ? getAgeAdjustedMAX() : { leftScalp:17, rightScalp:17, topScalp:40, backScalp:24, leftEyebrow:50, rightEyebrow:50, leftEyelash:50, rightEyelash:50, leftBeard:40, rightBeard:40, centralBeard:20 };
 
       function rel(val, max) {
         if (!max) return "0.00";
@@ -5831,9 +5904,7 @@ if (delta > 0) {
     let {L=0,R=0,B=0,T=0} = parts || {};
     if (g === '6-11') {
       L *= (19/18); R *= (19/18); B *= (23/24); T *= (39/40);
-    } else if (g === '&lt;6') {
-      L *= (19/18); R *= (19/18); B *= (24/24); T *= (38/40);
-    }
+    } else if (g === '2-5') { L *= (19/18); R *= (19/18); B *= (24/24); T *= (38/40); }
     return {L,R,B,T};
   };
 
@@ -5853,7 +5924,7 @@ if (delta > 0) {
       <span class="label">Age</span>
       <button type="button" class="age-btn" data-age="over12" aria-pressed="true">12+</button>
       <button type="button" class="age-btn" data-age="6-11">6-11</button>
-      <button type="button" class="age-btn" data-age="&lt;6">&lt;6</button>
+      <button type="button" class="age-btn" data-age="2-5">2-5</button>
     `;
 
     // right - put existing PDF button here to be on the same line
@@ -6288,12 +6359,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 <script>
 (function(){
-  const MAX = {
-    leftScalp: 17, rightScalp: 17, topScalp: 40, backScalp: 24,
-    leftEyebrow: 50, rightEyebrow: 50,
-    leftEyelash: 50, rightEyelash: 50,
-    leftBeard: 40, rightBeard: 40, centralBeard: 20
-  };
+  const MAX = (typeof getAgeAdjustedMAX === 'function') ? getAgeAdjustedMAX() : { leftScalp:17, rightScalp:17, topScalp:40, backScalp:24, leftEyebrow:50, rightEyebrow:50, leftEyelash:50, rightEyelash:50, leftBeard:40, rightBeard:40, centralBeard:20 };
   const BTN_ID = 'generate-pdf';
 
   // Fallback denominators for Detailed Area Breakdown
@@ -6344,7 +6410,8 @@ document.addEventListener('DOMContentLoaded', function(){
       centralBeard: getSubtotal(window.beardSelections?.['central-beard']?.selected, window.beardSelections?.['central-beard']?.density)
     };
     const percentages = {};
-    Object.keys(details).forEach(k => { const M = (typeof MAX !== 'undefined' && MAX && MAX[k]!=null) ? MAX : DEFAULT_MAX; percentages[k] = pctOfRegion(details[k], M[k]); });
+    const __AGE_MAX = (typeof getAgeAdjustedMAX === 'function') ? getAgeAdjustedMAX() : (typeof MAX !== 'undefined' ? MAX : DEFAULT_MAX);
+    Object.keys(details).forEach(k => { percentages[k] = pctOfRegion(details[k], __AGE_MAX[k]); });
     return { details, percentages };
   }
   function preparePayload(){
@@ -6418,7 +6485,15 @@ document.addEventListener('DOMContentLoaded', function(){
     const margin = 48, fontSize = 11, leading = 15;
     let y = pageHeight - margin;
 
-    const safeLines = lines.map(escapePdfText);
+    const safeLines = lines.map((ln) => {
+  const raw = String(ln);
+  if (/^Summary of Alopecia Areata Involvement \(.+\):\s*$/.test(raw)) {
+    return escapePdfText(raw)
+      .replace(/\\\(/g, '(')
+      .replace(/\\\)/g, ')');
+  }
+  return escapePdfText(raw);
+});
 
     const ops = ['BT', '/F1 ' + fontSize + ' Tf'];
     for (const ln of safeLines){
@@ -7951,6 +8026,561 @@ if (typeof window.colorForPercent !== 'function'){
       }
     } catch(e) {}
   }, true);
+})();
+</script>
+
+
+<style>
+/* Integration: hide density buttons for diffuse blocks until shown */
+.density-container.diffuse-enhanced button[data-density]{
+  /* Hidden by default until hover/click or user selects */
+  display: none;
+}
+.density-container.diffuse-enhanced.show button[data-density]{
+  display: inline-block;
+}
+/* Keep sizes defined elsewhere; we don't alter width/height here */
+</style>
+
+<script>
+(function(){
+  const DEFAULT_LABELS = [
+    "Diffuse/regrowing hair?",
+    "Remaining hairs in the bald patches?"
+  ];
+  const OPEN_TEXT = "What percentage of hairs is present in the alopecia patches?";
+
+  function textEquals(el, targets){
+    if(!el) return false;
+    const t = (el.textContent || "").trim();
+    return targets.some(s => t === s);
+  }
+
+  function enhance(container){
+    if(container.classList.contains("diffuse-enhanced")) return;
+    const label = container.querySelector("label");
+    if(!textEquals(label, DEFAULT_LABELS)) return;
+
+    container.classList.add("diffuse-enhanced");
+    container.setAttribute("data-user-selected","false");
+    const originalText = label.textContent.trim();
+
+    const densityButtons = Array.from(container.querySelectorAll("button[data-density]"));
+    if(densityButtons.length === 0) return;
+
+    // Show options (and switch label) helpers
+    function show(){
+      container.classList.add("show");
+      label.textContent = OPEN_TEXT;
+      label.setAttribute("aria-expanded","true");
+    }
+    function hide(){
+      container.classList.remove("show");
+      label.textContent = originalText;
+      label.setAttribute("aria-expanded","false");
+    }
+    function isUserSelected(){
+      return container.getAttribute("data-user-selected") === "true";
+    }
+
+    // Hover behavior on the whole container: show, then hide if nothing chosen
+    container.addEventListener("mouseenter", show);
+    container.addEventListener("mouseleave", function(){
+      if(!isUserSelected()){
+        hide();
+      }
+    });
+
+    // Click on the label toggles visibility if not user-locked
+    if(label){
+      label.setAttribute("role","button");
+      label.setAttribute("tabindex","0");
+      label.addEventListener("click", function(){
+        if(container.classList.contains("show")){
+          if(!isUserSelected()) hide();
+        }else{
+          show();
+        }
+      });
+      label.addEventListener("keydown", function(e){
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          label.click();
+        }
+      });
+    }
+
+    // When a percentage is selected, keep it visible (user-selected = true)
+    densityButtons.forEach(btn => {
+      btn.addEventListener("click", function(){
+        container.setAttribute("data-user-selected","true");
+        show();
+      });
+    });
+
+    // Start hidden regardless of pre-marked 'selected' states in the original tool
+    hide();
+  }
+
+  function init(){
+    // Enhance every density container that has the specific label text
+    document.querySelectorAll(".density-container").forEach(enhance);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  }else{
+    init();
+  }
+})();
+</script>
+
+
+
+
+<style>
+  #beard-title { display:flex; align-items:center; gap:8px; }
+</style>
+
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+
+  function setupBeardTogglePersist(){
+    var titleOld = $('beard-title');
+    var wrapper  = $('beard-wrapper');
+    if(!titleOld || !wrapper) return;
+
+    // Replace any prior listeners
+    var title = titleOld.cloneNode(true);
+    titleOld.parentNode.replaceChild(title, titleOld);
+
+    // Ensure checkbox exists
+    var cb = title.querySelector('input[type="checkbox"]#beard-toggle');
+    if(!cb){
+      cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id   = 'beard-toggle';
+      cb.setAttribute('aria-label','Toggle beard section');
+      title.prepend(cb);
+    }
+
+    var baseText = 'Alopecia in the beard?';
+    function getCurrentBeardPct(){
+      try {
+        var t = (document.getElementById('ring-val-beard')?.textContent||'0%').replace('%','');
+        var v = Number(t);
+        if (Number.isFinite(v)) return v.toFixed(0);
+      } catch(e){}
+      var ds = title.dataset?.total;
+      if (ds != null && ds !== '') return Number(ds).toFixed(2);
+      return '0';
+    }
+
+    function setTitleToBase(){
+      Array.from(title.childNodes).forEach(function(n, i){
+        if (i>0) title.removeChild(n);
+      });
+      title.appendChild(document.createTextNode(baseText));
+    }
+
+    function reveal(){
+      wrapper.classList.remove('beard-collapsed');
+      title.dataset.revealed = '1';
+      title.classList.remove('hovering');
+      // Update text to "Beard Area (x%)"
+      var txt = 'Beard Area (' + getCurrentBeardPct() + '%)';
+      if (title.lastChild && title.lastChild.nodeType === Node.TEXT_NODE){
+        title.lastChild.nodeValue = txt;
+      } else {
+        title.appendChild(document.createTextNode(txt));
+      }
+    }
+    function collapse(){
+      wrapper.classList.add('beard-collapsed');
+      title.dataset.revealed = '0';
+      title.classList.remove('hovering');
+      setTitleToBase();
+    }
+
+    // Hover ENTER: reveal and keep it revealed. No hover LEAVE collapse.
+    function onEnter(){
+      if (!cb.checked) {
+        cb.checked = true;
+        // Mark that hover caused the reveal, but we *do not* auto-undo it
+        cb.dataset.hoverActivated = '1';
+        reveal();
+      }
+    }
+
+    // Only a manual click (change to unchecked) should collapse
+    cb.addEventListener('change', function(e){
+      if (cb.checked){
+        reveal();
+      } else {
+        collapse();
+      }
+      // Reset hover flag whenever user acts
+      cb.dataset.hoverActivated = '';
+    });
+
+    title.addEventListener('mouseenter', onEnter);
+    cb.addEventListener('mouseenter', onEnter);
+
+    // Initial state
+    cb.checked = false;
+    collapse();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupBeardTogglePersist);
+  } else {
+    setupBeardTogglePersist();
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  var wrap = document.querySelector('.aga-help-wrap');
+  var pop  = document.getElementById('aga-help-float');
+  if(!wrap || !pop) return;
+
+  function positionPopup(){
+    var r = wrap.getBoundingClientRect();
+    var top = Math.round(r.bottom + 8); // 8px gap below the button
+    // Keep inside viewport vertically if too low
+    var maxTop = Math.max(0, window.innerHeight - pop.offsetHeight - 12);
+    pop.style.top = Math.min(top, maxTop) + 'px';
+  }
+
+  // Show-on-hover is handled by CSS, but we update position on enter and on resize/scroll
+  wrap.addEventListener('mouseenter', function(){
+    // Temporarily display to measure height correctly
+    var prev = pop.style.display;
+    pop.style.display = 'block';
+    positionPopup();
+    // Restore CSS control if needed - remain block during hover due to CSS rule
+    // No action needed here.
+  });
+
+  window.addEventListener('resize', function(){
+    if (getComputedStyle(pop).display !== 'none') positionPopup();
+  });
+  window.addEventListener('scroll', function(){
+    if (getComputedStyle(pop).display !== 'none') positionPopup();
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  // Configure
+  var HOVER_MS = 1500;
+  var TARGET_ID = 'androgenetic-density';
+  var RESET_TEXT = "What percentage of hairs is present in the alopecia patches?";
+
+  var target = document.getElementById(TARGET_ID);
+  if (!target) return;
+
+  // State
+  var hoverTimer = null;
+  var locked = false;
+
+  // Utility to find the reset element by text
+  function findResetEl(){
+    var nodes = document.querySelectorAll('label, span, div, a, p, button');
+    for (var i=0; i<nodes.length; i++){
+      var t = (nodes[i].textContent || '').trim();
+      if (t.indexOf(RESET_TEXT) !== -1) return nodes[i];
+    }
+    return null;
+  }
+
+  // Capture-phase mouseleave canceller to keep hover state when locked
+  function captureMouseLeave(e){
+    if (!locked) return;
+    try {
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+      // Do not preventDefault for mouseleave
+    } catch(_) {}
+  }
+
+  // If there are existing handlers, we attach ours in capture to intercept
+  target.addEventListener('mouseleave', captureMouseLeave, true);
+  target.addEventListener('mouseout', captureMouseLeave, true);
+
+  target.addEventListener('mouseenter', function(){
+    // Start or restart the hover dwell timer
+    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+    hoverTimer = setTimeout(function(){
+      locked = true; // dwell reached: persist changes
+      // Mark dataset for possible CSS/JS to inspect
+      target.dataset.diffuseLocked = '1';
+    }, HOVER_MS);
+  });
+
+  target.addEventListener('mouseleave', function(){
+    // If we leave before dwell threshold, revert as normal
+    if (hoverTimer){
+      clearTimeout(hoverTimer);
+      hoverTimer = null;
+      // not locked -> let existing logic revert naturally
+      target.dataset.diffuseLocked = '';
+    }
+    // If locked, the capture listener above already suppressed other leave handlers,
+    // keeping the current hovered state intact.
+  });
+
+  // Reset click unfreezes and forces a revert by dispatching a synthetic mouseleave
+  function setupReset(){
+    var resetEl = findResetEl();
+    if (!resetEl) return;
+    resetEl.style.cursor = 'pointer';
+    resetEl.addEventListener('click', function(){
+      locked = false;
+      target.dataset.diffuseLocked = '';
+      // Temporarily remove our capture listener so native leave handlers can run
+      target.removeEventListener('mouseleave', captureMouseLeave, true);
+      target.removeEventListener('mouseout', captureMouseLeave, true);
+      // Dispatch a synthetic mouseleave to trigger existing revert logic
+      var evt = new Event('mouseleave', {bubbles: true, cancelable: true});
+      target.dispatchEvent(evt);
+      // Reattach capture listener
+      setTimeout(function(){
+        target.addEventListener('mouseleave', captureMouseLeave, true);
+        target.addEventListener('mouseout', captureMouseLeave, true);
+      }, 0);
+    });
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', setupReset);
+  } else {
+    setupReset();
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  var HOVER_MS = 1500;
+  var container = document.getElementById('androgenetic-density');
+  if (!container) return;
+
+  var timer = null;
+
+  function onEnter(){
+    if (timer) clearTimeout(timer);
+    if (container.classList.contains('locked')) return;
+    timer = setTimeout(function(){
+      container.classList.add('locked');
+      timer = null;
+    }, HOVER_MS);
+  }
+  function onLeave(){
+    if (container.classList.contains('locked')) return; // keep open when locked
+    if (timer){ clearTimeout(timer); timer = null; }
+  }
+
+  container.addEventListener('mouseenter', onEnter, true);
+  container.addEventListener('mouseleave', onLeave, true);
+
+  // Reset handler: click on the specific explanatory text
+  var RESET_TEXT = "What percentage of hairs is present in the alopecia patches?";
+  function findResetEl(){
+    var nodes = document.querySelectorAll('label, span, div, a, p, button');
+    for (var i=0; i<nodes.length; i++){
+      if ((nodes[i].textContent||'').indexOf(RESET_TEXT) !== -1) return nodes[i];
+    }
+    return null;
+  }
+  function attachReset(){
+    var el = findResetEl();
+    if (!el) return;
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function(){
+      container.classList.remove('locked');
+      // optional: visually revert immediately by temporarily toggling display
+      // but native CSS will handle it on next repaint
+    });
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', attachReset);
+  } else {
+    attachReset();
+  }
+})();
+</script>
+
+
+<style id="beard-visibility-gate">
+  #beard-wrapper { display: none !important; }
+  #beard-wrapper[data-open="1"] { display: flex !important; }
+  #beard-title { display: inline-flex; align-items: center; gap: 8px; }
+  #beard-title .beard-label { pointer-events: auto; }
+</style>
+
+<script id="beard-hover-strict">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function init(){
+    var title = $('beard-title');
+    var wrapper = $('beard-wrapper');
+    if(!title || !wrapper) return;
+
+    var newTitle = title.cloneNode(false);
+    newTitle.id = 'beard-title';
+    title.parentNode.replaceChild(newTitle, title);
+    title = newTitle;
+
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = 'beard-toggle';
+    cb.setAttribute('aria-label','Toggle beard section');
+    title.appendChild(cb);
+
+    var labelSpan = document.createElement('span');
+    labelSpan.className = 'beard-label';
+    labelSpan.textContent = 'Alopecia in the beard?';
+    title.appendChild(labelSpan);
+
+    function getPct(){
+      try{
+        var t = (document.getElementById('ring-val-beard')?.textContent || '0%').replace('%','');
+        var v = Number(t); if (Number.isFinite(v)) return v.toFixed(0);
+      }catch(e){}
+      return '0';
+    }
+    function setQuestion(){ labelSpan.textContent = 'Alopecia in the beard?'; }
+    function setBeardArea(){ labelSpan.textContent = 'Beard Area (' + getPct() + '%)'; }
+
+    function openBeard(){
+      wrapper.setAttribute('data-open','1');
+      title.dataset.revealed = '1';
+      setBeardArea();
+    }
+    function closeBeard(){
+      wrapper.removeAttribute('data-open');
+      title.dataset.revealed = '0';
+      setQuestion();
+    }
+
+    function onEnter(){
+      if(!cb.checked) cb.checked = true;
+      openBeard();
+    }
+    labelSpan.addEventListener('mouseenter', onEnter);
+    cb.addEventListener('mouseenter', onEnter);
+
+    cb.addEventListener('change', function(){
+      if (cb.checked) openBeard(); else closeBeard();
+    });
+
+    cb.checked = false;
+    closeBeard();
+
+    ['updateBeardUI','updateScoreRings','updateSummaryUI'].forEach(function(fn){
+      var prev = window[fn];
+      if (typeof prev === 'function'){
+        window[fn] = function(){
+          var r = prev.apply(this, arguments);
+          try{ if(title.dataset.revealed === '1') setBeardArea(); }catch(e){}
+          return r;
+        };
+      }
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})();
+</script>
+
+
+<script id="density-delta-refresh">
+// Ensure scalp delta badge (green/red) updates after density changes from buttons
+(function(){
+  function refreshDelta(){
+    try {
+      if (typeof window.updateScalpUI === 'function') window.updateScalpUI();
+    } catch(e){}
+    try {
+      if (typeof window.updateScoreRings === 'function') window.updateScoreRings();
+    } catch(e){}
+    try {
+      if (typeof window.updateSummaryUI === 'function') window.updateSummaryUI();
+    } catch(e){}
+    try {
+      if (typeof window.updateScalpDelta === 'function') window.updateScalpDelta();
+    } catch(e){}
+  }
+  // Delegate clicks on density buttons
+  document.addEventListener('click', function(ev){
+    var btn = ev.target && ev.target.closest('button[data-density]');
+    if (!btn) return;
+    // Let the underlying handlers update selection/state first, then refresh
+    setTimeout(refreshDelta, 0);
+  }, true);
+
+  // Keyboard activation of density buttons
+  document.addEventListener('keydown', function(ev){
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var btn = ev.target && ev.target.closest && ev.target.closest('button[data-density]');
+    if (!btn) return;
+    setTimeout(refreshDelta, 0);
+  }, true);
+})();
+</script>
+
+
+<script>
+(function(){
+  function normAge(s){ return s; }
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('.age-btn');
+    if (!btn) return;
+    var g = normAge(btn.getAttribute('data-age') || btn.textContent || '');
+    try { globalThis.__ageGroup = g; } catch(_) {}
+  }, true);
+})();
+</script>
+
+<dialog id="instructionVideoModal" style="max-width: 900px; width: 90vw; border: none; border-radius: 12px; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+  <div style="background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-top-left-radius:12px; border-top-right-radius:12px;">
+    <strong>Tutorial</strong>
+    <button id="closeInstructionVideo" aria-label="Close" style="background:#e5e7eb; color:#111827; border:none; border-radius:8px; padding:6px 10px; cursor:pointer;">Close</button>
+  </div>
+  <div style="background:#000; padding:0;">
+    <video id="instructionVideoElement" src="Images/ExplanationVESALT.mp4" controls style="width:100%; height:auto; display:block;"></video>
+  </div>
+</dialog>
+<style>#instructionVideoModal::backdrop { background: rgba(0,0,0,0.6); }</style>
+<script>
+(function(){
+  const openBtn = document.getElementById('instruction-video-btn');
+  const dlg = document.getElementById('instructionVideoModal');
+  const closeBtn = document.getElementById('closeInstructionVideo');
+  const vid = document.getElementById('instructionVideoElement');
+  function openModal(){
+    try { if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open',''); } } catch(e){ dlg.setAttribute('open',''); }
+    try { if (vid) { vid.currentTime = 0; vid.play().catch(()=>{}); } } catch(e){}
+  }
+  function closeModal(){
+    try { if (vid) { vid.pause(); } } catch(e){}
+    try { if (typeof dlg.close === 'function') { dlg.close(); } else { dlg.removeAttribute('open'); } } catch(e){ dlg.removeAttribute('open'); }
+  }
+  if (openBtn && dlg) openBtn.addEventListener('click', openModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  dlg && dlg.addEventListener('click', (e) => {
+    const r = dlg.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (!inside) closeModal();
+  });
 })();
 </script>
 
