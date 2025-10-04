@@ -749,110 +749,6 @@ body { margin: 0 !important; padding-top: 0 !important; }
 /* Tighten spacing below the result line now that the bar is gone */
 #result { margin: 6px 0 2px 0 !important; }
 
-
-/* ===== Compact vertical layout (no changes to font sizes or figure sizes) ===== */
-.top-info-icons { margin-bottom: 4px !important; }
-.title-banner { margin-bottom: 6px !important; }
-.title-sub { margin-top: 2px !important; margin-bottom: 4px !important; }
-
-/* Space around the PDF icon row and preview strip */
-#pdf-icon-container { margin-bottom: 4px !important; }
-#selected-preview { margin: 4px 0 8px 0 !important; }
-
-/* Summary box and rings spacing */
-#results-summary { margin: 6px 0 !important; padding: 6px 10px !important; }
-#score-rings { margin: 6px 0 6px 0 !important; gap: 12px !important; }
-/* Keep ring sizes; do not alter .ring width/height */
-
-/* Section titles and blocks */
-#main-title { margin: 6px 0 4px 0 !important; }
-h3 { margin: 10px 0 6px 0 !important; } /* compact but readable for all section headers */
-
-/* Density row spacing and area containers */
-.density-container { margin: 6px 0 10px 0 !important; }
-.area-container { margin-top: 4px !important; }
-
-/* Androgenetic block tweaks */
-#androgenetic-score { margin-top: 2px !important; }
-#androgenetic-areas { margin-top: 4px !important; }
-
-/* Eyebrow/beard/eyelash blocks */
-#eyebrow-title, #beard-title, #eyelash-title { margin: 8px 0 4px 0 !important; }
-#eyebrows-wrapper, #beard-wrapper, #eyelashes-wrapper { margin-top: 4px !important; }
-
-/* General tighten for common containers */
-.banner-actions { margin-bottom: 4px !important; }
-#result { margin: 6px 0 2px 0 !important; } /* already reduced when we hid the bar; keep tight */
-
-
-/* ===== Ultra-compact vertical layout (no change to font or figure sizes) ===== */
-.top-info-icons { margin-bottom: 2px !important; }
-.title-banner { margin-bottom: 4px !important; }
-.title-sub { margin-top: 1px !important; margin-bottom: 2px !important; }
-
-/* PDF icon row and preview strip */
-#pdf-icon-container { margin-bottom: 2px !important; }
-#selected-preview { margin: 2px 0 6px 0 !important; }
-
-/* Summary box and rings */
-#results-summary { margin: 4px 0 !important; padding: 4px 8px !important; }
-#score-rings { margin: 4px 0 4px 0 !important; gap: 8px !important; }
-
-/* Section headers */
-#main-title { margin: 4px 0 2px 0 !important; }
-h2 { margin: 6px 0 4px 0 !important; }
-h3 { margin: 6px 0 4px 0 !important; }
-h4 { margin: 4px 0 2px 0 !important; }
-
-/* Immediately-following blocks under headers */
-h2 + div, h3 + div, h4 + div { margin-top: 2px !important; }
-
-/* Density rows and area containers */
-.density-container { margin: 4px 0 6px 0 !important; }
-.area-container { margin-top: 2px !important; }
-
-/* Androgenetic block */
-#androgenetic-score { margin-top: 2px !important; }
-#androgenetic-areas { margin-top: 2px !important; }
-
-/* Eyebrow/beard/eyelash blocks */
-#eyebrow-title, #beard-title, #eyelash-title { margin: 6px 0 3px 0 !important; }
-#eyebrows-wrapper, #beard-wrapper, #eyelashes-wrapper { margin-top: 2px !important; }
-
-/* Banner actions */
-.banner-actions { margin-bottom: 2px !important; }
-
-/* Reduce excess spacing around any helper boxes or info bands */
-#androgenetic-help-box, #help1-box, #help2-box, #aga-help-float {
-  margin-top: 2px !important;
-}
-
-
-/* Mobile overall scale so the tool doesn't feel oversized */
-body { transform-origin: top left; }
-/* Zoom control variables and robust scaling pipeline */
-:root { --user-scale: 1; --base-scale: 1; }
-body {
-  transform-origin: top left !important;
-  transform: scale(calc(var(--base-scale) * var(--user-scale))) !important;
-  
-}
-@media (max-width: 480px)  { body { --base-scale: 0.92; } }
-@media (max-width: 420px)  { body { --base-scale: 0.88; } }
-@media (max-width: 360px)  { body { --base-scale: 0.84; } }
-
-
-/* Global mobile scaling (no DOM changes). Shrinks overall UI on small screens */
-:root { --base-scale: 1; }
-body {
-  transform-origin: top left !important;
-  transform: scale(var(--base-scale)) !important;
-  width: calc(100% / var(--base-scale)) !important;
-}
-@media (max-width: 480px)  { :root { --base-scale: 0.92; } }
-@media (max-width: 420px)  { :root { --base-scale: 0.88; } }
-@media (max-width: 360px)  { :root { --base-scale: 0.84; } }
-
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
@@ -1698,7 +1594,6 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 
 </head>
 <body>
-
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
@@ -8906,12 +8801,8 @@ if (typeof window.colorForPercent !== 'function'){
   } else {
     flushTopGap();
   }
-})
-<script>
-(function(){ /* disabled mobile wrapper to prevent layout break */ })();
+})();
 </script>
-
-
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
