@@ -827,6 +827,32 @@ h2 + div, h3 + div, h4 + div { margin-top: 2px !important; }
   margin-top: 2px !important;
 }
 
+
+/* Mobile overall scale so the tool doesn't feel oversized */
+body { transform-origin: top left; }
+/* Zoom control variables and robust scaling pipeline */
+:root { --user-scale: 1; --base-scale: 1; }
+body {
+  transform-origin: top left !important;
+  transform: scale(calc(var(--base-scale) * var(--user-scale))) !important;
+  
+}
+@media (max-width: 480px)  { body { --base-scale: 0.92; } }
+@media (max-width: 420px)  { body { --base-scale: 0.88; } }
+@media (max-width: 360px)  { body { --base-scale: 0.84; } }
+
+
+/* Global mobile scaling (no DOM changes). Shrinks overall UI on small screens */
+:root { --base-scale: 1; }
+body {
+  transform-origin: top left !important;
+  transform: scale(var(--base-scale)) !important;
+  width: calc(100% / var(--base-scale)) !important;
+}
+@media (max-width: 480px)  { :root { --base-scale: 0.92; } }
+@media (max-width: 420px)  { :root { --base-scale: 0.88; } }
+@media (max-width: 360px)  { :root { --base-scale: 0.84; } }
+
 </style>
 <!-- Preload all beard Images -->
 <link as="Image" fetchpriority="high" href="Images/left-beard-0.jpg" rel="preload"/>
@@ -1672,6 +1698,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 
 </head>
 <body>
+
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
@@ -8879,8 +8906,12 @@ if (typeof window.colorForPercent !== 'function'){
   } else {
     flushTopGap();
   }
-})();
+})
+<script>
+(function(){ /* disabled mobile wrapper to prevent layout break */ })();
 </script>
+
+
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
