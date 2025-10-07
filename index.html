@@ -4047,13 +4047,11 @@ function getTotalsAndDetails(){
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          {
-  const __base = window.__baselineScalpPct;
-  const __cur = __val;
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
-  if (__f) { lines.push(__f.text); }
-} }
-            else {}
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
           }
         }
       }
@@ -4210,13 +4208,11 @@ copyBtn.style.marginLeft = "8px";
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          {
-  const __base = window.__baselineScalpPct;
-  const __cur = __val;
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
-  if (__f) { lines.push(__f.text); }
-} }
-            else {}
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
           }
         }
       }
@@ -5079,40 +5075,39 @@ function showImmediatePeekFor(region) {
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          {
-  const __base = window.__baselineScalpPct;
-  const __cur = __val;
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
-  if (__f) { lines.push(__f.text); }
-} }
-            else {}
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
           }
         }
       }
     } catch(__e){} })();
 // Include percentage change if a code baseline exists and only when non-zero
 if (typeof window.__baselineScalpPct === 'number') {
-  {
-  const __base = window.__baselineScalpPct;
-  const __cur  = Number(totals.Scalp);
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, __cur) : null;
-  if (__f) { lines.push(__f.text); }
-}
-`- Scalp improvement: ${abs}%`);
-    } else {}
+  const delta = window.__baselineScalpPct - Number(totals.Scalp);
+  if (delta !== 0) {
+    const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+    if (delta > 0) {
+      lines.push(`- Scalp improvement: ${abs}%`);
+    } else {
+      lines.push(`- Scalp worsening: ${abs}%`);
+    }
   }
 }
 
       // Include percentage change if a code baseline exists
       if (typeof window.__baselineScalpPct === 'number') {
-        {
-  const __base = window.__baselineScalpPct;
-  const __cur  = Number(totals.Scalp);
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, __cur) : null;
-  if (__f) { lines.push(__f.text); }
-}
-`- Scalp improvement: ${abs}%`);
-        } else if (delta < 0) {} else {}
+        const delta = window.__baselineScalpPct - Number(totals.Scalp);
+        const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+        if (delta > 0) {
+          lines.push(`- Scalp improvement: ${abs}%`);
+        } else if (delta < 0) {
+          lines.push(`- Scalp worsening: ${abs}%`);
+        } else {
+          lines.push(`- Scalp improvement: 0%`);
+        }
       }
 
       lines.push(`- Total Eyebrows: ${Number(totals.Eyebrows).toFixed(0)}%`);
@@ -5311,13 +5306,11 @@ if (typeof window.__baselineScalpPct === 'number') {
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          {
-  const __base = window.__baselineScalpPct;
-  const __cur = __val;
-  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
-  if (__f) { lines.push(__f.text); }
-} }
-            else {}
+          const __delta = window.__baselineScalpPct - __val;
+          if (__delta !== 0) {
+            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
+            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
+            else { lines.push(`- Scalp worsening: ${__abs}%`); }
           }
         }
       }
@@ -5870,38 +5863,36 @@ if (!pos) {
     var now = getScalpPctSafe();
     if (now == null) return;
 
+    var delta = window.__baselineScalpPct - now; // decrease = improvement
     var node = getPatternNode();
     if (!node || !node.textContent) return;
 
     var id = 'scalp-delta-badge';
-    var badge = document.getElementById(id);
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.id = id;
-      badge.style.marginLeft = '8px';
-      badge.style.fontWeight = '600';
-      node.appendChild(badge);
-    }
-
-    var __base = window.__baselineScalpPct;
-    if (__base > 0) {
-      var __rel = ((__base - now) / __base) * 100;
-      var __abs = Math.abs(__rel).toFixed(1).replace(/\.0$/, '');
-      if (__rel > 0) {
-        badge.textContent = 'Scalp improvement: ' + __abs + '%';
-        badge.style.color = '#16a34a';
-        badge.style.display = '';
-      } else if (__rel < 0) {
-        badge.textContent = 'Scalp worsening: ' + __abs + '%';
-        badge.style.color = '#dc2626';
-        badge.style.display = '';
-      } else {
-        if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
-      }
-    } else {
-      if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
-    }
+var badge = document.getElementById(id);
+if (!badge) {
+  badge = document.createElement('span');
+  badge.id = id;
+  badge.style.marginLeft = '8px';
+  badge.style.fontWeight = '600';
+  node.appendChild(badge);
 }
+
+var abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
+if (delta > 0) {
+  badge.textContent = 'Scalp improvement: ' + abs + '%';
+  badge.style.color = '#16a34a';
+  badge.style.display = '';
+} else if (delta < 0) {
+  badge.textContent = 'Scalp worsening: ' + abs + '%';
+  badge.style.color = '#dc2626';
+  badge.style.display = '';
+} else {
+  // No change: hide the badge entirely
+  if (badge && badge.parentNode) {
+    badge.parentNode.removeChild(badge);
+  }
+}
+  }
 
   function setBaselineFromCurrent(){
     var v = getScalpPctSafe();
@@ -8997,50 +8988,6 @@ if (typeof window.colorForPercent !== 'function'){
 })();
 </script>
 
-
-
-<script>
-// --- relative percent helper (injected) ---
-(function(){
-  if (window.__relativeScalpHelperInjected) return;
-  window.__relativeScalpHelperInjected = true;
-  window.formatRelativeScalpDelta = function(base, current){
-    if (!(typeof base === 'number' && base > 0)) return null;
-    var rel = ((base - current) / base) * 100; // decrease = improvement
-    if (rel === 0) return { value: 0, abs: '0', improve: true, text: '- Scalp improvement: 0%' };
-    var abs = Math.abs(rel).toFixed(1).replace(/\.0$/, '');
-    return (rel > 0)
-      ? { value: rel, abs: abs, improve: true,  text: '- Scalp improvement: ' + abs + '%' }
-      : { value: rel, abs: abs, improve: false, text: '- Scalp worsening: '  + abs + '%' };
-  };
-})();
-</script>
-
-
-<script>
-(function(){
-  function __fixBadgeRelative(){
-    try{
-      var base = window.__baselineScalpPct;
-      var now = (window.__currentScalpPct != null) ? Number(window.__currentScalpPct)
-               : (window.__lastTotals && window.__lastTotals.Scalp != null) ? Number(window.__lastTotals.Scalp)
-               : null;
-      var badge = document.querySelector('[data-role="scalp-delta-badge"], .scalp-delta-badge');
-      if (!badge || now == null) return;
-      if (!(base > 0)) { return; }
-      var rel = ((base - now) / base) * 100;
-      var abs = Math.abs(rel).toFixed(1).replace(/\.0$/, '');
-      if (rel > 0) { badge.textContent = 'Scalp improvement: ' + abs + '%'; badge.style.color = '#16a34a'; }
-      else if (rel < 0) { badge.textContent = 'Scalp worsening: ' + abs + '%'; badge.style.color = '#dc2626'; }
-      else { badge.textContent = 'Scalp improvement: 0%'; badge.style.color = ''; }
-    } catch(e){ /* no-op */ }
-  }
-  document.addEventListener('AA_STATE_UPDATED', __fixBadgeRelative);
-  document.addEventListener('DOMContentLoaded', __fixBadgeRelative);
-  window.addEventListener('load', __fixBadgeRelative);
-  setTimeout(__fixBadgeRelative, 0);
-})();
-</script>
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
