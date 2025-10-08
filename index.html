@@ -1848,6 +1848,23 @@ input, select, textarea, #codeInput {
 }
 </style>
 
+
+<style id="tight-top-spacing">
+/* Reduce gap below the banner */
+.title-banner { margin-bottom: 6px !important; padding-bottom: 14px !important; }
+/* Pull the guidance text (pattern) closer to the banner */
+#pattern-dominant { margin: 2px 0 6px 0 !important; }
+/* Pull rings up and trim extra margins */
+#score-rings { margin: 0 !important; }
+/* If a rings-row wrapper exists, keep it tight as well */
+#rings-row { margin-top: 0 !important; margin-bottom: 8px !important; }
+/* Global top padding smaller so the whole header area sits higher */
+body { padding-top: 8px !important; }
+/* Ensure any residual summary block doesn't add spacing */
+#results-summary { margin: 0 !important; }
+.top-info-icons { margin-bottom: 4px !important; }
+</style>
+
 </head>
 <body>
 
@@ -9136,6 +9153,45 @@ if (typeof window.colorForPercent !== 'function'){
 })();
 </script>
 
+
+
+<style id="backside-compact-css">
+/* Make back-of-scalp block sit higher */
+#backside-areas { margin-top: 0 !important; }
+#backside-density { margin-top: 4px !important; margin-bottom: 8px !important; }
+/* Optional: slightly reduce space after the preceding section to pull this up */
+.backside-compact { margin-top: -12px !important; }
+/* Ensure images/boxes don't add extra top spacing via first-child margins */
+#backside-areas > *:first-child { margin-top: 0 !important; }
+</style>
+<script id="backside-compact-js">
+(function(){
+  function init(){
+    var areas = document.getElementById('backside-areas');
+    if (!areas) return;
+    // Try to find a reasonable section container to nudge up
+    var container = areas.closest('section') || areas.parentElement;
+    if (container && !container.classList.contains('backside-compact')) {
+      container.classList.add('backside-compact');
+    }
+    // Also tighten any heading directly above the density row
+    var density = document.getElementById('backside-density');
+    if (density) {
+      var prev = density.previousElementSibling;
+      while (prev && !/^H[2-4]$/.test(prev.tagName)) prev = prev.previousElementSibling;
+      if (prev) prev.style.marginBottom = '6px';
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+  // Retry after any dynamic rendering
+  setTimeout(init, 200);
+  setTimeout(init, 700);
+})();
+</script>
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
