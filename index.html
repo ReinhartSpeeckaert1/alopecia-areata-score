@@ -1865,6 +1865,98 @@ body { padding-top: 8px !important; }
 .top-info-icons { margin-bottom: 4px !important; }
 </style>
 
+
+<style id="light-tooltips-b">
+/* Light grey tooltip style for bottom buttons */
+#btnCopyCode18, #btnLoadCode18 { position: relative; overflow: visible; }
+#btnCopyCode18:hover::after,
+#btnCopyCode18:focus-visible::after {
+  content: "Copy a code to recreate the score later";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  bottom: 100%;
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  z-index: 10000;
+}
+#btnCopyCode18:hover::before,
+#btnCopyCode18:focus-visible::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 1px);
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #f3f4f6;
+  z-index: 10001;
+}
+#btnLoadCode18:hover::after,
+#btnLoadCode18:focus-visible::after {
+  content: "Load a code to recreate a previous score";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  bottom: 100%;
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  z-index: 10000;
+}
+#btnLoadCode18:hover::before,
+#btnLoadCode18:focus-visible::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 1px);
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #f3f4f6;
+  z-index: 10001;
+}
+</style>
+
+
+<style id="box-image-scaling-fix">
+/* Fill each area box with its background image exactly */
+#backside-areas .area-box,
+#topside-areas .area-box,
+#leftside-areas .area-box,
+#rightside-areas .area-box,
+#androgenetic-areas .area-box,
+#right-eyebrow-areas .area-box,
+#left-eyebrow-areas .area-box,
+#right-eyelash-areas .area-box,
+#left-eyelash-areas .area-box,
+#right-beard-areas .area-box,
+#left-beard-areas .area-box,
+#central-beard-areas .area-box {
+  background-size: 100% 100% !important;  /* stretch to edges of the fixed box */
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Do the same for density buttons with image backgrounds */
+.density-container button {
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -9190,6 +9282,62 @@ if (typeof window.colorForPercent !== 'function'){
   // Retry after any dynamic rendering
   setTimeout(init, 200);
   setTimeout(init, 700);
+})();
+</script>
+
+
+<script id="light-tooltips-b-js">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function init(){
+    var copyCode = byId('btnCopyCode18');
+    if (copyCode) {
+      if (copyCode.hasAttribute('title')) copyCode.removeAttribute('title');
+      // Set label to "Copy code" while preserving any leading emoji
+      var txt = copyCode.textContent || "";
+      var emoji = "";
+      var m = txt.match(/^\s*([\u2190-\u2BFF\u2600-\u27BF\uFE0F\uD83C-\uDBFF\uDC00-\uDFFF])\s*/);
+      if (m && m[1]) emoji = m[1] + " ";
+      copyCode.textContent = (emoji ? emoji : "") + "Copy code";
+      copyCode.setAttribute('aria-label', 'Copy a code to recreate the score later');
+    }
+    var loadBtn = byId('btnLoadCode18');
+    if (loadBtn) {
+      loadBtn.setAttribute('aria-label', 'Load a code to recreate a previous score');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+  setTimeout(init, 200);
+  setTimeout(init, 800);
+})();
+</script>
+
+
+<script id="fix-copycode-icon">
+(function(){
+  function init(){
+    var btn = document.getElementById('btnCopyCode18');
+    if (!btn) return;
+    // Prefer a reliable inline SVG icon to avoid emoji fallback issues
+    var svg = '<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" style="margin-right:6px;vertical-align:middle;"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>';
+    // Normalize text
+    var label = 'Copy code';
+    btn.innerHTML = svg + label;
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+    btn.style.gap = '6px';
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+  setTimeout(init, 200);
+  setTimeout(init, 800);
 })();
 </script>
 
