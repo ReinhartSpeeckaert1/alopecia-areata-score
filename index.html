@@ -1701,262 +1701,10 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 </style>
 
 
-<!-- Design polish overrides: typography, color system, buttons, boxes, spacing, dark mode -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style id="polish-overrides">
-:root {
-  --blue: #2563eb;
-  --blue-600: #2563eb;
-  --blue-700: #1d4ed8;
-  --blue-800: #1e40af;
-  --green-500: #22c55e;
-  --red-500: #ef4444;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --text: #111827;
-  --bg: #f7f7fb;
-}
-
-html, body { background: var(--bg) !important; }
-body {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif !important;
-  color: var(--text) !important;
-  font-size: 16px !important;
-  line-height: 1.5 !important;
-  padding: 32px 48px !important;
-}
-
-/* Title banner */
-.title-banner {
-  background: linear-gradient(135deg, var(--blue-700), var(--blue-600)) !important;
-  border-radius: 14px !important;
-  padding: 18px 22px !important;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.20) !important;
-}
-.title-banner h1, .title-banner h2, .title-banner h3 {
-  font-weight: 700 !important;
-  letter-spacing: 0.2px !important;
-}
-.title-sub { font-size: 14px !important; opacity: 0.9 !important; }
-
-/* Buttons - unify */
-button, .btn-primary, .btn-blue, #copy-summary, #instruction-video-btn, .help-info-btn {
-  border-radius: 12px !important;
-  border: 1px solid var(--gray-300) !important;
-  background: #ffffff !important;
-  color: var(--text) !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
-  transition: transform 0.08s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
-}
-button:hover, .btn-primary:hover, .btn-blue:hover, #copy-summary:hover, #instruction-video-btn:hover, .help-info-btn:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.10) !important;
-  background: var(--gray-50) !important;
-}
-#instruction-video-btn {
-  border-color: #b91c1c !important;
-  background: #dc2626 !important;
-  color: #fff !important;
-}
-#instruction-video-btn:hover { background: #b91c1c !important; }
-
-/* Area boxes */
-.area-box {
-  border-radius: 10px !important;
-  border-color: var(--gray-300) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
-}
-.area-box.selected {
-  box-shadow: 0 0 0 3px var(--blue-600), 0 0 22px rgba(37,99,235,0.35) !important;
-  border-color: var(--blue-600) !important;
-  background-color: rgba(179, 217, 255, 0.85) !important;
-}
-.area-box .plus, .area-box .minus {
-  border-radius: 8px !important;
-  border-color: var(--gray-300) !important;
-}
-
-/* Density buttons */
-.density-container button {
-  border-radius: 10px !important;
-  border-color: var(--gray-300) !important;
-}
-.density-container button.selected {
-  background-color: rgba(209, 250, 229, 0.9) !important;
-  border-color: var(--green-500) !important;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.35) !important;
-}
-
-/* Tooltips */
-.tooltip, .help-tooltip {
-  background: #111827 !important;
-  color: #fff !important;
-  border: none !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.20) !important;
-  padding: 6px 10px !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-}
-
-/* Progress and rings */
-.ring { box-shadow: 0 6px 16px rgba(0,0,0,0.10) !important; }
-.ring .ring-val { font-size: 22px !important; }
-#result {
-  background: #fff !important;
-  border: 1px solid var(--gray-200) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 20px rgba(2,132,199,0.10) !important;
-}
-
-/* Spacing rhythm */
-section { margin-bottom: 32px !important; }
-.area-container, .density-container { margin-bottom: 24px !important; }
-#results-summary { margin: 10px 0 24px 0 !important; }
-
-/* Inputs */
-input, select, textarea, #codeInput {
-  border: 1px solid var(--gray-300) !important;
-  border-radius: 10px !important;
-  padding: 10px 12px !important;
-  background: #fff !important;
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  :root { --text: #e5e7eb; --bg: #0f172a; }
-  body { color: var(--text) !important; background: var(--bg) !important; }
-  .title-banner { background: linear-gradient(135deg, #1e3a8a, #1d4ed8) !important; }
-  .area-box, .density-container button, #result, input, select, textarea, #codeInput {
-    background: #111827 !important;
-    border-color: #334155 !important;
-    color: var(--text) !important;
-  }
-  .tooltip, .help-tooltip { background: #111827 !important; color: #e5e7eb !important; }
-}
-
-/* Accessibility - focus rings */
-:focus-visible {
-  outline: 3px solid rgba(37,99,235,0.6) !important;
-  outline-offset: 2px !important;
-  border-radius: 8px !important;
-}
+<style>
+/* FIX: ensure pdf-icon-container visible */
+#pdf-icon-container { display: inline-flex !important; gap: 8px; align-items: center; }
 </style>
-
-
-<style id="tight-top-spacing">
-/* Reduce gap below the banner */
-.title-banner { margin-bottom: 6px !important; padding-bottom: 14px !important; }
-/* Pull the guidance text (pattern) closer to the banner */
-#pattern-dominant { margin: 2px 0 6px 0 !important; }
-/* Pull rings up and trim extra margins */
-#score-rings { margin: 0 !important; }
-/* If a rings-row wrapper exists, keep it tight as well */
-#rings-row { margin-top: 0 !important; margin-bottom: 8px !important; }
-/* Global top padding smaller so the whole header area sits higher */
-body { padding-top: 8px !important; }
-/* Ensure any residual summary block doesn't add spacing */
-#results-summary { margin: 0 !important; }
-.top-info-icons { margin-bottom: 4px !important; }
-</style>
-
-
-<style id="light-tooltips-b">
-/* Light grey tooltip style for bottom buttons */
-#btnCopyCode18, #btnLoadCode18 { position: relative; overflow: visible; }
-#btnCopyCode18:hover::after,
-#btnCopyCode18:focus-visible::after {
-  content: "Copy a code to recreate the score later";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  bottom: 100%;
-  background: #f3f4f6;
-  color: #111827;
-  border: 1px solid #d1d5db;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.2;
-  white-space: nowrap;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  z-index: 10000;
-}
-#btnCopyCode18:hover::before,
-#btnCopyCode18:focus-visible::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% - 1px);
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #f3f4f6;
-  z-index: 10001;
-}
-#btnLoadCode18:hover::after,
-#btnLoadCode18:focus-visible::after {
-  content: "Load a code to recreate a previous score";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  bottom: 100%;
-  background: #f3f4f6;
-  color: #111827;
-  border: 1px solid #d1d5db;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.2;
-  white-space: nowrap;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  z-index: 10000;
-}
-#btnLoadCode18:hover::before,
-#btnLoadCode18:focus-visible::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% - 1px);
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: #f3f4f6;
-  z-index: 10001;
-}
-</style>
-
-
-<style id="box-image-scaling-fix">
-/* Fill each area box with its background image exactly */
-#backside-areas .area-box,
-#topside-areas .area-box,
-#leftside-areas .area-box,
-#rightside-areas .area-box,
-#androgenetic-areas .area-box,
-#right-eyebrow-areas .area-box,
-#left-eyebrow-areas .area-box,
-#right-eyelash-areas .area-box,
-#left-eyelash-areas .area-box,
-#right-beard-areas .area-box,
-#left-beard-areas .area-box,
-#central-beard-areas .area-box {
-  background-size: 100% 100% !important;  /* stretch to edges of the fixed box */
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-}
-
-/* Do the same for density buttons with image backgrounds */
-.density-container button {
-  background-size: 100% 100% !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-}
-</style>
-
 </head>
 <body>
 
@@ -1974,7 +1722,7 @@ body { padding-top: 8px !important; }
 <div class="title-sub">For each section, choose the row that matches the alopecia extent. In that row, click the image that resembles the hair loss pattern. Check the percentage and adjust with ⊕︀ or ⊖ if needed.</div>
 <div class="title-sub"> </div>
 </div>
-<div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;">
+<div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;"><button id="copy-summary" type="button" aria-label="Copy" title="Copy"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M16 4H8a2 2 0 0 0-2 2v10h2V6h8V4zm0 4h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2h8a2 2 0 0 0 2-2V8z" fill="currentColor"/></svg><span>Copy</span></button>
 </div><div id="selected-preview" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;"></div>
 <div id="results-summary" style="padding: 10px; font-size: 18px; background: #e0f0ff; border-radius: 8px; box-shadow: 0 0 5px #ccc;">
 <!-- Results will be populated here -->
@@ -4304,11 +4052,13 @@ function getTotalsAndDetails(){
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          const __delta = window.__baselineScalpPct - __val;
-          if (__delta !== 0) {
-            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
-            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
-            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          {
+  const __base = window.__baselineScalpPct;
+  const __cur = __val;
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
+  if (__f) { lines.push(__f.text); }
+} }
+            else {}
           }
         }
       }
@@ -4465,11 +4215,13 @@ copyBtn.style.marginLeft = "8px";
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          const __delta = window.__baselineScalpPct - __val;
-          if (__delta !== 0) {
-            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
-            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
-            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          {
+  const __base = window.__baselineScalpPct;
+  const __cur = __val;
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
+  if (__f) { lines.push(__f.text); }
+} }
+            else {}
           }
         }
       }
@@ -5332,40 +5084,38 @@ function showImmediatePeekFor(region) {
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          const __delta = window.__baselineScalpPct - __val;
-          if (__delta !== 0) {
-            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
-            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
-            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          {
+  const __base = window.__baselineScalpPct;
+  const __cur = __val;
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
+  if (__f) { lines.push(__f.text); }
+} }
+            else {}
           }
         }
       }
     } catch(__e){} })();
 // Include percentage change if a code baseline exists and only when non-zero
 if (typeof window.__baselineScalpPct === 'number') {
-  const delta = window.__baselineScalpPct - Number(totals.Scalp);
-  if (delta !== 0) {
-    const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
-    if (delta > 0) {
-      lines.push(`- Scalp improvement: ${abs}%`);
-    } else {
-      lines.push(`- Scalp worsening: ${abs}%`);
-    }
+  {
+  const __base = window.__baselineScalpPct;
+  const __cur  = Number(totals.Scalp);
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, __cur) : null;
+  if (__f) { lines.push(__f.text); }
+}
+} else {}
   }
 }
 
       // Include percentage change if a code baseline exists
       if (typeof window.__baselineScalpPct === 'number') {
-        const delta = window.__baselineScalpPct - Number(totals.Scalp);
-        const abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
-        if (delta > 0) {
-          lines.push(`- Scalp improvement: ${abs}%`);
-        } else if (delta < 0) {
-          lines.push(`- Scalp worsening: ${abs}%`);
-        } else {
-          lines.push(`- Scalp improvement: 0%`);
-        }
-      }
+        {
+  const __base = window.__baselineScalpPct;
+  const __cur  = Number(totals.Scalp);
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, __cur) : null;
+  if (__f) { lines.push(__f.text); }
+}
+}}
 
       lines.push(`- Total Eyebrows: ${Number(totals.Eyebrows).toFixed(0)}%`);
       lines.push(`- Total Eyelashes: ${Number(totals.Eyelashes).toFixed(0)}%`);
@@ -5563,11 +5313,13 @@ if (typeof window.__baselineScalpPct === 'number') {
         const __cur = (typeof totals === 'object') ? (('Scalp' in totals ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null))) : null;
         const __val = Number(__cur);
         if (Number.isFinite(__val)) {
-          const __delta = window.__baselineScalpPct - __val;
-          if (__delta !== 0) {
-            const __abs = Math.abs(__delta).toFixed(1).replace(/\.0$/, '');
-            if (__delta > 0) { lines.push(`- Scalp improvement: ${__abs}%`); }
-            else { lines.push(`- Scalp worsening: ${__abs}%`); }
+          {
+  const __base = window.__baselineScalpPct;
+  const __cur = __val;
+  const __f = (typeof formatRelativeScalpDelta === 'function') ? formatRelativeScalpDelta(__base, Number(__cur)) : null;
+  if (__f) { lines.push(__f.text); }
+} }
+            else {}
           }
         }
       }
@@ -6120,36 +5872,38 @@ if (!pos) {
     var now = getScalpPctSafe();
     if (now == null) return;
 
-    var delta = window.__baselineScalpPct - now; // decrease = improvement
     var node = getPatternNode();
     if (!node || !node.textContent) return;
 
     var id = 'scalp-delta-badge';
-var badge = document.getElementById(id);
-if (!badge) {
-  badge = document.createElement('span');
-  badge.id = id;
-  badge.style.marginLeft = '8px';
-  badge.style.fontWeight = '600';
-  node.appendChild(badge);
-}
+    var badge = document.getElementById(id);
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = id;
+      badge.style.marginLeft = '8px';
+      badge.style.fontWeight = '600';
+      node.appendChild(badge);
+    }
 
-var abs = Math.abs(delta).toFixed(1).replace(/\.0$/, '');
-if (delta > 0) {
-  badge.textContent = 'Scalp improvement: ' + abs + '%';
-  badge.style.color = '#16a34a';
-  badge.style.display = '';
-} else if (delta < 0) {
-  badge.textContent = 'Scalp worsening: ' + abs + '%';
-  badge.style.color = '#dc2626';
-  badge.style.display = '';
-} else {
-  // No change: hide the badge entirely
-  if (badge && badge.parentNode) {
-    badge.parentNode.removeChild(badge);
-  }
+    var __base = window.__baselineScalpPct;
+    if (__base > 0) {
+      var __rel = ((__base - now) / __base) * 100;
+      var __abs = Math.abs(__rel).toFixed(1).replace(/\.0$/, '');
+      if (__rel > 0) {
+        badge.textContent = 'Scalp improvement: ' + __abs + '%';
+        badge.style.color = '#16a34a';
+        badge.style.display = '';
+      } else if (__rel < 0) {
+        badge.textContent = 'Scalp worsening: ' + __abs + '%';
+        badge.style.color = '#dc2626';
+        badge.style.display = '';
+      } else {
+        if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+      }
+    } else {
+      if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+    }
 }
-  }
 
   function setBaselineFromCurrent(){
     var v = getScalpPctSafe();
@@ -9247,97 +9001,179 @@ if (typeof window.colorForPercent !== 'function'){
 
 
 
-<style id="backside-compact-css">
-/* Make back-of-scalp block sit higher */
-#backside-areas { margin-top: 0 !important; }
-#backside-density { margin-top: 4px !important; margin-bottom: 8px !important; }
-/* Optional: slightly reduce space after the preceding section to pull this up */
-.backside-compact { margin-top: -12px !important; }
-/* Ensure images/boxes don't add extra top spacing via first-child margins */
-#backside-areas > *:first-child { margin-top: 0 !important; }
-</style>
-<script id="backside-compact-js">
+<script>
+// --- relative percent helper (injected) ---
 (function(){
-  function init(){
-    var areas = document.getElementById('backside-areas');
-    if (!areas) return;
-    // Try to find a reasonable section container to nudge up
-    var container = areas.closest('section') || areas.parentElement;
-    if (container && !container.classList.contains('backside-compact')) {
-      container.classList.add('backside-compact');
-    }
-    // Also tighten any heading directly above the density row
-    var density = document.getElementById('backside-density');
-    if (density) {
-      var prev = density.previousElementSibling;
-      while (prev && !/^H[2-4]$/.test(prev.tagName)) prev = prev.previousElementSibling;
-      if (prev) prev.style.marginBottom = '6px';
-    }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
-  // Retry after any dynamic rendering
-  setTimeout(init, 200);
-  setTimeout(init, 700);
+  if (window.__relativeScalpHelperInjected) return;
+  window.__relativeScalpHelperInjected = true;
+  window.formatRelativeScalpDelta = function(base, current){
+    if (!(typeof base === 'number' && base > 0)) return null;
+    var rel = ((base - current) / base) * 100; // decrease = improvement
+    if (rel === 0) return { value: 0, abs: '0', improve: true, text: '- Scalp improvement: 0%' };
+    var abs = Math.abs(rel).toFixed(1).replace(/\.0$/, '');
+    return (rel > 0)
+      ? { value: rel, abs: abs, improve: true,  text: '- Scalp improvement: ' + abs + '%' }
+      : { value: rel, abs: abs, improve: false, text: '- Scalp worsening: '  + abs + '%' };
+  };
 })();
 </script>
 
 
-<script id="light-tooltips-b-js">
+<script>
 (function(){
-  function byId(id){ return document.getElementById(id); }
-  function init(){
-    var copyCode = byId('btnCopyCode18');
-    if (copyCode) {
-      if (copyCode.hasAttribute('title')) copyCode.removeAttribute('title');
-      // Set label to "Copy code" while preserving any leading emoji
-      var txt = copyCode.textContent || "";
-      var emoji = "";
-      var m = txt.match(/^\s*([\u2190-\u2BFF\u2600-\u27BF\uFE0F\uD83C-\uDBFF\uDC00-\uDFFF])\s*/);
-      if (m && m[1]) emoji = m[1] + " ";
-      copyCode.textContent = (emoji ? emoji : "") + "Copy code";
-      copyCode.setAttribute('aria-label', 'Copy a code to recreate the score later');
-    }
-    var loadBtn = byId('btnLoadCode18');
-    if (loadBtn) {
-      loadBtn.setAttribute('aria-label', 'Load a code to recreate a previous score');
-    }
+  function __fixBadgeRelative(){
+    try{
+      var base = window.__baselineScalpPct;
+      var now = (window.__currentScalpPct != null) ? Number(window.__currentScalpPct)
+               : (window.__lastTotals && window.__lastTotals.Scalp != null) ? Number(window.__lastTotals.Scalp)
+               : null;
+      var badge = document.querySelector('[data-role="scalp-delta-badge"], .scalp-delta-badge');
+      if (!badge || now == null) return;
+      if (!(base > 0)) { return; }
+      var rel = ((base - now) / base) * 100;
+      var abs = Math.abs(rel).toFixed(1).replace(/\.0$/, '');
+      if (rel > 0) { badge.textContent = 'Scalp improvement: ' + abs + '%'; badge.style.color = '#16a34a'; }
+      else if (rel < 0) { badge.textContent = 'Scalp worsening: ' + abs + '%'; badge.style.color = '#dc2626'; }
+      else { badge.textContent = 'Scalp improvement: 0%'; badge.style.color = ''; }
+    } catch(e){ /* no-op */ }
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
-  setTimeout(init, 200);
-  setTimeout(init, 800);
+  document.addEventListener('AA_STATE_UPDATED', __fixBadgeRelative);
+  document.addEventListener('DOMContentLoaded', __fixBadgeRelative);
+  window.addEventListener('load', __fixBadgeRelative);
+  setTimeout(__fixBadgeRelative, 0);
 })();
 </script>
 
 
-<script id="fix-copycode-icon">
+<script>
 (function(){
-  function init(){
-    var btn = document.getElementById('btnCopyCode18');
+  function getTotals(){
+    try {
+      if (typeof calculateSectionTotals === "function") return calculateSectionTotals();
+    } catch(e){}
+    try {
+      if (typeof window.getTotals === "function") return window.getTotals();
+    } catch(e){}
+    return { Scalp: null, Eyebrows: null, Eyelashes: null, Beard: null };
+  }
+
+  function nowStamp(){
+    try {
+      const dtNode = document.getElementById("current-date") || document.querySelector('[data-role="current-date"]');
+      const txt = dtNode && dtNode.textContent.trim();
+      if (txt) return txt;
+    } catch(e){}
+    try {
+      return new Date().toLocaleString();
+    } catch(e){ return ""; }
+  }
+
+  function dominantPattern(){
+    try {
+      const node = document.getElementById("pattern-dominant");
+      const t = node && node.textContent && node.textContent.trim();
+      return t ? ("Dominant pattern: " + t) : null;
+    } catch(e){ return null; }
+  }
+
+  function aaCode(){
+    try {
+      if (typeof encodeAA18 === "function") return String(encodeAA18());
+    } catch(e){}
+    try {
+      if (typeof encodeAA19 === "function") return String(encodeAA19());
+    } catch(e){}
+    return null;
+  }
+
+  function fmtChange(base, cur){
+    if (!(base > 0) || !isFinite(cur)) return null;
+    const rel = ((base - cur) / base) * 100; // positive means improvement
+    const kind = rel > 0 ? "improvement" : (rel < 0 ? "worsening" : "no change");
+    const val = Math.abs(rel).toFixed(1);
+    if (kind === "no change") return "Scalp: no change from baseline";
+    return `Scalp: ${val}% ${kind}`;
+  }
+
+  function writeClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      return true;
+    } catch(e){ return false; }
+  }
+
+  function buildSummary(){
+    const totals = getTotals();
+    const lines = [];
+    lines.push("Alopecia Areata Calculator");
+    lines.push(nowStamp());
+    lines.push("");
+    lines.push("Summary of Alopecia Areata Involvement");
+    if (totals && (totals.Scalp != null || totals.scalp != null)) {
+      const scalp = Number((totals.Scalp != null) ? totals.Scalp : totals.scalp);
+      lines.push(`- Total Scalp: ${Math.round(scalp)}%`);
+      // Baseline-relative change for scalp, if available
+      try {
+        const base = (typeof window.__baselineScalpPct === "number") ? window.__baselineScalpPct : null;
+        const ch = fmtChange(base, scalp);
+        if (ch) lines.push(`- ${ch}`);
+      } catch(e){}
+    }
+    if (totals && (totals.Eyebrows != null || totals.eyebrows != null)) {
+      const v = Number((totals.Eyebrows != null) ? totals.Eyebrows : totals.eyebrows);
+      lines.push(`- Total Eyebrows: ${Math.round(v)}%`);
+    }
+    if (totals && (totals.Eyelashes != null || totals.eyelashes != null)) {
+      const v = Number((totals.Eyelashes != null) ? totals.Eyelashes : totals.eyelashes);
+      lines.push(`- Total Eyelashes: ${Math.round(v)}%`);
+    }
+    if (totals && (totals.Beard != null || totals.beard != null)) {
+      const v = Number((totals.Beard != null) ? totals.Beard : totals.beard);
+      if (v > 0) lines.push(`- Total Beard: ${Math.round(v)}%`);
+    }
+    const dp = dominantPattern();
+    if (dp) lines.push(dp);
+    const code = aaCode();
+    if (code) lines.push(`Code: ${code}`);
+    return lines.join("
+");
+  }
+
+  function replaceButtonAndBind(){
+    var btn = document.getElementById("copy-summary");
     if (!btn) return;
-    // Prefer a reliable inline SVG icon to avoid emoji fallback issues
-    var svg = '<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" style="margin-right:6px;vertical-align:middle;"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>';
-    // Normalize text
-    var label = 'Copy code';
-    btn.innerHTML = svg + label;
-    btn.style.display = 'inline-flex';
-    btn.style.alignItems = 'center';
-    btn.style.gap = '6px';
+    // Replace to drop existing listeners
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+    clone.addEventListener("click", async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+      const text = buildSummary();
+      const ok = await writeClipboard(text);
+      if (ok) {
+        const prev = clone.textContent;
+        clone.textContent = "Copied!";
+        setTimeout(()=>{ clone.textContent = prev || "Copy"; }, 1200);
+      } else {
+        alert("Copy failed");
+      }
+    }, true);
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", replaceButtonAndBind);
   } else {
-    init();
+    replaceButtonAndBind();
   }
-  setTimeout(init, 200);
-  setTimeout(init, 800);
 })();
 </script>
 
