@@ -1700,6 +1700,154 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
   }
 </style>
 
+
+<!-- Design polish overrides: typography, color system, buttons, boxes, spacing, dark mode -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="polish-overrides">
+:root {
+  --blue: #2563eb;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --green-500: #22c55e;
+  --red-500: #ef4444;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --text: #111827;
+  --bg: #f7f7fb;
+}
+
+html, body { background: var(--bg) !important; }
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif !important;
+  color: var(--text) !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  padding: 32px 48px !important;
+}
+
+/* Title banner */
+.title-banner {
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-600)) !important;
+  border-radius: 14px !important;
+  padding: 18px 22px !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.20) !important;
+}
+.title-banner h1, .title-banner h2, .title-banner h3 {
+  font-weight: 700 !important;
+  letter-spacing: 0.2px !important;
+}
+.title-sub { font-size: 14px !important; opacity: 0.9 !important; }
+
+/* Buttons - unify */
+button, .btn-primary, .btn-blue, #copy-summary, #instruction-video-btn, .help-info-btn {
+  border-radius: 12px !important;
+  border: 1px solid var(--gray-300) !important;
+  background: #ffffff !important;
+  color: var(--text) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+  transition: transform 0.08s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+button:hover, .btn-primary:hover, .btn-blue:hover, #copy-summary:hover, #instruction-video-btn:hover, .help-info-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.10) !important;
+  background: var(--gray-50) !important;
+}
+#instruction-video-btn {
+  border-color: #b91c1c !important;
+  background: #dc2626 !important;
+  color: #fff !important;
+}
+#instruction-video-btn:hover { background: #b91c1c !important; }
+
+/* Area boxes */
+.area-box {
+  border-radius: 10px !important;
+  border-color: var(--gray-300) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+.area-box.selected {
+  box-shadow: 0 0 0 3px var(--blue-600), 0 0 22px rgba(37,99,235,0.35) !important;
+  border-color: var(--blue-600) !important;
+  background-color: rgba(179, 217, 255, 0.85) !important;
+}
+.area-box .plus, .area-box .minus {
+  border-radius: 8px !important;
+  border-color: var(--gray-300) !important;
+}
+
+/* Density buttons */
+.density-container button {
+  border-radius: 10px !important;
+  border-color: var(--gray-300) !important;
+}
+.density-container button.selected {
+  background-color: rgba(209, 250, 229, 0.9) !important;
+  border-color: var(--green-500) !important;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.35) !important;
+}
+
+/* Tooltips */
+.tooltip, .help-tooltip {
+  background: #111827 !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.20) !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+/* Progress and rings */
+.ring { box-shadow: 0 6px 16px rgba(0,0,0,0.10) !important; }
+.ring .ring-val { font-size: 22px !important; }
+#result {
+  background: #fff !important;
+  border: 1px solid var(--gray-200) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(2,132,199,0.10) !important;
+}
+
+/* Spacing rhythm */
+section { margin-bottom: 32px !important; }
+.area-container, .density-container { margin-bottom: 24px !important; }
+#results-summary { margin: 10px 0 24px 0 !important; }
+
+/* Inputs */
+input, select, textarea, #codeInput {
+  border: 1px solid var(--gray-300) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  background: #fff !important;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root { --text: #e5e7eb; --bg: #0f172a; }
+  body { color: var(--text) !important; background: var(--bg) !important; }
+  .title-banner { background: linear-gradient(135deg, #1e3a8a, #1d4ed8) !important; }
+  .area-box, .density-container button, #result, input, select, textarea, #codeInput {
+    background: #111827 !important;
+    border-color: #334155 !important;
+    color: var(--text) !important;
+  }
+  .tooltip, .help-tooltip { background: #111827 !important; color: #e5e7eb !important; }
+}
+
+/* Accessibility - focus rings */
+:focus-visible {
+  outline: 3px solid rgba(37,99,235,0.6) !important;
+  outline-offset: 2px !important;
+  border-radius: 8px !important;
+}
+</style>
+
 </head>
 <body>
 
