@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<meta name="viewport" content="width=1200, viewport-fit=cover, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes">
 <script>
 // Age helpers - minimal, non-invasive
 (function(){
@@ -1705,15 +1705,191 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 /* FIX: ensure pdf-icon-container visible */
 #pdf-icon-container { display: inline-flex !important; gap: 8px; align-items: center; }
 </style>
+
+<style id="always-tight-css">
+/* Always-on spacing trims only - no size scaling */
+:root{
+  --gap-xxs:4px;
+  --gap-xs:6px;
+  --gap-sm:8px;
+}
+body.always-tight{ background:#fafafa; }
+
+/* Global containers */
+body.always-tight .title-banner{ margin-bottom:8px !important; padding-top:6px !important; padding-bottom:6px !important; }
+body.always-tight .area-container,
+body.always-tight .density-container{ gap:var(--gap-xxs) !important; margin:6px 0 !important; }
+body.always-tight #results-summary{ margin:6px 0 !important; }
+body.always-tight #score-rings{ gap:var(--gap-xs) !important; margin:6px 0 !important; }
+
+/* Boxes and result header */
+body.always-tight .area-box{ margin:1px !important; }
+body.always-tight .result-box{ padding:4px 8px !important; }
+body.always-tight #result{ margin:6px auto !important; padding-top:6px !important; padding-bottom:6px !important; }
+
+/* Controls: only external spacing */
+body.always-tight .density-container button{ margin:1px !important; }
+body.always-tight .help-info-btn,
+body.always-tight .btn-primary,
+body.always-tight .btn-blue{ margin:1px 3px !important; }
+
+/* Section stacking */
+body.always-tight .density-container + .area-container{ margin-top:4px !important; }
+
+/* Print: minimal blank space */
+@media print{
+  .title-banner{ margin-bottom:4px !important; }
+  .area-container, .density-container{ margin:4px 0 !important; gap:4px !important; }
+}
+</style>
+
+
+<style id="modern-buttons-tooltips">
+/* Light-only modern buttons */
+:root{
+  --btn-bg:#2563eb;
+  --btn-bg-hover:#1d4ed8;
+  --btn-text:#ffffff;
+  --btn-border:#1e40af;
+  --btn-soft:#e5e7eb;
+  --ring:0 0 0 3px rgba(37,99,235,0.25);
+}
+button.btn-modern{
+  -webkit-font-smoothing: antialiased;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-weight: 600;
+  letter-spacing: .1px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(16,24,40,.06);
+  cursor: pointer;
+  transition: transform .04s ease, box-shadow .12s ease, background-color .15s ease, border-color .15s ease;
+}
+button.btn-modern:hover{ background: var(--btn-bg-hover); }
+button.btn-modern:active{ transform: translateY(1px); }
+button.btn-modern:focus{ outline: none; box-shadow: var(--ring); border-color: var(--btn-bg-hover); }
+button.btn-modern[disabled]{ opacity:.6; cursor:not-allowed; }
+
+/* Secondary style if needed (detected via .btn-blue, .help-info-btn etc.) */
+button.btn-modern.secondary{
+  background:#ffffff; color:#0f172a; border: 2px solid var(--btn-soft);
+}
+button.btn-modern.secondary:hover{ border-color:#cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+
+/* Minimal reset for legacy button classes to avoid conflicts */
+button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; color: inherit; border: inherit; box-shadow: inherit; }
+
+/* Modern CSS-only tooltip */
+.has-tip{ position: relative; }
+.has-tip[data-tip]:hover::after,
+.has-tip[data-tip]:focus-visible::after{
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity .12s ease;
+  z-index: 1000;
+}
+.has-tip[data-tip]:hover::before,
+.has-tip[data-tip]:focus-visible::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #111827 transparent;
+  z-index: 1000;
+}
+/* Default hidden state so there is no layout shift */
+.has-tip::after, .has-tip::before{ opacity: 0; }
+.has-tip:hover::after, .has-tip:hover::before,
+.has-tip:focus-visible::after, .has-tip:focus-visible::before{ opacity: 1; }
+</style>
+
+
+<style id="copy-load-strong-borders">
+/* Clear, high-contrast borders for bottom action buttons */
+#btnCopyCode18,
+#btnLoadCode18{
+  border-width: 2px !important;
+  border-color: #111827 !important; /* near-black for clarity */
+}
+#btnCopyCode18:focus-visible,
+#btnLoadCode18:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(17,24,39,0.18) !important;
+  border-color: #111827 !important;
+}
+#btnCopyCode18:hover,
+#btnLoadCode18:hover{
+  border-color: #0f172a !important;
+}
+</style>
+
+
+
+
+
+<style id="density-image-fix">
+/* Robust density tile visuals */
+.density-container button,
+#androgenetic-areas .density-container button {
+  padding: 0 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: contain !important; /* show full image without cropping */
+  min-width: 40px !important;
+  min-height: 30px !important;
+}
+
+/* Selected state */
+.density-container button.selected {
+  border-color: #0f172a !important;
+  outline: 2px solid #0f172a !important;
+  outline-offset: 2px !important;
+}
+
+/* Map images by data-density attributes to avoid nth-child issues */
+.density-container button[data-density="0"]  { background-image: url('Images/density-0.jpg') !important; }
+.density-container button[data-density="10"] { background-image: url('Images/density-10.jpg') !important; }
+.density-container button[data-density="25"] { background-image: url('Images/density-25.jpg') !important; }
+.density-container button[data-density="50"] { background-image: url('Images/density-50.jpg') !important; }
+.density-container button[data-density="75"] { background-image: url('Images/density-75.jpg') !important; }
+.density-container button[data-density="90"] { background-image: url('Images/density-90.jpg') !important; }
+
+/* Small, consistent gap */
+.density-container { gap: 6px !important; }
+</style>
+
 </head>
-<body>
+<body class="always-tight">
 
 <div id="summary-actions-bar" style="display:flex;justify-content:flex-end;gap:8px;margin:16px 0 8px 0;flex-wrap:wrap;width:100%;box-sizing:border-box;padding:0 16px"></div><style>
 @media (max-width: 900px) { #floating-preview, #floating-close-btn { display: none; } }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
-<div class="title-banner has-hero" style="position: relative;"><div 20;"="" style="position: absolute; top: 5px; left: 10px;" z-index:=""><button class="age-btn help-info-btn" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)" type="button">ⓘ</button>
-  <button id="instruction-video-btn" class="help-info-btn" type="button" title="Tutorial">ⓘ ▶</button>
+<div class="title-banner has-hero" style="position: relative;"><div 20;"="" style="position: absolute; top: 5px; left: 10px;" z-index:=""><button class="age-btn help-info-btn btn-modern secondary" onmouseenter="showTooltip(this, 'Click on the Images, + or - to indicate the Images that best fit with the EXTENT of the alopecia areata.')" onmouseleave="hideTooltip(this)" type="button">ⓘ</button>
+  <button id="instruction-video-btn" class="help-info-btn btn-modern secondary" type="button" title="Tutorial">ⓘ ▶</button>
 </div>
 <div style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; color: white; opacity: 0.8;">
     © Reinhart Speeckaert, Nanja van Geel
@@ -1722,7 +1898,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 <div class="title-sub">For each section, choose the row that matches the alopecia extent. In that row, click the image that resembles the hair loss pattern. Check the percentage and adjust with ⊕︀ or ⊖ if needed.</div>
 <div class="title-sub"> </div>
 </div>
-<div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;"><button id="copy-summary" type="button" aria-label="Copy" title="Copy"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M16 4H8a2 2 0 0 0-2 2v10h2V6h8V4zm0 4h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2h8a2 2 0 0 0 2-2V8z" fill="currentColor"/></svg><span>Copy</span></button>
+<div class="banner-actions" id="pdf-icon-container" style="text-align: right; margin-bottom: 8px;"><button id="copy-summary" type="button" aria-label="Copy"  class="btn-modern has-tip" data-tip="Copy the score to the clipboard"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M16 4H8a2 2 0 0 0-2 2v10h2V6h8V4zm0 4h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2h8a2 2 0 0 0 2-2V8z" fill="currentColor"/></svg><span>Copy</span></button>
 </div><div id="selected-preview" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;"></div>
 <div id="results-summary" style="padding: 10px; font-size: 18px; background: #e0f0ff; border-radius: 8px; box-shadow: 0 0 5px #ccc;">
 <!-- Results will be populated here -->
@@ -1733,7 +1909,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 <div class="ring" id="ring-eyelashes"><span class="ring-val" id="ring-val-eyelashes">0%</span><span class="ring-label">Eyelashes</span></div>
 <div class="ring" id="ring-beard"><span class="ring-val" id="ring-val-beard">0%</span><span class="ring-label">Beard</span></div>
 </div>
-<div class="controls-row-above-reset" id="controls-row-above-reset"><button class="pdf-download-btn" id="generate-pdf" style="color: red; font-weight: bold;
+<div class="controls-row-above-reset" id="controls-row-above-reset"><button class="pdf-download-btn btn-modern" id="generate-pdf" style="color: red; font-weight: bold;
         background: none;
         border: none;
         cursor: pointer;
@@ -1742,7 +1918,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
     " title="Download"><svg aria-hidden="true" data-icon="download" height="18" style="vertical-align:middle; margin-right:6px;" viewbox="0 0 24 24" width="18"><path d="M12 3v10m0 0l-4-4m4 4l4-4M4 17v4h16v-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
         📄 
     <span class="btn-label">PDF</span></button></div><div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
-<button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page">🔄 Reset</button></div>
+<button id="reset-button" style="background: none; border: none; cursor: pointer; font-size: 20px; color: #0077cc;" title="Reset Page" class="btn-modern">🔄 Reset</button></div>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 </div>
 <div class="area-container" id="areaContainer"></div>
@@ -1752,7 +1928,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
 <span><strong>Androgenetic alopecia</strong> <span style="font-weight: normal;">(Score in 'Top of the scalp' (↑) ONLY the alopecia areata patches and score the androgenetic alopecia below (↓)</span></span>
 <span class="aga-help-wrap" style="position: relative; display: inline-block;">
-<button class="age-btn help-info-btn" id="aga-help" title="Help" type="button">Info</button>
+<button class="age-btn help-info-btn btn-modern secondary" id="aga-help" title="Help" type="button">Info</button>
 <div id="aga-help-float" style="display:none; position: fixed; left: 50%; transform: translateX(-50%); top: 0; background: white; border: 1px solid #999; box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 12px; z-index: 1000; max-width: min(720px, 90vw); max-height: 80vh; overflow: auto; text-align: center;">
 <img alt="Androgenetic alopecia help" src="Images/Androgenetichelp.jpg" style="max-width: 100%; height: auto;"/>
 </div>
@@ -1760,7 +1936,7 @@ body.ml-sticky-active .ml-float:not([data-sticky="1"]) { display: none !importan
 </h3>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div></div>
-<div class="density-container" id="androgenetic-density"><label>Diffuse/regrowing hair?</label><button class="selected" data-density="0"></button><button data-density="10"></button><button data-density="25"></button><button data-density="50"></button><button data-density="75"></button><button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></div>
+<div class="density-container" id="androgenetic-density"><label>Diffuse/regrowing hair?</label><button class="selected btn-modern" data-density="0"></button><button data-density="10" class="btn-modern"></button><button data-density="25" class="btn-modern"></button><button data-density="50" class="btn-modern"></button><button data-density="75" class="btn-modern"></button><button data-density="90" class="btn-modern"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the androgenetic area')" onmouseleave="hideTooltip(this)">?</span></div>
 </div>
 <div class="area-container" id="androgenetic-areas" style="margin-top: 6px;"></div>
 <div id="androgenetic-score" style="font-weight: 600; text-align: right; margin-top: 4px;">Androgenetic alopecia score: 0%</div>
@@ -1893,12 +2069,12 @@ function renderScalpSection(section) {
       <div></div>
       <div class="density-container" id="${section.id}-density">
         <label>Diffuse/regrowing hair?</label>
-        <button data-density="0" class="selected"></button>
-        <button data-density="10"></button>
-        <button data-density="25"></button>
-        <button data-density="50"></button>
-        <button data-density="75"></button>
-        <button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the alopecia areata patches')" onmouseleave="hideTooltip(this)">?</span>
+        <button data-density="0" class="selected btn-modern"></button>
+        <button data-density="10" class="btn-modern"></button>
+        <button data-density="25" class="btn-modern"></button>
+        <button data-density="50" class="btn-modern"></button>
+        <button data-density="75" class="btn-modern"></button>
+        <button data-density="90" class="btn-modern"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Mark the density of hairs in the alopecia areata patches')" onmouseleave="hideTooltip(this)">?</span>
       </div>
     </div>
     <div class="area-container" id="${section.id}-areas"></div>
@@ -2907,12 +3083,12 @@ window.addEventListener("DOMContentLoaded", function() {
 <div></div>
 <div class="density-container" id="right-beard-density">
 <label>Diffuse/regrowing hair?</label>
-<button class="selected" data-density="0"></button>
-<button data-density="10"></button>
-<button data-density="25"></button>
-<button data-density="50"></button>
-<button data-density="75"></button>
-<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 22')" onmouseleave="hideTooltip(this)">?</span>
+<button class="selected btn-modern" data-density="0"></button>
+<button data-density="10" class="btn-modern"></button>
+<button data-density="25" class="btn-modern"></button>
+<button data-density="50" class="btn-modern"></button>
+<button data-density="75" class="btn-modern"></button>
+<button data-density="90" class="btn-modern"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 22')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="right-beard-areas"></div>
@@ -2924,12 +3100,12 @@ window.addEventListener("DOMContentLoaded", function() {
 <div></div>
 <div class="density-container" id="left-beard-density">
 <label>Diffuse/regrowing hair?</label>
-<button class="selected" data-density="0"></button>
-<button data-density="10"></button>
-<button data-density="25"></button>
-<button data-density="50"></button>
-<button data-density="75"></button>
-<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
+<button class="selected btn-modern" data-density="0"></button>
+<button data-density="10" class="btn-modern"></button>
+<button data-density="25" class="btn-modern"></button>
+<button data-density="50" class="btn-modern"></button>
+<button data-density="75" class="btn-modern"></button>
+<button data-density="90" class="btn-modern"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="left-beard-areas"></div>
@@ -2941,12 +3117,12 @@ window.addEventListener("DOMContentLoaded", function() {
 <div></div>
 <div class="density-container" id="central-beard-density">
 <label>Diffuse/regrowing hair?</label>
-<button class="selected" data-density="0"></button>
-<button data-density="10"></button>
-<button data-density="25"></button>
-<button data-density="50"></button>
-<button data-density="75"></button>
-<button data-density="90"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
+<button class="selected btn-modern" data-density="0"></button>
+<button data-density="10" class="btn-modern"></button>
+<button data-density="25" class="btn-modern"></button>
+<button data-density="50" class="btn-modern"></button>
+<button data-density="75" class="btn-modern"></button>
+<button data-density="90" class="btn-modern"></button><span class="help-icon" onmouseenter="showTooltip(this, 'Help window 2')" onmouseleave="hideTooltip(this)">?</span>
 </div>
 </div>
 <div class="area-container" id="central-beard-areas"></div>
@@ -4609,7 +4785,7 @@ function showImmediatePeekFor(region) {
   });
 })();
 </script>
-<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue" id="btnCopyCode18" title="Copy">📋 Copy</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue" id="btnLoadCode18">📥 Load Score</button></div><script>
+<div id="shortcode-controls" style="display:flex; align-items:center; justify-content:center; gap:12px; padding:20px 0;"><button class="btn-blue btn-modern has-tip" id="btnCopyCode18"  data-tip="Copy the code to recreate the score later" style="border:2px solid #111827 !important;; border:2px solid #9ca3af !important; background-color:#dbeafe !important; color:#111827 !important;">📋 Copy code</button><input id="codeInput" placeholder="Paste score code here" style="width: 300px; margin: 5px;"/><button class="btn-blue btn-modern has-tip" id="btnLoadCode18" data-tip="Load a code to recreate a previous score" style="border:2px solid #111827 !important;; border:2px solid #9ca3af !important; background-color:#dbeafe !important; color:#111827 !important;">📥 Load Score</button></div><script>
 (function(){
   // 52-symbol alphabet: uppercase + lowercase
   const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -6075,14 +6251,14 @@ if (!pos) {
   .age-controls .label { font-weight:600; margin-right:4px; }
   .age-btn {
     padding: 4px 10px;
-    border: 1px solid #cbd5e1;
+    border: 2px solid #cbd5e1;
     border-radius: 9999px;
     background: white;
     color: #111827;
     cursor: pointer;
     font-size: 13px;
   }
-  .age-btn.selected { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .age-btn.selected { background: #0ea5e9; color: #fff; border-color: #0ea5e9; }
   .title-topbar { display:flex; align-items:center; justify-content:space-between; margin-top: 10px; }
 .pdf-top-right { position:absolute; top:6px; right:8px; }
 </style>
@@ -6115,9 +6291,9 @@ if (!pos) {
     left.className = 'age-controls';
     left.innerHTML = `
       <span class="label">Age</span>
-      <button type="button" class="age-btn" data-age="over12" aria-pressed="true">12+</button>
-      <button type="button" class="age-btn" data-age="6-11">6-11</button>
-      <button type="button" class="age-btn" data-age="2-5">2-5</button>
+      <button type="button" class="age-btn btn-modern" data-age="over12" aria-pressed="true">12+</button>
+      <button type="button" class="age-btn btn-modern" data-age="6-11">6-11</button>
+      <button type="button" class="age-btn btn-modern" data-age="2-5">2-5</button>
     `;
 
     // right - put existing PDF button here to be on the same line
@@ -8885,7 +9061,7 @@ if (typeof window.colorForPercent !== 'function'){
 <dialog id="instructionVideoModal" style="max-width: 900px; width: 90vw; border: none; border-radius: 12px; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
   <div style="background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-top-left-radius:12px; border-top-right-radius:12px;">
     <strong>Tutorial</strong>
-    <button id="closeInstructionVideo" aria-label="Close" style="background:#e5e7eb; color:#111827; border:none; border-radius:8px; padding:6px 10px; cursor:pointer;">Close</button>
+    <button id="closeInstructionVideo" aria-label="Close" style="background:#e5e7eb; color:#111827; border:none; border-radius:8px; padding:6px 10px; cursor:pointer;" class="btn-modern">Close</button>
   </div>
   <div style="background:#000; padding:0;">
     <video id="instructionVideoElement" src="Images/ExplanationVESALT.mp4" controls style="width:100%; height:auto; display:block;"></video>
