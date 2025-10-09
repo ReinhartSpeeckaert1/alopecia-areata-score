@@ -1881,6 +1881,98 @@ button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; 
 .density-container { gap: 6px !important; }
 </style>
 
+
+<style>
+/* Mobile: reduce visual scale by ~2x */
+@media (max-width: 640px){
+
+  /* Score rings: 90→45, 68→34, text halved */
+  #score-rings .ring{ width:45px !important; height:45px !important; }
+  #score-rings .ring::before{ width:34px !important; height:34px !important; }
+  #score-rings .ring .ring-val{ font-size:10px !important; }
+  #score-rings .ring .ring-label{ font-size:9px !important; bottom:-10px !important; }
+
+  /* Summary line and gauges */
+  #result{ font-size:10px !important; padding:5px 7px !important; }   /* inline was 20px */
+  #scalp-progress{ width:140px !important; max-width:45vw !important; } /* 280→140; 90vw→45vw */
+  #scalp-scale{ width:140px !important; max-width:45vw !important; }
+
+  /* Density buttons: halve fixed sizes where present */
+  #backside-density button,
+  #topside-density button,
+  #leftside-density button,
+  #rightside-density button{ width:25px !important; height:18px !important; } /* 50×35→25×18 */
+  #right-beard-density button,
+  #left-beard-density button,
+  #central-beard-density button{ width:22px !important; height:20px !important; } /* 45×40→22×20 */
+
+  /* Area boxes: halve per section */
+  /* Scalp sides that use 160×84 */
+  #backside-areas  .area-box,
+  #topside-areas   .area-box,
+  #leftside-areas  .area-box,
+  #rightside-areas .area-box,
+  #left-eyebrow-areas  .area-box,
+  #right-eyebrow-areas .area-box,
+  #left-eyelash-areas  .area-box,
+  #right-eyelash-areas .area-box{ width:80px !important; height:42px !important; }
+
+  /* Beard that uses 120×138 */
+  #left-beard-areas .area-box,
+  #central-beard-areas .area-box,
+  #right-beard-areas .area-box{ width:60px !important; height:69px !important; }
+
+  /* Androgenetic that uses 110×260 */
+  #androgenetic-areas .area-box{ width:55px !important; height:130px !important; }
+
+  /* Allow browser to shrink text naturally on phones */
+  html{ -webkit-text-size-adjust: 100% !important; text-size-adjust: 100% !important; }
+}
+</style>
+
+<style>
+/* === UI tweak: backgrounds for age and code controls; selected age dark red === */
+
+/* Container behind age buttons */
+.age-controls{
+  background: #f8fafc;           /* subtle panel */
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* Selected age appearance: dark red background with white text */
+.age-btn[aria-pressed="true"],
+.age-btn.selected{
+  background: #7f1d1d !important;   /* dark red */
+  color: #ffffff !important;
+  border-color: #7f1d1d !important;
+}
+
+/* Improve hover/focus for other ages */
+.age-btn:not([aria-pressed="true"]):hover{
+  background: #fee2e2;             /* light red hover */
+  border-color: #fca5a5;
+}
+
+/* Container behind Copy code / Load code controls */
+#shortcode-controls{
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Keep buttons readable on the new panel */
+#btnCopyCode18, #btnLoadCode18, #btnCopyCode19, #btnLoadCode19{
+  background: #e5e7eb;            /* neutral button fill */
+  color: #111827;
+  border-color: #cbd5e1;
+}
+#btnCopyCode18:hover, #btnLoadCode18:hover, #btnCopyCode19:hover, #btnLoadCode19:hover{
+  background: #d1d5db;
+}
+</style>
 </head>
 <body class="always-tight">
 
@@ -9355,3 +9447,40 @@ if (typeof window.colorForPercent !== 'function'){
 
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
+<style>
+/* === Refinement: remove box around age; dark-blue panel for score controls === */
+
+/* Remove background box around age controls */
+.age-controls{
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Keep selected age dark red */
+.age-btn[aria-pressed="true"],
+.age-btn.selected{
+  background: #7f1d1d !important;
+  color: #ffffff !important;
+  border-color: #7f1d1d !important;
+}
+
+/* Dark blue background for Copy/Load score section */
+#shortcode-controls{
+  background: #1e3a8a !important;      /* dark blue */
+  border: 1px solid #1e40af !important; /* darker blue border */
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #ffffff;                        /* ensure text is readable */
+}
+
+/* Buttons on dark panel: use light fills for contrast */
+#btnCopyCode18, #btnLoadCode18, #btnCopyCode19, #btnLoadCode19{
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #e5e7eb !important;
+}
+#btnCopyCode18:hover, #btnLoadCode18:hover, #btnCopyCode19:hover, #btnLoadCode19:hover{
+  background: #f3f4f6 !important;
+}
+</style>
