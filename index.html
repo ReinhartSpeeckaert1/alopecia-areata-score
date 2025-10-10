@@ -9757,19 +9757,20 @@ if (typeof window.colorForPercent !== 'function'){
         }
         // same classify logic
         function classify(sectionId, pos, index, value){
-          var v = Number(value); if (!isFinite(v) || v === 0) return null;
-          if (pos === 'upper') return 'Patchy alopecia areata';
-          if (pos === 'middle'){
-            if (sectionId === 'topside'){
-              if (index >= 2 && index <= 6) return 'Focal alopecia areata';
-            } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside'){
-              if (index === 2 || index === 3) return 'Reticular pattern';
-            }
-            return 'Patchy alopecia areata';
-          }
-          if (pos === 'lower') return 'Ophiasis pattern';
-          return 'Patchy alopecia areata';
-        }
+    var v = Number(value);
+    if (!isFinite(v) || v === 0) return null;
+    if (pos === 'upper') return 'Patchy alopecia areata';
+    if (pos === 'middle'){
+      if (sectionId === 'topside'){
+        if (index >= 2 && index <= 6) return 'Focal alopecia areata';
+      } else if (sectionId === 'backside' || sectionId === 'leftside' || sectionId === 'rightside'){
+        if (index >= 2 && index <= 5) return 'Focal alopecia areata';
+      }
+      return 'Reticular pattern';
+    }
+    if (pos === 'lower') return 'Ophiasis pattern';
+    return 'Patchy alopecia areata';
+}
         var p = classify(regionId, pos, idx, value);
         if (p) scores[p]++;
       });
