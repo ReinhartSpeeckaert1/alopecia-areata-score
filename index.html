@@ -2068,6 +2068,98 @@ button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; 
   }
 }
 </style>
+
+<style>
+/* --- Small-screen sizing & centering for banner and rings --- */
+@media (max-width: 900px){
+  /* Center the banner container and give it symmetric side margins */
+  .title-banner{
+    width: calc(100% - 24px) !important;
+    max-width: 780px !important;
+    margin: 10px auto 16px auto !important;
+    padding: 16px 14px !important;
+  }
+  .title-banner h2{ font-size: 26px !important; }
+}
+
+@media (max-width: 640px){
+  /* Stronger scaling for very small screens */
+  .title-banner{
+    width: calc(100% - 20px) !important;
+    max-width: 720px !important;
+    margin: 10px auto 16px auto !important;
+    padding: 18px 12px !important;
+  }
+  .title-banner h2{ font-size: 28px !important; }
+
+  /* Keep the ring row strictly centered and roomy */
+  #score-rings{
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 22px !important;
+    width: 100% !important;
+    margin: 10px auto 22px auto !important;
+    padding: 0 12px !important;
+    text-align: center !important;
+  }
+  #score-rings > *{ flex: 0 0 auto !important; margin: 0 !important; }
+
+  /* Make the rings larger for readability */
+  #score-rings .ring{ width: 140px !important; height: 140px !important; }
+  #score-rings .ring::before{ width: 104px !important; height: 104px !important; }
+  #score-rings .ring .ring-val{ font-size: 26px !important; }
+  #score-rings .ring .ring-label{ font-size: 16px !important; bottom: -18px !important; }
+
+  /* SVG/canvas fallback if rings are drawn with those */
+  #score-rings svg, #score-rings canvas{ width: 140px !important; height: 140px !important; }
+}
+</style>
+
+<style>
+/* Robust centering for the improvement/worsening sentence and summary */
+#result, #results-summary{
+  display: block !important;
+  width: 100% !important;
+  margin: 6px auto 2px auto !important;
+  text-align: center !important;
+  align-self: center !important;   /* if placed in a flex container */
+  justify-self: center !important; /* if placed in a grid container */
+  float: none !important;
+}
+</style>
+
+<style>
+/* Robust centering of the improvement/worsening sentence in all layouts */
+#result{
+  /* defeat inherited layout */
+  float: none !important;
+  position: static !important;
+  max-width: none !important;
+
+  /* occupy full row in flex/grid parents */
+  flex: 0 0 100% !important;
+  align-self: center !important;
+  justify-self: center !important;
+
+  /* center content whether it's inline text or children */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+
+  /* standard margins */
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
+}
+/* if the sentence is wrapped in a span inside #result */
+#result > span { display: inline-block !important; text-align: center !important; }
+</style>
 </head>
 <body class="always-tight">
 
@@ -10158,7 +10250,191 @@ if (typeof window.colorForPercent !== 'function'){
   } else { start(); }
 })();
 </script>
-\n</body></html>
+\n
+<script>
+(function(){
+  function centerResult(){
+    const candidates = Array.from(document.querySelectorAll(
+      '#result, #results-summary, .result, .results-summary, [id*="result"], [class*="result"]'
+    ));
+    const target = candidates.find(el => /improvement|worsening/i.test(el.textContent || '')) || candidates[0];
+    if(target){
+      // Center the element
+      Object.assign(target.style, {
+        display: 'block',
+        width: '100%',
+        textAlign: 'center',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        float: 'none'
+      });
+      // Also center its immediate container row if it aligns children left
+      const parent = target.parentElement;
+      if(parent){
+        if(getComputedStyle(parent).display.includes('flex')){
+          parent.style.justifyContent = 'center';
+          parent.style.alignItems = 'center';
+        }
+        parent.style.textAlign = 'center';
+      }
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', centerResult);
+  } else {
+    centerResult();
+  }
+  // Keep centered after dynamic updates
+  const obs = new MutationObserver(centerResult);
+  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+
+<style>
+/* Ensure sections after the rings are left-aligned */
+#score-rings ~ * {
+  text-align: left !important;
+}
+/* Common containers used below the rings remain left-aligned */
+.sections, .areas, .scalp-areas, .extent-sections, .images-grid, .body, .content {
+  text-align: left !important;
+}
+</style>
+<script>
+// Center only the 'improvement/worsening' text node; do NOT center its parent.
+(function(){
+  function centerOnlyResult(){
+    const cands = Array.from(document.querySelectorAll(
+      '#result, #results-summary, .result, .results-summary, [id*="result"], [class*="result"]'
+    ));
+    const el = cands.find(n => /improvement|worsening/i.test(n.textContent || '')) || document.getElementById('result');
+    if(!el) return;
+    Object.assign(el.style, {
+      display: 'block',
+      width: '100%',
+      textAlign: 'center',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      float: 'none'
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', centerOnlyResult);
+  } else {
+    centerOnlyResult();
+  }
+  const obs = new MutationObserver(centerOnlyResult);
+  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+
+<script>
+(function(){
+  function leftAlignBeard(){
+    // Look for elements whose text mentions 'beard' (case-insensitive)
+    const nodes = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, .section-title, .area-title, .title, .label, [data-area]"));
+    nodes.forEach(n => {
+      const t = (n.textContent || "").toLowerCase().trim();
+      if(t.includes("beard")){
+        // Left-align the heading and its closest section/container
+        n.style.textAlign = "left";
+        const container = n.closest("section, .section, .area, .areas, .panel, .card, .block, .row, .container") || n.parentElement;
+        if(container){
+          container.style.textAlign = "left";
+          container.style.marginLeft = ""; // ensure no forced centering margin
+          container.style.marginRight = "";
+          if(getComputedStyle(container).display.includes("flex")){
+            container.style.justifyContent = "flex-start";
+          }
+        }
+      }
+    });
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", leftAlignBeard);
+  } else {
+    leftAlignBeard();
+  }
+  // Keep stable on dynamic updates
+  const obs = new MutationObserver(leftAlignBeard);
+  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+
+<script>
+(function(){
+  function centerResultParent(){
+    const res = document.getElementById('result');
+    if(!res) return;
+    const p = res.parentElement;
+    if(!p) return;
+    // Center just this container so the combined "pattern + improvement/worsening" line centers.
+    p.style.textAlign = 'center';
+    const cs = getComputedStyle(p);
+    if (cs.display.includes('flex')){
+      p.style.justifyContent = 'center';
+      p.style.alignItems = 'center';
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', centerResultParent);
+  } else {
+    centerResultParent();
+  }
+  // Keep it centered after any dynamic content changes
+  const obs = new MutationObserver(centerResultParent);
+  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+
+<style>
+.beard, .beard-area, #beard, [data-area="beard"]{ text-align: left !important; }
+</style>
+<script>
+(function(){
+  function centerResultInline(){
+    var res = document.getElementById('result');
+    if(!res) return;
+    // Undo any parent-level centering
+    var p = res.parentElement;
+    if(p){
+      p.style.removeProperty('text-align');
+      if(getComputedStyle(p).display.includes('flex')){
+        p.style.removeProperty('justify-content');
+        p.style.removeProperty('align-items');
+      }
+    }
+    // Wrap inner content
+    var wrap = res.querySelector('.result-center-wrap');
+    if(!wrap){
+      wrap = document.createElement('span');
+      wrap.className = 'result-center-wrap';
+      while(res.firstChild){ wrap.appendChild(res.firstChild); }
+      res.appendChild(wrap);
+    }
+    res.style.textAlign = 'center';
+    wrap.style.display = 'inline-block';
+  }
+  function leftAlignBeard(){
+    var cands = Array.from(document.querySelectorAll('.beard, .beard-area, #beard, [data-area="beard"]'));
+    cands.forEach(function(n){
+      n.style.textAlign = 'left';
+      var c = n.closest('section, .section, .area, .areas, .panel, .card, .block, .row, .container') || n.parentElement;
+      if(c){
+        c.style.textAlign = 'left';
+        if(getComputedStyle(c).display.includes('flex')){
+          c.style.justifyContent = 'flex-start';
+        }
+      }
+    });
+  }
+  function runAll(){ centerResultInline(); leftAlignBeard(); }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', runAll); } else { runAll(); }
+  var obs = new MutationObserver(runAll);
+  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+})();
+</script>
+</body></html>
 <!-- removed legacy SAFE OVERRIDES -->
 <style>
 /* === Refinement: remove box around age; dark-blue panel for score controls === */
