@@ -1973,6 +1973,101 @@ button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; 
   background: #d1d5db;
 }
 </style>
+
+<style>
+/* Always allow the rings row to center and avoid stray left offsets */
+#score-rings{
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 18px !important;
+  margin: 10px auto 16px auto !important;
+  padding: 0 !important;
+}
+
+/* Larger rings by default */
+#score-rings .ring{ width: 110px !important; height: 110px !important; }
+#score-rings .ring::before{ width: 84px !important; height: 84px !important; }
+#score-rings .ring .ring-val{ font-size: 18px !important; }
+#score-rings .ring .ring-label{ font-size: 14px !important; }
+
+/* Small-screen tuning */
+@media (max-width: 900px){
+  /* Center the banner with equal side breathing room */
+  .title-banner{
+    width: calc(100% - 32px) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  /* Keep rings centered and readable */
+  #score-rings{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    gap: 24px !important;
+  }
+  #score-rings .ring{ width: 118px !important; height: 118px !important; }
+  #score-rings .ring::before{ width: 90px !important; height: 90px !important; }
+  #score-rings .ring .ring-val{ font-size: 19px !important; }
+  #score-rings .ring .ring-label{ font-size: 14px !important; }
+  #score-rings svg, #score-rings canvas{ width: 118px !important; height: 118px !important; }
+}
+</style>
+
+<script>
+// Replace ': ... extent' with '(... extent)' consistently
+(function(){
+  function overrideCompute(){
+    if (typeof window.computeExtentText === 'function'){
+      window.computeExtentText = function(p){
+        if (!(p > 0)) return '';
+        if (p < 21) return ' (limited extent)';
+        if (p < 50) return ' (moderate extent)';
+        if (p < 95) return ' (severe extent)';
+        return ' (very severe extent)';
+      };
+    }
+    // Some parts may compute scalp-specific text; patch common helpers if present
+    if (typeof window.computeScalpExtentText === 'function'){
+      window.computeScalpExtentText = window.computeExtentText;
+    }
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', overrideCompute);
+  } else {
+    overrideCompute();
+  }
+})();
+</script>
+
+<style>
+/* Bigger percentages inside the rings */
+#score-rings .ring .ring-val,
+#score-rings .ring .ring-value,
+#score-rings .ring .ring-percentage,
+#score-rings .ring .percentage,
+#score-rings .ring .value,
+#score-rings .donut .value,
+#score-rings svg text{
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-anchor: middle;
+}
+
+/* Even larger on small screens for readability */
+@media (max-width: 900px){
+  #score-rings .ring .ring-val,
+  #score-rings .ring .ring-value,
+  #score-rings .ring .ring-percentage,
+  #score-rings .ring .percentage,
+  #score-rings .ring .value,
+  #score-rings .donut .value,
+  #score-rings svg text{
+    font-size: 24px !important;
+  }
+}
+</style>
 </head>
 <body class="always-tight">
 
