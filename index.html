@@ -10504,6 +10504,96 @@ if (typeof window.colorForPercent !== 'function'){
 </script>
 <!-- === End injected fixes v2 === -->
 
+
+<style>
+  #first-hover-tip {
+    position: absolute;
+    max-width: 420px;
+    background: transparent;
+    color: #000000;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.35;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    z-index: 99999;
+  }
+</style>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'scalpFirstHoverTipDismissed';
+  if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+  const scalpBoxes = document.querySelectorAll(
+    '#backside-areas .area-box, ' +
+    '#topside-areas .area-box, '  +
+    '#leftside-areas .area-box, ' +
+    '#rightside-areas .area-box'
+  );
+  if (!scalpBoxes.length) return;
+
+  let tipEl = null;
+  let firstHost = null;
+  const TIP_TEXT = "Choose the row that matches the alopecia extent. In that row, click the image that resembles the hair loss pattern. Check the percentage and adjust with ⊕︀ or ⊖ if needed.";
+
+  function createTip() {
+    const el = document.createElement('div');
+    el.id = 'first-hover-tip';
+    el.textContent = TIP_TEXT;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function positionTip(host) {
+    if (!tipEl) return;
+    const r = host.getBoundingClientRect();
+    const margin = 8;
+    const left = Math.max(margin, Math.min(
+      window.innerWidth - margin - tipEl.offsetWidth,
+      r.left + (r.width / 2) - (tipEl.offsetWidth / 2)
+    ));
+    const top = Math.max(margin, r.top - tipEl.offsetHeight - 34);
+    tipEl.style.left = left + 'px';
+    tipEl.style.top  = top + 'px';
+  }
+
+  function hideForever() {
+    if (tipEl) {
+      tipEl.remove();
+      tipEl = null;
+      firstHost = null;
+    }
+    sessionStorage.setItem(STORAGE_KEY, '1');
+    window.removeEventListener('scroll', onReposition, { passive: true });
+    window.removeEventListener('resize', onReposition);
+  }
+
+  function onReposition() { if (firstHost && tipEl) positionTip(firstHost); }
+
+  let shownOn = null;
+  scalpBoxes.forEach(box => {
+    box.addEventListener('mouseenter', () => {
+      if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+      if (!tipEl) {
+        shownOn = box;
+        firstHost = box;
+        tipEl = createTip();
+        positionTip(box);
+        window.addEventListener('scroll', onReposition, { passive: true });
+        window.addEventListener('resize', onReposition);
+        return;
+      }
+
+      if (tipEl && box !== shownOn) {
+        hideForever();
+      }
+    });
+  });
+})();
+</script>
+
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
 <style>
