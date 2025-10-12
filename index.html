@@ -2160,6 +2160,15 @@ button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; 
 /* if the sentence is wrapped in a span inside #result */
 #result > span { display: inline-block !important; text-align: center !important; }
 </style>
+
+<style>
+  /* Make the total result banner dark blue with white text */
+  #result {
+    background-color: #0b3a7e !important;
+    color: #ffffff !important;
+  }
+</style>
+
 </head>
 <body class="always-tight">
 
@@ -2207,7 +2216,7 @@ button.btn-blue, button.btn-primary, button.help-info-btn{ background: inherit; 
 <div id="aga-toggle-container" style="display: none;"></div>
 <div id="aga-ui-wrapper" style="display: none; flex-direction: column; gap: 6px;">
 <h3 style="display:flex; align-items:center; gap:8px; margin-bottom: 6px; position: relative;">
-<span><strong>Androgenetic alopecia</strong> <span style="font-weight: normal;">(Score in 'Top of the scalp' (↑) ONLY the alopecia areata patches and score the androgenetic alopecia below (↓)</span></span>
+<span><strong>Androgenetic alopecia</strong> <span style="font-weight: normal;">(Score in the alopecia areata areas (🡩🡩🡩) ONLY the alopecia areata patches and score ONLY the androgenetic alopecia below (🡳🡳🡳)</span></span>
 <span class="aga-help-wrap" style="position: relative; display: inline-block;">
 <button class="age-btn help-info-btn btn-modern secondary" id="aga-help" title="Help" type="button">Info</button>
 <div id="aga-help-float" style="display:none; position: fixed; left: 50%; transform: translateX(-50%); top: 0; background: white; border: 1px solid #999; box-shadow: 0 4px 16px rgba(0,0,0,0.2); padding: 12px; z-index: 1000; max-width: min(720px, 90vw); max-height: 80vh; overflow: auto; text-align: center;">
@@ -10517,6 +10526,7 @@ if (typeof window.colorForPercent !== 'function'){
     line-height: 1.35;
     box-shadow: 0 8px 24px rgba(0,0,0,.2);
     z-index: 99999;
+    pointer-events: none;
   }
 </style>
 
@@ -10535,6 +10545,10 @@ if (typeof window.colorForPercent !== 'function'){
 
   let tipEl = null;
   let firstHost = null;
+  let shownOn = null;
+  let hideTimer = null;
+  let shownAt = 0;
+
   const TIP_TEXT = "Choose the row that matches the alopecia extent. In that row, click the image that resembles the hair loss pattern. Check the percentage and adjust with ⊕︀ or ⊖ if needed.";
 
   function createTip() {
@@ -10571,7 +10585,17 @@ if (typeof window.colorForPercent !== 'function'){
 
   function onReposition() { if (firstHost && tipEl) positionTip(firstHost); }
 
-  let shownOn = null;
+  function scheduleHideWithMinimum(elapsedMs) {
+    const minVisible = 2000;
+    const remaining = Math.max(0, minVisible - elapsedMs);
+    if (remaining === 0) {
+      hideForever();
+    } else {
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(hideForever, remaining);
+    }
+  }
+
   scalpBoxes.forEach(box => {
     box.addEventListener('mouseenter', () => {
       if (sessionStorage.getItem(STORAGE_KEY)) return;
@@ -10580,16 +10604,19 @@ if (typeof window.colorForPercent !== 'function'){
         shownOn = box;
         firstHost = box;
         tipEl = createTip();
-        positionTip(box);
+        // Allow layout to compute size before positioning
+        requestAnimationFrame(() => positionTip(box));
         window.addEventListener('scroll', onReposition, { passive: true });
         window.addEventListener('resize', onReposition);
+        shownAt = Date.now();
         return;
       }
 
       if (tipEl && box !== shownOn) {
-        hideForever();
+        const elapsed = Date.now() - shownAt;
+        scheduleHideWithMinimum(elapsed);
       }
-    });
+    }, { passive: true });
   });
 })();
 </script>
