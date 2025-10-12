@@ -10291,149 +10291,220 @@ if (typeof window.colorForPercent !== 'function'){
 </script>
 
 <style>
-/* Ensure sections after the rings are left-aligned */
-#score-rings ~ * {
-  text-align: left !important;
-}
-/* Common containers used below the rings remain left-aligned */
-.sections, .areas, .scalp-areas, .extent-sections, .images-grid, .body, .content {
-  text-align: left !important;
-}
-</style>
-<script>
-// Center only the 'improvement/worsening' text node; do NOT center its parent.
-(function(){
-  function centerOnlyResult(){
-    const cands = Array.from(document.querySelectorAll(
-      '#result, #results-summary, .result, .results-summary, [id*="result"], [class*="result"]'
-    ));
-    const el = cands.find(n => /improvement|worsening/i.test(n.textContent || '')) || document.getElementById('result');
-    if(!el) return;
-    Object.assign(el.style, {
-      display: 'block',
-      width: '100%',
-      textAlign: 'center',
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      float: 'none'
-    });
+  .align-left { text-align: left !important; margin-left: 0 !important; }
+  /* Stronger z-index for tooltips to stay above fixed UI */
+  .tooltip{ position: fixed !important; z-index: 99999 !important; pointer-events: none; }
+  /* On small screens, prevent clipping and hide floating preview */
+  @media (max-width: 640px){
+    .aga-ui-wrapper, .androgenetic-areas, .androgenetic-density, .androgenetic-score, body, html { overflow: visible !important; }
+    #floating-preview, [id^="floating-preview"], #beard-floating-preview, .selected-preview { display: none !important; }
   }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', centerOnlyResult);
-  } else {
-    centerOnlyResult();
-  }
-  const obs = new MutationObserver(centerOnlyResult);
-  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
-})();
-</script>
-
-<script>
-(function(){
-  function leftAlignBeard(){
-    // Look for elements whose text mentions 'beard' (case-insensitive)
-    const nodes = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, .section-title, .area-title, .title, .label, [data-area]"));
-    nodes.forEach(n => {
-      const t = (n.textContent || "").toLowerCase().trim();
-      if(t.includes("beard")){
-        // Left-align the heading and its closest section/container
-        n.style.textAlign = "left";
-        const container = n.closest("section, .section, .area, .areas, .panel, .card, .block, .row, .container") || n.parentElement;
-        if(container){
-          container.style.textAlign = "left";
-          container.style.marginLeft = ""; // ensure no forced centering margin
-          container.style.marginRight = "";
-          if(getComputedStyle(container).display.includes("flex")){
-            container.style.justifyContent = "flex-start";
-          }
-        }
-      }
-    });
-  }
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", leftAlignBeard);
-  } else {
-    leftAlignBeard();
-  }
-  // Keep stable on dynamic updates
-  const obs = new MutationObserver(leftAlignBeard);
-  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
-})();
-</script>
-
-<script>
-(function(){
-  function centerResultParent(){
-    const res = document.getElementById('result');
-    if(!res) return;
-    const p = res.parentElement;
-    if(!p) return;
-    // Center just this container so the combined "pattern + improvement/worsening" line centers.
-    p.style.textAlign = 'center';
-    const cs = getComputedStyle(p);
-    if (cs.display.includes('flex')){
-      p.style.justifyContent = 'center';
-      p.style.alignItems = 'center';
-    }
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', centerResultParent);
-  } else {
-    centerResultParent();
-  }
-  // Keep it centered after any dynamic content changes
-  const obs = new MutationObserver(centerResultParent);
-  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
-})();
-</script>
-
-<style>
-.beard, .beard-area, #beard, [data-area="beard"]{ text-align: left !important; }
 </style>
 <script>
 (function(){
-  function centerResultInline(){
-    var res = document.getElementById('result');
-    if(!res) return;
-    // Undo any parent-level centering
-    var p = res.parentElement;
-    if(p){
-      p.style.removeProperty('text-align');
-      if(getComputedStyle(p).display.includes('flex')){
-        p.style.removeProperty('justify-content');
-        p.style.removeProperty('align-items');
-      }
-    }
-    // Wrap inner content
-    var wrap = res.querySelector('.result-center-wrap');
-    if(!wrap){
-      wrap = document.createElement('span');
-      wrap.className = 'result-center-wrap';
-      while(res.firstChild){ wrap.appendChild(res.firstChild); }
-      res.appendChild(wrap);
-    }
-    res.style.textAlign = 'center';
-    wrap.style.display = 'inline-block';
-  }
-  function leftAlignBeard(){
-    var cands = Array.from(document.querySelectorAll('.beard, .beard-area, #beard, [data-area="beard"]'));
-    cands.forEach(function(n){
-      n.style.textAlign = 'left';
-      var c = n.closest('section, .section, .area, .areas, .panel, .card, .block, .row, .container') || n.parentElement;
-      if(c){
-        c.style.textAlign = 'left';
-        if(getComputedStyle(c).display.includes('flex')){
-          c.style.justifyContent = 'flex-start';
-        }
-      }
+  // 1) Left-align the requested titles
+  function alignTitles(){
+    const wanted = new Set([
+      'Back of the scalp',
+      'Left side of the scalp',
+      'Right side of the scalp',
+      'Top of the scalp',
+      'Eyebrows',
+      'Eyelashes',
+      'Alopecia in the beard'
+    ]);
+    const sel = 'h1,h2,h3,h4,.section-title,.area-title';
+    document.querySelectorAll(sel).forEach(el=>{
+      const t = (el.textContent||'').trim().replace(/\(.*\)$/, '').trim();
+      if (wanted.has(t)) el.classList.add('align-left');
+    });
+    ['eyebrow-title','eyelash-title','beard-title'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) el.classList.add('align-left');
     });
   }
-  function runAll(){ centerResultInline(); leftAlignBeard(); }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', runAll); } else { runAll(); }
-  var obs = new MutationObserver(runAll);
-  obs.observe(document.body, {childList:true, subtree:true, characterData:true});
+
+  // 2) Mobile-first tooltip placement override
+  // Replaces any earlier global placeTip() with one that prefers showing below on small screens
+  window.placeTip = function placeTip(tip, el, w, h){
+    const rect = el.getBoundingClientRect();
+    let left = rect.left;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const MOBILE_MAX = 640;
+    const TOP_SAFE = 64; // header safe area
+
+    // Keep horizontally in view
+    if (left + w > vw - 8) left = Math.max(8, vw - w - 8);
+
+    // Try below first
+    let top = rect.bottom + 8;
+
+    if (vw <= MOBILE_MAX){
+      // On mobile, avoid flipping above unless absolutely necessary
+      if (top + h > vh - 8){
+        const above = Math.max(TOP_SAFE, rect.top - h - 8);
+        if (above + h <= vh - 8){
+          top = above;
+        }else{
+          // Clamp within viewport
+          top = Math.max(TOP_SAFE, Math.min(vh - h - 8, top));
+        }
+      }
+    }else{
+      // Desktop behavior: fallback to above if bottom would overflow
+      if (top + h > vh - 8){
+        top = Math.max(8, rect.top - h - 8);
+      }
+    }
+
+    tip.style.left = left + 'px';
+    tip.style.top  = top  + 'px';
+  };
+
+  // Run on ready
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', alignTitles);
+  }else{
+    alignTitles();
+  }
 })();
 </script>
+<!-- === End injected fixes === -->
+
+
+<!-- === Injected fixes v2: stronger heading alignment, robust mobile tooltips, and preview hide === -->
+<style id="fix-mobile-tooltips-and-preview-v2">
+  .align-left { text-align: left !important; margin-left: 0 !important; }
+
+  /* Tooltips: always on top and fixed so they ignore parent overflow */
+  .tooltip {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+    pointer-events: none;
+    max-width: min(92vw, 360px);
+    transform: translateZ(0); /* create new layer */
+  }
+
+  /* On small screens, prevent clipping and hide any fixed preview UI */
+  @media (max-width: 768px){
+    html, body { overflow: visible !important; }
+    [class*="wrapper"], [class*="container"], [class*="areas"], [class*="density"], [class*="score"] {
+      overflow: visible !important;
+    }
+    /* Hide any element that looks like a floating preview */
+    #floating-preview, #beard-floating-preview,
+    [id*="floating-preview"], [class*="floating-preview"],
+    [id*="preview"], [class*="preview"],
+    .selected-preview { display: none !important; visibility: hidden !important; }
+  }
+</style>
+<script id="fix-mobile-tooltips-and-preview-v2-js">
+(function(){
+  // 1) Left-align required headings (including Beard)
+  function alignTitles(){
+    const wanted = new Set([
+      'Back of the scalp',
+      'Left side of the scalp',
+      'Right side of the scalp',
+      'Top of the scalp',
+      'Eyebrows',
+      'Eyelashes',
+      'Alopecia in the beard',
+      'Beard'
+    ]);
+    const sel = 'h1,h2,h3,h4,.section-title,.area-title,[id$="-title"]';
+    document.querySelectorAll(sel).forEach(el=>{
+      const t = (el.textContent||'').trim().replace(/\(.*\)$/, '').trim();
+      if (wanted.has(t)) el.classList.add('align-left');
+    });
+    ['eyebrow-title','eyelash-title','beard-title'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) el.classList.add('align-left');
+    });
+  }
+
+  // 2) Robust, last-wins tooltip placement
+  // Ensure a single global placement function that measures size itself.
+  window.placeTip = function placeTip(tip, el){
+    // Ensure tip is attached for measurement
+    if (!tip.isConnected) document.body.appendChild(tip);
+    // Temporarily show for measurement
+    const prevVis = tip.style.visibility, prevDisp = tip.style.display;
+    tip.style.visibility = 'hidden';
+    tip.style.display = 'block';
+    let w = tip.offsetWidth || 220;
+    let h = tip.offsetHeight || 48;
+    tip.style.visibility = prevVis || '';
+    tip.style.display = prevDisp || '';
+
+    const rect = el.getBoundingClientRect();
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const MOBILE = vw <= 768;
+    const MARGIN = 8;
+    const TOP_SAFE = 56; // avoid top app bars
+
+    // Default: below
+    let left = Math.min(Math.max(MARGIN, rect.left), Math.max(MARGIN, vw - w - MARGIN));
+    let top  = rect.bottom + MARGIN;
+
+    if (MOBILE){
+      // Prefer below; if it overflows bottom, clamp or try above if space
+      if (top + h > vh - MARGIN){
+        const above = Math.max(TOP_SAFE, rect.top - h - MARGIN);
+        if (above + h <= vh - MARGIN) top = above;
+        else top = Math.max(TOP_SAFE, Math.min(vh - h - MARGIN, top));
+      }
+    }else{
+      // Desktop: flip above if needed
+      if (top + h > vh - MARGIN) top = Math.max(MARGIN, rect.top - h - MARGIN);
+    }
+
+    tip.style.left = left + 'px';
+    tip.style.top  = top  + 'px';
+  };
+
+  // 3) Patch showTooltip to guarantee body-level, fixed-position tooltips
+  (function ensureShowTooltipPatch(){
+    if (!window.showTooltip) return;
+    const original = window.showTooltip;
+    window.showTooltip = function(el, text){
+      const tip = original(el, text) || window.ACTIVE_TIP || document.querySelector('.tooltip:last-of-type');
+      if (tip){
+        // Force body-level and fixed stacking
+        if (tip.parentElement !== document.body) document.body.appendChild(tip);
+        tip.style.position = 'fixed';
+        tip.style.zIndex = '2147483647';
+        // Re-place now
+        window.placeTip(tip, el);
+      }
+      return tip;
+    };
+  })();
+
+  // 4) Hide floating preview immediately on load for mobile
+  function hidePreviewOnMobile(){
+    if ((window.innerWidth||0) <= 768){
+      document.querySelectorAll('#floating-preview, #beard-floating-preview, [id*="floating-preview"], [class*="floating-preview"], [id*="preview"], [class*="preview"], .selected-preview')
+        .forEach(el=>{ el.style.display='none'; el.style.visibility='hidden'; });
+    }
+  }
+
+  // Run
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      alignTitles(); hidePreviewOnMobile();
+    });
+  }else{
+    alignTitles(); hidePreviewOnMobile();
+  }
+  // Also respond to resizes
+  window.addEventListener('resize', hidePreviewOnMobile, { passive:true });
+})();
+</script>
+<!-- === End injected fixes v2 === -->
+
 </body></html>
 <!-- removed legacy SAFE OVERRIDES -->
 <style>
