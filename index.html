@@ -8774,7 +8774,7 @@ if (typeof window.colorForPercent !== 'function'){
     "Diffuse/regrowing hair?",
     "Remaining hairs in the bald patches?"
   ];
-  const OPEN_TEXT = "What percentage of hairs is present in the alopecia patches?";
+  const OPEN_TEXT = "What % of hair is present in the alopecia patches?";
 
   function textEquals(el, targets){
     if(!el) return false;
@@ -9050,7 +9050,7 @@ if (typeof window.colorForPercent !== 'function'){
   // Configure
   var HOVER_MS = 1500;
   var TARGET_ID = 'androgenetic-density';
-  var RESET_TEXT = "What percentage of hairs is present in the alopecia patches?";
+  var RESET_TEXT = "What % of hair is present in the alopecia patches?";
 
   var target = document.getElementById(TARGET_ID);
   if (!target) return;
@@ -9161,7 +9161,7 @@ if (typeof window.colorForPercent !== 'function'){
   container.addEventListener('mouseleave', onLeave, true);
 
   // Reset handler: click on the specific explanatory text
-  var RESET_TEXT = "What percentage of hairs is present in the alopecia patches?";
+  var RESET_TEXT = "What % of hair is present in the alopecia patches?";
   function findResetEl(){
     var nodes = document.querySelectorAll('label, span, div, a, p, button');
     for (var i=0; i<nodes.length; i++){
