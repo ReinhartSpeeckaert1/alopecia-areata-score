@@ -10702,3 +10702,106 @@ if (typeof window.colorForPercent !== 'function'){
   } else { start(); }
 })();
 </script>
+
+<!-- Final fixup patch: unify dominant label decoration and clipboard normalization -->
+<script>
+(function(){
+  if (window.__finalFixInstalled) return; window.__finalFixInstalled = true;
+
+  function scalpPct(){
+    try {
+      var totals = (typeof calculateSectionTotals==='function') ? calculateSectionTotals() : null;
+      var v = totals && (('Scalp' in totals) ? totals.Scalp : (('scalp' in totals) ? totals.scalp : null));
+      v = Number(v);
+      if (isFinite(v)) return v;
+    } catch(e){}
+    return 0;
+  }
+
+  function isDiffuse(){
+    try{
+      if (typeof globalSelections === 'object' && globalSelections){
+        var ids = ['backside','topside','leftside','rightside','androgenetic'];
+        for (var i=0;i<ids.length;i++){
+          var s = globalSelections[ids[i]];
+          if (s && typeof s.density !== 'undefined' && Number(s.density||0) > 0) return true;
+        }
+      }
+    }catch(e){}
+    return false;
+  }
+
+  function stripExtent(s){
+    s = String(s||'');
+    s = s.replace(/\s*\(diffuse\)\s*$/ig, '');
+    s = s.replace(/\s*:\s*(limited|moderate|severe|very\s*severe)\s+extent\s*$/ig, '');
+    return s.trim();
+  }
+
+  function computeExtentText(pct){
+    pct = Number(pct)||0;
+    var label = '';
+    if      (pct > 50) label = ': very severe extent';
+    else if (pct > 25) label = ': severe extent';
+    else if (pct > 10) label = ': moderate extent';
+    else if (pct > 0)  label = ': limited extent';
+    else label = ': no current scalp involvement';
+    return label;
+  }
+
+  function unifiedDecorate(name){
+    var base = stripExtent(name);
+    if (!base) return '';
+    var txt = base;
+    if (isDiffuse()) txt += ' (diffuse)';
+    txt += computeExtentText(scalpPct());
+    return txt;
+  }
+
+  // Make it the canonical decorator used elsewhere
+  window.__aa_decorateDominant = unifiedDecorate;
+
+  function refreshDominant(){
+    try{
+      var el = document.getElementById('pattern-dominant');
+      if (!el) return;
+      var raw = el.textContent || '';
+      var base = stripExtent(raw);
+      el.textContent = unifiedDecorate(base);
+    }catch(e){}
+  }
+
+  // Run on load and after common UI interactions
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(refreshDominant, 0); });
+  document.addEventListener('input', function(){ setTimeout(refreshDominant, 0); }, true);
+  document.addEventListener('click', function(){ setTimeout(refreshDominant, 0); }, true);
+  // Also patch ring updates if present
+  try{
+    var _origR = window.updateScoreRings;
+    window.updateScoreRings = function(){ try{ if (typeof _origR==='function') _origR(); }catch(e){} refreshDominant(); };
+  }catch(e){}
+
+  // Clipboard normalization
+  try{
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
+      var _origWrite = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = function(text){
+        try{
+          var t = String(text||'');
+          // Ensure "Scalp improvement/worsening" start on a new line
+          t = t.replace(/([^\n])(Scalp\s+(?:improvement|worsening):)/g, '$1\n$2');
+          // Normalize Dominant pattern line
+          t = t.replace(/(^|\n)\s*Dominant\s+pattern:\s*([^\n]*)/i, function(_, p1, rest){
+            var base = stripExtent(rest);
+            return p1 + 'Dominant pattern: ' + unifiedDecorate(base);
+          });
+          // Remove any stray " (diffuse)" after "Scalp improvement/worsening" lines
+          t = t.replace(/(Scalp\s+(?:improvement|worsening):\s*[^\n%]*%)(?:\s*\(diffuse\))+/ig, '$1');
+          text = t;
+        }catch(e){}
+        return _origWrite(text);
+      };
+    }
+  }catch(e){}
+})();
+</script>
