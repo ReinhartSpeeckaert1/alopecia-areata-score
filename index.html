@@ -10741,9 +10741,9 @@ if (typeof window.colorForPercent !== 'function'){
   function computeExtentText(pct){
     pct = Number(pct)||0;
     var label = '';
-    if      (pct > 50) label = ': very severe extent';
-    else if (pct > 25) label = ': severe extent';
-    else if (pct > 10) label = ': moderate extent';
+    if      (pct > 95) label = ': very severe extent';
+    else if (pct > 49) label = ': severe extent';
+    else if (pct > 19) label = ': moderate extent';
     else if (pct > 0)  label = ': limited extent';
     else label = ': no current scalp involvement';
     return label;
