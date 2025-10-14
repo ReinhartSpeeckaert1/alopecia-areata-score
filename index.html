@@ -10140,7 +10140,7 @@ if (typeof window.colorForPercent !== 'function'){
   })();
 </script>
 
-<!-- header-format patch v4 (robust parse, preserve percent) -->
+<!-- header-format patch v5 (robust parse, preserve percent) -->
 <style>
   #pattern-dominant { text-align: center !important; }
   .trend--improve { color: #16a34a !important; }
@@ -10148,13 +10148,13 @@ if (typeof window.colorForPercent !== 'function'){
 </style>
 <script>
 (function(){
-  if (window.__headerFixInstalledV4) return; window.__headerFixInstalledV4 = true;
+  if (window.__headerFixInstalledV5) return; window.__headerFixInstalledV5 = true;
 
   function build(dx, kind, pct, label){
     var kindClean = (kind || '').toLowerCase().includes('worsen') ? 'worsening' : 'improvement';
     var wrapper = document.createElement('span');
     wrapper.appendChild(document.createTextNode(dx.trim().replace(/[;:,\-\s]+$/,'')));
-    wrapper.appendChild(document.createTextNode('; '));
+    wrapper.appendChild(document.createTextNode(': '));
     var trend = document.createElement('span');
     trend.className = 'trend ' + (kindClean === 'improvement' ? 'trend--improve' : 'trend--worsen');
     var pctText = pct.replace(',', '.').trim();
@@ -10167,7 +10167,7 @@ if (typeof window.colorForPercent !== 'function'){
   // "... Scalp improvement: 85.7% (label)"
   // "... Scalp improvement 85,7%: label"
   // "... Scalp worsening: 12 % - label"
-  var RE_MAIN = /^(.+?)\s*Scalp\s*(improvement|worsening)\s*:?\s*([0-9]+(?:[\.,][0-9]+)?)\s*%\s*(?:[:\-]\s*|\(?\s*)([^)]*)\)?\s*$/i;
+  var RE_MAIN = /^(.+?)\s*Scalp\s*(improvement|worsening)\s*:?\s*([0-9]+(?:[\.,][0-9]+)?)\s*%\s*(?:\(\s*([^)]*?)\s*\))?\s*(?::\s*(.+))?\s*$/i;
 
   function format(raw){
     try{
@@ -10179,8 +10179,13 @@ if (typeof window.colorForPercent !== 'function'){
         var dx = m[1] || '';
         var kind = m[2] || 'improvement';
         var pct = m[3] || '';
-        var label = (m[4] || '').trim();
-        return build(dx, kind, pct, label);
+        var labelA = (m[4] || '').trim();
+var labelB = (m[5] || '').trim();
+var parts = [];
+if (labelA) parts.push(labelA);
+if (labelB && (!labelA || labelB.toLowerCase() !== labelA.toLowerCase())) parts.push(labelB);
+var label = parts.join(' - ');
+return build(dx, kind, pct, label);
       }
       // If "Scalp ..." part exists but regex failed, leave text untouched to avoid data loss
       if (/Scalp\s+(improvement|worsening)/i.test(txt)) return null;
